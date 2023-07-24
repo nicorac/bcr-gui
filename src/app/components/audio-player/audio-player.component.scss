@@ -1,0 +1,15 @@
+:host {
+  display: flex;
+  align-items: center;
+  gap: 1.2em;
+  // padding: .3em 1em;
+}
+
+.buttons {
+  font-size: 2em;
+  line-height: 0;
+}
+
+.progress {
+  width: 100%;
+}

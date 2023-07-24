@@ -1,0 +1,46 @@
+<app-header />
+
+<ion-content id="main-content" class="main ion-padding">
+
+  <div class="left-right-container main-item">
+
+    <div>
+      <div class="title">{{ version.appName }}</div>
+      <p>BCR-GUI is a companion app for <a href="https://github.com/chenxiaolong/BCR">BCR</a> (Basic Call Recorder) to ease management of its recordings database</p>
+    </div>
+
+    <img src="/assets/icons/icon-rounded.svg" style="width: 64px; aspect-ratio: 1;">
+
+  </div>
+
+  <div class="item">
+    <ion-label class="ion-text-wrap">
+      <h2>Version</h2>
+      <p>{{ version.version }}</p>
+    </ion-label>
+  </div>
+
+  <div class="item">
+    <ion-label class="ion-text-wrap">
+      <h2>Copyright</h2>
+      <p>{{ version.copyright }} (<a href="{{ version.website }}">{{ version.website }}</a>)</p>
+    </ion-label>
+  </div>
+
+  <div class="item">
+    <ion-label class="ion-text-wrap">
+      <h2>Source code</h2>
+      <p>GitHub (<a href="{{ version.sources }}">{{ version.sources }}</a>)</p>
+    </ion-label>
+  </div>
+
+  <div class="item">
+    <ion-label class="ion-text-wrap">
+      <h2>Attributions</h2>
+      <p>
+        Call icons by <a href="https://freesvg.org/1547046949" target="_blank">FreeSVG (public domain icons)</a>
+      </p>
+    </ion-label>
+  </div>
+
+</ion-content>

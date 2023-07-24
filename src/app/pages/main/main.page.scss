@@ -1,0 +1,49 @@
+.title {
+  font-size: 14pt;
+  line-height: 16pt;
+  display: flex;
+  justify-content: space-between;
+}
+
+.call-direction-icon {
+  height: 16pt;
+  aspect-ratio: 1;
+}
+
+.items {
+  padding: 0 0 2em 0;
+  background: var(--ion-background-color);
+}
+
+.item {
+  border: 1px solid var(--ion-color-step-400);
+  border-radius: .8em;
+  box-shadow: 0 0 .2em var(--ion-color-step-800);
+  margin-bottom: 1em;
+
+  &.selected {
+    border-color: var(--ion-color-step-800);
+    box-shadow: 0 0 1em var(--ion-color-step-800);
+  }
+
+  .content {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+  }
+
+  .player {
+    border-radius: .6em;
+  }
+
+  .actions {
+    display: flex;
+    gap: 1em;
+    justify-content: flex-end;
+  }
+
+  .action {
+    font-size: 2em;
+    line-height: 2em;
+  }
+}

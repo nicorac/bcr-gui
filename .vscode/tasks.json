@@ -1,0 +1,37 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Ionic run (ext device)",
+      "type": "shell",
+      "command": "ionic",
+      "args": [ "cap", "run", "android", "--livereload", "--external"],
+      "isBackground": true,
+      "options": {
+        "cwd": "${workspaceFolder}",
+      },
+      "presentation": {
+        "focus": true,
+        "reveal": "always",
+        "echo": true,
+        "panel": "shared",
+      },
+    },
+    {
+      "label": "Ionic serve (localhost)",
+      "type": "shell",
+      "command": "ionic",
+      "args": [ "serve", "--port=8100", "--host=localhost"],
+      "isBackground": true,
+      "options": {
+        "cwd": "${workspaceFolder}",
+      },
+      "presentation": {
+        "focus": true,
+        "reveal": "always",
+        "echo": true,
+        "panel": "shared",
+      },
+    }
+  ]
+}

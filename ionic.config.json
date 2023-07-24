@@ -1,0 +1,7 @@
+{
+  "name": "bcrgui",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}

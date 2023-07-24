@@ -1,0 +1,79 @@
+<app-header />
+
+<ion-content id="main-content" class="ion-padding">
+
+  <!-- refresh FAB button -->
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button (click)="refreshList()" class="fab" [disabled]="recordingsService.isRefreshing | async">
+      <ion-icon name="refresh"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+  <!-- recordings list -->
+  <ion-list class="items" lines="full">
+
+    <!-- recording list item -->
+    <ion-card *ngFor="let item of recordingsService.recordings | async"
+      class="item"
+      [class.selected]="item === selectedItem"
+      (click)="onItemClick(item)"
+    >
+      <ion-card-header>
+        <ion-card-title class="title">
+          {{ item.opName }}
+          <img class="call-direction-icon"
+            [src]="item?.direction === 'out' ? 'assets/icons/call-incoming.svg' : 'assets/icons/call-outgoing.svg'"
+          >
+        </ion-card-title>
+        <ion-card-subtitle class="left-right-container">
+          <div>{{ item?.date | date:'medium' }}</div>
+          <div *ngIf="item.duration">{{ item.duration | toHms }}</div>
+        </ion-card-subtitle>
+      </ion-card-header>
+
+      <ion-card-content *ngIf="item === selectedItem" class="content">
+
+        <!-- details -->
+        <div class="details">
+          <p *ngIf="item.opName !== item.opNumber">Number: {{ item.opNumber }}</p>
+          <p>Type: {{ item.mimeType }}</p>
+          <p>Size: {{ item.filesize | filesize }}</p>
+          <p *ngIf="!item.hasMetadata"><i>Missing .json metadata file!</i></p>
+        </div>
+
+        <!-- audio player -->
+        <app-audio-player class="player" [recording]="item" />
+
+        <!-- action buttons -->
+        <div class="actions">
+
+          <!-- share -->
+          <ion-icon name="pencil"
+            class="action"
+            [class.disabled]="true"
+            (click)="onActionNotImplemented(item)"
+          />
+
+          <!-- share -->
+          <ion-icon name="share-social"
+            class="action"
+            [class.disabled]="false"
+            (click)="onActionNotImplemented(item)"
+          />
+
+          <!-- delete -->
+          <ion-icon name="trash"
+            class="action"
+            [class.disabled]="true"
+            (click)="onActionNotImplemented(item)"
+          />
+
+        </div>
+
+      </ion-card-content>
+
+    </ion-card>
+
+  </ion-list>
+
+</ion-content>

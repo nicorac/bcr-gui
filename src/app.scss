@@ -1,0 +1,29 @@
+:root {
+  --app-main-color: #43a047;
+  --ion-color-primary: var(--app-main-color);
+  --ion-color-primary-rgb: 67, 160, 71;
+  --ion-item-background: #ffffff;
+  --ion-overlay-background-color: #ffffff;  // used by alerts...
+}
+
+ion-toolbar {
+  --color: #ffffff;
+  --ion-background-color: var(--app-main-color);
+}
+
+ion-menu {
+  --ion-background-color: var(--ion-color-step-800);  // menu background
+  --ion-item-background: var(--ion-background-color); // menu items background
+  --ion-item-color: #ffffff;              // menu items text
+  --ion-text-color-rgb: rgb(255,255,255); // menu icons
+}
+
+.left-right-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+ion-icon.disabled {
+  opacity: .5;
+  pointer-events: none;
+}

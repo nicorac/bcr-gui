@@ -1,0 +1,20 @@
+<app-header />
+
+<ion-content id="main-content" class="ion-padding">
+
+  <ion-list class="config-items" lines="none">
+
+    <ion-item-divider>
+      <h1>Recordings</h1>
+    </ion-item-divider>
+
+    <ion-item>
+      <ion-label (click)="selectRecordingsDirectory()">
+        <h2>BCR recordings directory</h2>
+        <p class="ion-text-wrap">{{ settings.recordingsDirectoryUri ? settings.recordingsDirectoryUri : 'Click here to select BCR recordings directory...' }}</p>
+      </ion-label>
+    </ion-item>
+
+  </ion-list>
+
+</ion-content>

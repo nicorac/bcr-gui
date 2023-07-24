@@ -1,0 +1,11 @@
+.config-items {
+  padding: 0;
+
+  > ion-item {
+    margin-bottom: 1em;
+  }
+
+  > ion-item-divider {
+    color: #000000;
+  }
+}

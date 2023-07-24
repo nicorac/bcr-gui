@@ -1,0 +1,19 @@
+<ion-icon
+  class="buttons"
+  color="primary"
+  [class.disabled]="!ready"
+  [name]="status !== PlayerStatusEnum.Playing ? 'play' : 'pause'"
+  (click)="toggle()"
+/>
+
+<div class="progress">
+  <ion-range
+    label="{{ progress | toHms }} / {{ duration | toHms }}"
+    labelPlacement="end"
+    [disabled]="!ready"
+    [value]="progress"
+    [max]="duration"
+    (ionKnobMoveStart)="onIonKnobMoveStart($event)"
+    (ionKnobMoveEnd)="onIonKnobMoveEnd($event)"
+  />
+</div>

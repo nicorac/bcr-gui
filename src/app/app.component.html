@@ -1,0 +1,44 @@
+<ion-app>
+
+  <!-- app side menu -->
+  <ion-menu contentId="main-content" type="overlay">
+
+    <ion-header>
+      <ion-toolbar translucent>
+        <ion-title>Menu</ion-title>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content>
+
+      <ion-list lines="none">
+
+        <ion-menu-toggle autoHide="true">
+          <ion-item [routerLink]="AppRoutesEnum.Main" menuClose>
+            <ion-icon name="home-sharp" slot="start"></ion-icon>
+            <ion-label>Home</ion-label>
+          </ion-item>
+        </ion-menu-toggle>
+
+        <ion-menu-toggle autoHide="true">
+          <ion-item [routerLink]="AppRoutesEnum.Settings" menuClose>
+            <ion-icon name="options-sharp" slot="start"></ion-icon>
+            <ion-label>Settings</ion-label>
+          </ion-item>
+        </ion-menu-toggle>
+
+        <ion-menu-toggle autoHide="true">
+          <ion-item [routerLink]="AppRoutesEnum.About" menuClose>
+            <ion-icon name="information-circle-sharp" slot="start"></ion-icon>
+            <ion-label>About</ion-label>
+          </ion-item>
+        </ion-menu-toggle>
+
+      </ion-list>
+    </ion-content>
+  </ion-menu>
+
+  <!-- main content -->
+  <ion-router-outlet />
+
+</ion-app>

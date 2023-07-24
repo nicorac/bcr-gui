@@ -1,0 +1,21 @@
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: 2em;
+  --ion-padding: 2em;
+}
+
+.main-item {
+  gap: 1.5em;
+  padding-bottom: 1.5em;
+  align-items: flex-start;
+}
+
+.title {
+  font-size: 18pt;
+  font-weight: bold;
+}
+
+.item {
+  padding-bottom: 1em;
+}

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">BCR Gui</string>
+    <string name="title_activity_main">BCR Gui</string>
+    <string name="package_name">com.github.nicorac.bcrgui</string>
+    <string name="custom_url_scheme">com.github.nicorac.bcrgui</string>
+</resources>

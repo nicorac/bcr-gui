@@ -1,0 +1,10 @@
+{
+  "recommendations": [
+    "angular.ng-template",
+    "dbaeumer.vscode-eslint",
+    "ionic.ionic",
+    "infinity1207.angular2-switcher",
+    "mike-co.import-sorter",
+    "mpotthoff.vscode-android-webview-debug"
+  ]
+}
