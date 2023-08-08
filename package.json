@@ -1,13 +1,13 @@
 {
   "name": "bcrgui",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "author": "Claudio Nicora",
-  "homepage": "https://coolsoft.altervista.org/",
+  "homepage": "https://github.com/nicorac/bcr-gui",
   "scripts": {
     "ng": "ng",
     "start": "ionic serve",
     "build": "ng build",
-    "build:android": "ionic capacitor build android --prod && echo 'When Android studio opens, build APK by pressing F7...",
+    "build:android": "ionic capacitor build android --no-open --prod && cd android && gradlew assembleRelease && cd ..",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint",
