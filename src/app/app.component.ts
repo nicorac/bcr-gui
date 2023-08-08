@@ -17,12 +17,15 @@ export class AppComponent {
     private platform: Platform,
     @Optional() private routerOutlet?: IonRouterOutlet
   ) {
+
+    // customize Back button management
     this.platform.backButton.subscribeWithPriority(-1, () => {
       if (!this.routerOutlet?.canGoBack()) {
         App.exitApp();
       }
     });
 
+    // set Android status bar color
     this.platform.ready().then(() => {
       StatusBar.setBackgroundColor({ color: '#43a047' });
     });
