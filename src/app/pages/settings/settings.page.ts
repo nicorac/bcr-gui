@@ -1,3 +1,4 @@
+import { SortMode } from 'src/app/pipes/recordings-sort.pipe';
 import { RecordingsService } from 'src/app/services/recordings.service';
 import { Component } from '@angular/core';
 import { SettingsService } from '../../services/settings.service';
@@ -8,6 +9,8 @@ import { SettingsService } from '../../services/settings.service';
   styleUrls: ['./settings.page.scss'],
 })
 export class SettingsPage {
+
+  SortMode = SortMode;
 
   constructor(
     protected settings: SettingsService,

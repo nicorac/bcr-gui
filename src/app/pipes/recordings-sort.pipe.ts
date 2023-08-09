@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { Recording } from '../models/Recording';
+import { Recording } from '../models/recording';
 
 export enum SortMode {
   Date_ASC = 10,      // call date

@@ -3,7 +3,7 @@ import { AndroidSAF } from 'src/plugins/capacitorandroidsaf';
 import { Injectable } from '@angular/core';
 import { AlertController, IonicSafeString } from '@ionic/angular';
 import { BcrRecordingMetadata } from '../models/BcrRecordingMetadata';
-import { Recording } from '../models/Recording';
+import { Recording } from '../models/recording';
 import { stripExtension } from '../utils/filesystem';
 import { SettingsService } from './settings.service';
 

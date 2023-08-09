@@ -5,7 +5,7 @@
   <ion-list class="config-items" lines="none">
 
     <ion-item-divider>
-      <h1>Recordings</h1>
+      <h4>General</h4>
     </ion-item-divider>
 
     <ion-item>
@@ -13,6 +13,19 @@
         <h2>BCR recordings directory</h2>
         <p class="ion-text-wrap">{{ settings.recordingsDirectoryUri ? settings.recordingsDirectoryUri : 'Click here to select BCR recordings directory...' }}</p>
       </ion-label>
+    </ion-item>
+
+    <ion-item-divider>
+      <h4>Recordings</h4>
+    </ion-item-divider>
+
+    <ion-item>
+      <ion-select label="List sort mode" [(ngModel)]="settings.recordingsSortMode" placeholder="Make a Selection">
+        <ion-select-option [value]="SortMode.Date_ASC">Date (ascending)</ion-select-option>
+        <ion-select-option [value]="SortMode.Date_DESC">Date (descending)</ion-select-option>
+        <ion-select-option [value]="SortMode.Duration_ASC">Duration (ascending)</ion-select-option>
+        <ion-select-option [value]="SortMode.Duration_DESC">Duration (descending)</ion-select-option>
+      </ion-select>
     </ion-item>
 
   </ion-list>

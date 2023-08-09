@@ -3,6 +3,7 @@ import localeIt from '@angular/common/locales/it';
 import { Injectable } from '@angular/core';
 import { Device } from '@capacitor/device';
 import { Preferences } from '@capacitor/preferences';
+import { SortMode } from '../pipes/recordings-sort.pipe';
 
 @Injectable({
   providedIn: 'root'
@@ -28,6 +29,12 @@ export class SettingsService {
     'audio/ogg',
     'audio/x-wav',
   ];
+
+  /**
+   * Recordings list sort mode
+   */
+  public recordingsSortMode: SortMode = SortMode.Date_DESC;
+
 
   constructor() { }
 

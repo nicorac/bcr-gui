@@ -1,5 +1,6 @@
-import { Recording } from 'src/app/models/Recording';
+import { Recording } from 'src/app/models/recording';
 import { RecordingsService } from 'src/app/services/recordings.service';
+import { SettingsService } from 'src/app/services/settings.service';
 import { bringIntoView } from 'src/app/utils/scroll';
 import { Component, OnInit } from '@angular/core';
 import { AlertController } from '@ionic/angular';
@@ -18,6 +19,7 @@ export class MainPage implements OnInit {
   constructor(
     private alertController: AlertController,
     protected recordingsService: RecordingsService,
+    protected settings: SettingsService,
   ) { }
 
   ngOnInit(): void {

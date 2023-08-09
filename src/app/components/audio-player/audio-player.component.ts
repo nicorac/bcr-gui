@@ -1,6 +1,6 @@
 
 import { Subscription } from 'rxjs';
-import { Recording } from 'src/app/models/Recording';
+import { Recording } from 'src/app/models/recording';
 import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { NativeAudio } from '@capacitor-community/native-audio';
 import { AlertController, Platform, RangeCustomEvent } from '@ionic/angular';
