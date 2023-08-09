@@ -14,6 +14,7 @@ import { SettingsPage } from './pages/settings/settings.page';
 import { FilesizePipe } from './pipes/filesize.pipe';
 import { ToHmsPipe } from './pipes/to-hms.pipe';
 import { SettingsService } from './services/settings.service';
+import { RecordingsSortPipe } from './pipes/recordings-sort.pipe';
 
 @NgModule({
   declarations: [
@@ -25,6 +26,7 @@ import { SettingsService } from './services/settings.service';
     MainPage,
     SettingsPage,
     ToHmsPipe,
+    RecordingsSortPipe,
   ],
   imports: [
     AppRoutingModule,

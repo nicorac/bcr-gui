@@ -13,7 +13,7 @@
   <ion-list class="items" lines="full">
 
     <!-- recording list item -->
-    <ion-card *ngFor="let item of recordingsService.recordings | async"
+    <ion-card *ngFor="let item of recordingsService.recordings | async | recordingsSort"
       class="item"
       [class.selected]="item === selectedItem"
       (click)="onItemClick(item)"
