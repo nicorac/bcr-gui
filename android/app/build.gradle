@@ -34,11 +34,27 @@ android {
         }
     }
     buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
-        }
+      release {
+        minifyEnabled false
+        proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        signingConfig signingConfigs.release
+      }
+    }
+    sourceSets {
+      main {
+        manifest.srcFile 'src/main/AndroidManifest.xml'
+        res.srcDirs = ['src/main/res']
+      }
+
+      debug {
+        manifest.srcFile 'src/main/debug/AndroidManifest.xml'
+        //res.srcDirs = ['src/main/debug/res']
+      }
+
+      //  release {
+      //    manifest.srcFile 'src/main/release/AndroidManifest.xml'
+      //    res.srcDirs = ['src/main/release/res']
+      //  }
     }
 }
 
