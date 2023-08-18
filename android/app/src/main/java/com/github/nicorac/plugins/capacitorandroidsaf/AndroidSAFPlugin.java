@@ -26,6 +26,11 @@ import java.util.Objects;
 @CapacitorPlugin(name = "AndroidSAF")
 public class AndroidSAFPlugin extends Plugin {
 
+  private static final String ERR_CANCELED = "ERR_CANCELED";
+  private static final String ERR_INVALID_URI = "ERR_INVALID_URI";
+  private static final String ERR_NOT_FOUND = "ERR_NOT_FOUND";
+  private static final String ERR_IO_EXCEPTION = "ERR_IO_EXCEPTION";
+
   /**
    * Allow client to select a directory and get access to contained files and subfolders
    */
@@ -36,7 +41,7 @@ public class AndroidSAFPlugin extends Plugin {
     String initialUri = call.getString("initialUri", "");
 
     // open folder selector
-    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+    var intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
     if (initialUri != "") {
       intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, initialUri);
     }
@@ -54,7 +59,7 @@ public class AndroidSAFPlugin extends Plugin {
     }
 
     if (result.getResultCode() != AppCompatActivity.RESULT_OK) {
-      call.reject(result.toString());
+      call.reject(result.toString(), ERR_CANCELED);
       return;
     }
 
@@ -67,7 +72,7 @@ public class AndroidSAFPlugin extends Plugin {
     getContext().getContentResolver().takePersistableUriPermission(uri, takeFlags);
 
     // Do something with the result data
-    JSObject ret = new JSObject();
+    var ret = new JSObject();
     ret.put("selectedUri", intent.getDataString());
     call.resolve(ret);
 
@@ -82,7 +87,7 @@ public class AndroidSAFPlugin extends Plugin {
     // get input arguments
     String uriString = call.getString("uri", "");
     if (uriString == "") {
-      call.reject("Invalid uri");
+      call.reject("Invalid uri", ERR_INVALID_URI);
       return;
     }
 
@@ -90,7 +95,7 @@ public class AndroidSAFPlugin extends Plugin {
     var uri = Uri.parse(uriString);
     var folder = DocumentFile.fromTreeUri(getContext(), uri);
     if (!folder.exists()) {
-      call.reject("Invalid uri");
+      call.reject("Folder not found", ERR_NOT_FOUND);
       return;
     }
 
@@ -110,7 +115,7 @@ public class AndroidSAFPlugin extends Plugin {
     }
 
     // return
-    JSObject ret = new JSObject();
+    var ret = new JSObject();
     ret.put("items", items);
     call.resolve(ret);
 
@@ -121,7 +126,7 @@ public class AndroidSAFPlugin extends Plugin {
    * Load and return file content
    *
    * @param call
-   *  call.fileUri: URI of the file to read
+   *  call.uri: URI of the file to read
    */
   @PluginMethod()
   public void readFile(PluginCall call) {
@@ -129,7 +134,7 @@ public class AndroidSAFPlugin extends Plugin {
     // get input arguments
     String fileUri = call.getString("uri", null);
     if (fileUri == null) {
-      call.reject("Invalid or missing uri");
+      call.reject("Invalid or missing uri", ERR_INVALID_URI);
       return;
     }
 
@@ -137,31 +142,66 @@ public class AndroidSAFPlugin extends Plugin {
     var uri = Uri.parse(fileUri);
     var file = DocumentFile.fromSingleUri(getContext(), uri);
     if (!file.exists()) {
-      call.reject("File does not exist");
+      call.reject("File not found", ERR_NOT_FOUND);
       return;
     }
 
     // load file content
-    StringBuilder stringBuilder = new StringBuilder();
+    var stringBuilder = new StringBuilder();
     try (InputStream inputStream = getContext().getContentResolver().openInputStream(uri);
-         BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(inputStream)))) {
+         var reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(inputStream)))) {
       String line;
       while ((line = reader.readLine()) != null) {
         stringBuilder.append(line);
       }
     }
     catch (FileNotFoundException e) {
-      call.reject(e.toString());
+      call.reject(e.toString(), ERR_NOT_FOUND);
       return;
     } catch (IOException e) {
-      call.reject(e.toString());
+      call.reject(e.toString(), ERR_IO_EXCEPTION);
       return;
     }
 
     // return file content
-    JSObject ret = new JSObject();
+    var ret = new JSObject();
     ret.put("content", stringBuilder.toString());
     call.resolve(ret);
+
+  }
+
+  /**
+   * Delete file
+   *
+   * @param call
+   *  call.uri: URI of the file to delete
+   */
+  @PluginMethod()
+  public void deleteFile(PluginCall call) {
+
+    // get input arguments
+    String fileUri = call.getString("uri", null);
+    if (fileUri == null) {
+      call.reject("Invalid or missing uri", ERR_INVALID_URI);
+      return;
+    }
+
+    // Get a DocumentFile from the given TreeUri
+    var uri = Uri.parse(fileUri);
+    var file = DocumentFile.fromSingleUri(getContext(), uri);
+    if (!file.exists()) {
+      call.reject("File not found", ERR_NOT_FOUND);
+      return;
+    }
+
+    // delete file
+    var res = file.delete();
+    if (res) {
+      call.resolve();
+    }
+    else {
+      call.reject("Error deleting file", ERR_IO_EXCEPTION);
+    }
 
   }
 

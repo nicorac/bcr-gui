@@ -16,6 +16,24 @@ export interface AndroidSAFPlugin {
    */
   readFile(options: ReadFileOptions): Promise<{ content: string }>;
 
+  /**
+   * Delete a file
+   *
+   * @param options DeleteFileOptions
+   * @returns boolean true on success
+   */
+  deleteFile(options: DeleteFileOptions): Promise<boolean>;
+
+}
+
+/**
+ * Error codes returned on failures
+ */
+export enum SAFErrorCode {
+  ERR_CANCELED = "ERR_CANCELED",
+  ERR_INVALID_URI = "ERR_INVALID_URI",
+  ERR_NOT_FOUND = "ERR_NOT_FOUND",
+  ERR_IO_EXCEPTION = "ERR_IO_EXCEPTION",
 }
 
 interface BaseFilesOptions {
@@ -26,6 +44,8 @@ interface BaseFilesOptions {
 export interface ListFilesOptions extends BaseFilesOptions { }
 
 export interface ReadFileOptions extends BaseFilesOptions { }
+
+export interface DeleteFileOptions extends BaseFilesOptions { }
 
 export interface IDocumentFile extends BaseFilesOptions {
   name: string,     // file/directory name
