@@ -2,9 +2,9 @@ import { BehaviorSubject } from 'rxjs';
 import { AndroidSAF } from 'src/plugins/capacitorandroidsaf';
 import { Injectable } from '@angular/core';
 import { AlertController, IonicSafeString } from '@ionic/angular';
-import { BcrRecordingMetadata } from '../models/BcrRecordingMetadata';
 import { Recording } from '../models/recording';
-import { stripExtension } from '../utils/filesystem';
+import { replaceExtension } from '../utils/filesystem';
+import { MessageBoxService } from './message-box.service';
 import { SettingsService } from './settings.service';
 
 @Injectable({
@@ -20,6 +20,7 @@ export class RecordingsService {
 
   constructor(
     private alertController: AlertController,
+    private mbs: MessageBoxService,
     protected settings: SettingsService,
   ) { }
 
@@ -65,25 +66,15 @@ export class RecordingsService {
 
       // map each audio file to a Recording class based on it and its corresponding (optional) metadata file
       const recordings: Recording[] = [];
-      for (const i of audioFiles) {
+      for (const file of audioFiles) {
 
         // test if current file has a corresponding metadata .json file
-        const metadataFileName = stripExtension(i.name) + '.json';
+        const metadataFileName = replaceExtension(file.name, '.json');
         const metadataFile = allFiles.find(i => i.name === metadataFileName);
-        let metadata: BcrRecordingMetadata | undefined;
 
-        // load and parse metadata json file content
-        if (metadataFile) {
-          const { content: metadataFileContent } = await AndroidSAF.readFile({ uri: metadataFile.uri });
-          try {
-            metadata = JSON.parse(metadataFileContent);
-          } catch (error) {
-            metadata = undefined;
-            console.error(error);
-          }
-        }
         // add to new files
-        recordings.push(Recording.createInstance(i, metadata));
+        recordings.push(await Recording.createInstance(file, metadataFile));
+
       }
 
       // update collection
@@ -114,5 +105,27 @@ export class RecordingsService {
 
   }
 
+  /**
+   * Deletes the given recording file and its optional JSON metadata
+   */
+  async deleteRecording(item: Recording) {
+
+    // shared delete function
+    const deleteFileFn = async (uri: string) => {
+      try {
+        await AndroidSAF.deleteFile({ uri });
+      }
+      catch(err) {
+        this.mbs.showError({
+          message: 'There was an error while deleting item: ' + uri,
+          error: err,
+        });
+      }
+    }
+
+    item && await deleteFileFn(item.file.uri);
+    item?.metadataFile && await deleteFileFn(item.metadataFile.uri);
+
+  }
 
 }

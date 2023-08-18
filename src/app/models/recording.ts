@@ -1,5 +1,4 @@
-import { IDocumentFile } from 'src/plugins/capacitorandroidsaf';
-
+import { AndroidSAF, IDocumentFile } from 'src/plugins/capacitorandroidsaf';
 import { stripExtension } from '../utils/filesystem';
 import { BcrRecordingMetadata } from './BcrRecordingMetadata';
 
@@ -8,8 +7,9 @@ import { BcrRecordingMetadata } from './BcrRecordingMetadata';
  */
 export class Recording {
 
-  // original reference to underlying Android DocumentFile
+  // original reference to underlying Android DocumentFile + optional JSON metadata
   file!: IDocumentFile;
+  metadataFile?: IDocumentFile;
 
   // recording has associated json metadata file
   hasMetadata = false;
@@ -46,14 +46,15 @@ export class Recording {
   private constructor() {}
 
   /**
-   * Create a new Recording instance
+   * Create a new Recording instance from the given audio file and optional metadata file
    */
-  static createInstance(file: IDocumentFile, metadata?: Partial<BcrRecordingMetadata>) {
+  static async createInstance(file: IDocumentFile, metadataFile?: IDocumentFile) {
 
     const res = new Recording();
 
-    // save file reference
+    // save files references
     res.file = file;
+    res.metadataFile = metadataFile;
 
     // save Android file props
     res.filesize = file.size;
@@ -63,8 +64,17 @@ export class Recording {
     res.opNumber = file.name;
 
     // if JSON metadata props are not available, try to extract them from filename
-    if (metadata) {
-      res.hasMetadata = true;
+    let metadata: Partial<BcrRecordingMetadata> = {};
+    if (metadataFile) {
+      const { content: metadataFileContent } = await AndroidSAF.readFile({ uri: metadataFile.uri });
+      try {
+        metadata = JSON.parse(metadataFileContent);
+        res.hasMetadata = true;
+      }
+      catch (error) {
+        res.hasMetadata = false;
+        console.error(error);
+      }
     }
     else {
       metadata = Recording.extractMetadataFromFilename(file.name);
@@ -86,7 +96,6 @@ export class Recording {
     }
 
     return res;
-
   }
 
   /**

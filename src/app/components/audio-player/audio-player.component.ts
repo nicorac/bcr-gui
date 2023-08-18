@@ -136,7 +136,7 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
   /**
    * Start a JS interval to update player status
    */
-  startUpdateInterval() {
+  private startUpdateInterval() {
     this.stopUpdateInterval();
     this.updateInterval = setInterval(() => {
       NativeAudio.getCurrentTime({ assetId: this.assetId }).then(res => {
@@ -150,7 +150,7 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
   /**
    * Clear update interval
    */
-  stopUpdateInterval() {
+  private stopUpdateInterval() {
     if (this.updateInterval) {
       clearInterval(this.updateInterval);
     }
@@ -187,7 +187,6 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
     if (position === undefined) {
       position = this.progress;
     }
-    console.warn("PLAY");
     return NativeAudio.play({ assetId: this.assetId, time: position })
       .then(_ => {
         this.status = PlayerStatusEnum.Playing;
@@ -201,7 +200,7 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
    */
   async pause() {
     if (this.status !== PlayerStatusEnum.Playing) {
-      throw new Error('Not playing...');
+      return;
     }
     this.stopUpdateInterval();
     await NativeAudio.pause({ assetId: this.assetId })
@@ -212,14 +211,14 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
   /**
    * User started dragging the position knob
    */
-  onIonKnobMoveStart(_ev: Event) {
+  protected onIonKnobMoveStart(_ev: Event) {
     this.isMovingKnob = true;
   }
 
   /**
    * User released the position knob
    */
-  async onIonKnobMoveEnd(ev: Event) {
+  protected async onIonKnobMoveEnd(ev: Event) {
     const newProgress = (ev as RangeCustomEvent).detail.value as number;
     this.isMovingKnob = false;
     this.progress = newProgress;

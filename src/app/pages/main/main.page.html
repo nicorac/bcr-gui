@@ -42,30 +42,28 @@
         </div>
 
         <!-- audio player -->
-        <app-audio-player class="player" [recording]="item" />
+        <app-audio-player #audioPlayer class="player" [recording]="item" />
 
         <!-- action buttons -->
         <div class="actions">
 
-          <!-- share -->
-          <ion-icon name="pencil"
+          <!-- edit -->
+          <!-- <ion-icon name="pencil"
             class="action"
             [class.disabled]="true"
             (click)="onActionNotImplemented(item)"
-          />
+          /> -->
 
           <!-- share -->
-          <ion-icon name="share-social"
+          <!-- <ion-icon name="share-social"
             class="action"
-            [class.disabled]="false"
             (click)="onActionNotImplemented(item)"
-          />
+          /> -->
 
           <!-- delete -->
           <ion-icon name="trash"
             class="action"
-            [class.disabled]="true"
-            (click)="onActionNotImplemented(item)"
+            (click)="deleteRecording(item, audioPlayer)"
           />
 
         </div>

@@ -1,9 +1,10 @@
+import { AudioPlayerComponent } from 'src/app/components/audio-player/audio-player.component';
 import { Recording } from 'src/app/models/recording';
+import { MessageBoxService } from 'src/app/services/message-box.service';
 import { RecordingsService } from 'src/app/services/recordings.service';
 import { SettingsService } from 'src/app/services/settings.service';
 import { bringIntoView } from 'src/app/utils/scroll';
 import { Component, OnInit } from '@angular/core';
-import { AlertController } from '@ionic/angular';
 import version from '../../version';
 
 @Component({
@@ -17,7 +18,7 @@ export class MainPage implements OnInit {
   selectedItem?: Recording;
 
   constructor(
-    private alertController: AlertController,
+    private mbs: MessageBoxService,
     protected recordingsService: RecordingsService,
     protected settings: SettingsService,
   ) { }
@@ -46,13 +47,26 @@ export class MainPage implements OnInit {
 
   }
 
-  async onActionNotImplemented(item: Recording) {
-    const alert = await this.alertController.create({
-      header: 'Not yet implemented',
-      message: 'This action is not yet implemented...',
-      buttons: [ 'OK' ],
+  /**
+   * Deletes the given recording file (and its companion JSON metadata)
+   */
+  async deleteRecording(item: Recording, player: AudioPlayerComponent) {
+
+    // stop player
+    player.pause();
+
+    // show confirmation alert
+    await this.mbs.showConfirm({
+      header: 'Delete recording?',
+      message: 'Do you really want to delete this recording?',
+      cancelText: 'Cancel',
+      confirmText: 'Delete',
+      onConfirm: () => {
+        this.recordingsService.deleteRecording(item);
+        this.recordingsService.refreshContent();
+      }
     });
-    await alert.present();
+
   }
 
 }
