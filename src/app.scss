@@ -27,3 +27,11 @@ ion-icon.disabled {
   opacity: .5;
   pointer-events: none;
 }
+
+// MessageBox customizations
+ion-alert.msgbox-error {
+  .alert-head {
+    padding-left: 4em;
+    background: no-repeat 1em center / 2em url('assets/icons/alert-circle-outline-red.svg') ;
+  }
+}
