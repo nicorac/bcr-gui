@@ -49,10 +49,10 @@ export interface DeleteFileOptions extends BaseFilesOptions { }
 
 export interface IDocumentFile extends BaseFilesOptions {
   name: string,     // file/directory name
+  uri: string,      // file URI
   type: string,     // MIME type
   isDirectory: boolean,
-  isFile: boolean,
   isVirtual: boolean,
   size: number,
-  lastModified: string|number,
+  lastModified: number,
 }

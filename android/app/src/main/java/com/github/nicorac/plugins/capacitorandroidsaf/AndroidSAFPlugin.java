@@ -1,6 +1,8 @@
 package com.github.nicorac.plugins.capacitorandroidsaf;
 
+import android.content.ContentResolver;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.provider.DocumentsContract;
 
@@ -99,28 +101,17 @@ public class AndroidSAFPlugin extends Plugin {
       return;
     }
 
-    // compose result array
-    var items = new JSArray();
-    for (var item : folder.listFiles()) {
-      JSObject child = new JSObject();
-      child.put("name", item.getName());
-      child.put("uri", item.getUri().toString());
-      child.put("type", item.getType());
-      child.put("isDirectory", item.isDirectory());
-      child.put("isFile", item.isFile());
-      child.put("isVirtual", item.isVirtual());
-      child.put("size", item.length());
-      child.put("lastModified", item.lastModified());
-      items.put(child);
+    // return files list
+    try {
+      var ret = new JSObject();
+      ret.put("items", this.listFileFaster(folder.getUri()));
+      call.resolve(ret);
+    }
+    catch (Exception e) {
+      call.reject("Error retrieving files list", ERR_IO_EXCEPTION, e);
     }
 
-    // return
-    var ret = new JSObject();
-    ret.put("items", items);
-    call.resolve(ret);
-
   }
-
 
   /**
    * Load and return file content
@@ -203,6 +194,55 @@ public class AndroidSAFPlugin extends Plugin {
       call.reject("Error deleting file", ERR_IO_EXCEPTION);
     }
 
+  }
+
+  /**
+   * More efficient method to retrieve directory content, avoiding calls to
+   * slow DocumentFile methods like .getDisplayName()
+   *
+   * @see https://stackoverflow.com/questions/42186820/why-is-documentfile-so-slow-and-what-should-i-use-instead
+   *
+   * @param folderUri URI of the folder to be scanned
+   *
+   * @return JSArray of JSObject items, ready to be returned to JS
+   */
+  private JSArray listFileFaster(Uri folderUri) {
+
+    final ContentResolver resolver = getContext().getContentResolver();
+    final Uri childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(folderUri, DocumentsContract.getDocumentId(folderUri));
+    final var result = new JSArray();
+    Cursor c;
+
+    // load all of the needed data in a single shot
+    c = resolver.query(
+      childrenUri,
+      new String[] {
+        DocumentsContract.Document.COLUMN_DOCUMENT_ID,    // 0
+        DocumentsContract.Document.COLUMN_DISPLAY_NAME,   // 1
+        DocumentsContract.Document.COLUMN_MIME_TYPE,      // 2
+        DocumentsContract.Document.COLUMN_FLAGS,          // 3
+        DocumentsContract.Document.COLUMN_SIZE,           // 4
+        DocumentsContract.Document.COLUMN_LAST_MODIFIED,  // 5
+      }, null, null, null);
+    while (c.moveToNext()) {
+      final var item = new JSObject();
+      final var documentId = c.getString(0);
+      final var mimeType = c.getString(2);
+      final var flags = c.getInt(3);
+
+      item.put("name", c.getString(1));
+      item.put("uri", DocumentsContract.buildDocumentUriUsingTree(folderUri, documentId).toString());
+      item.put("type", mimeType);
+      item.put("isDirectory", mimeType == DocumentsContract.Document.MIME_TYPE_DIR);
+      item.put("isVirtual", flags & DocumentsContract.Document.FLAG_VIRTUAL_DOCUMENT);
+      item.put("size", c.getLong(4));
+      item.put("lastModified", c.getLong(5));
+
+      // append to result
+      result.put(item);
+    }
+
+    return result;
   }
 
 }
