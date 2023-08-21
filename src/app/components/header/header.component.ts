@@ -1,3 +1,4 @@
+import { RecordingsService } from 'src/app/services/recordings.service';
 import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
@@ -10,7 +11,10 @@ export class HeaderComponent implements OnInit {
 
   @Input() title?: string = undefined;
 
-  constructor(private readonly route: ActivatedRoute)
+  constructor(
+    private readonly route: ActivatedRoute,
+    protected recordingsService: RecordingsService,
+  )
   { }
 
   ngOnInit(): void {

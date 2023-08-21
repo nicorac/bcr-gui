@@ -1,10 +1,10 @@
 <app-header />
 
-<ion-content id="main-content" class="ion-padding">
+<ion-content id="main-content" class="ion-padding" [class.disabled]="recordingsService.refreshProgress | async">
 
   <!-- refresh FAB button -->
   <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-    <ion-fab-button (click)="refreshList()" class="fab" [disabled]="recordingsService.isRefreshing | async">
+    <ion-fab-button (click)="refreshList()" class="fab">
       <ion-icon name="refresh"></ion-icon>
     </ion-fab-button>
   </ion-fab>

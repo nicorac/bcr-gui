@@ -15,8 +15,12 @@ export class RecordingsService {
   // recordings database
   public recordings = new BehaviorSubject<Recording[]>([]);
 
-  // status
-  public isRefreshing = new BehaviorSubject<boolean>(false);
+  /**
+   * Refresh status:
+   * value === 0    ==> no refresh running
+   * 0 < value <=1  ==> refresh progress (%)
+   */
+  public refreshProgress = new BehaviorSubject<number>(-1);
 
   constructor(
     private alertController: AlertController,
@@ -38,7 +42,7 @@ export class RecordingsService {
           Click <strong>OK</strong> and Android will show you the default folder-selector.
 
           Now select the recordings directory used by BCR and allow access to its content...`
-        .replace(/[\r\n]/g, '<br/>')),
+          .replace(/[\r\n]/g, '<br/>')),
         buttons: [
           'Cancel',
           {
@@ -46,45 +50,55 @@ export class RecordingsService {
             handler: () => this.selectRecordingsDirectory(),
           },
         ],
-        backdropDismiss​: false,
+        backdropDismiss: false,
       });
 
       await alert.present();
       return;
     }
 
-    this.isRefreshing.next(true);
+    this.refreshProgress.next(0.0000001); // immediately send a non-zero progress
     console.log("Reading files in folder:");
 
     try {
-      // keep files only
+      // keep files only (no directories)
       const allFiles = (await AndroidSAF.listFiles({ uri: this.settings.recordingsDirectoryUri }))
-        ?.items.filter(i => i.isFile);
+        ?.items.filter(i => !i.isDirectory);
 
-      // extract supported recordings audio files
+      // extract supported audio file types
       const audioFiles = allFiles.filter(i => this.settings.supportedTypes.includes(i.type));
 
-      // map each audio file to a Recording class based on it and its corresponding (optional) metadata file
+      // compose an array of Recording class instances based on
+      // each audio file and its corresponding (optional) metadata file
       const recordings: Recording[] = [];
-      for (const file of audioFiles) {
+      const count = audioFiles.length;
 
-        // test if current file has a corresponding metadata .json file
-        const metadataFileName = replaceExtension(file.name, '.json');
-        const metadataFile = allFiles.find(i => i.name === metadataFileName);
+      // no files?
+      if (count > 0) {
+        let i = 0;
+        for (const file of audioFiles) {
 
-        // add to new files
-        recordings.push(await Recording.createInstance(file, metadataFile));
+          // send progress update
+          this.refreshProgress.next(++i / count);
 
+          // test if current file has a corresponding metadata .json file
+          const metadataFileName = replaceExtension(file.name, '.json');
+          const metadataFile = allFiles.find(i => i.name === metadataFileName);
+
+          // add to result array
+          recordings.push(await Recording.createInstance(file, metadataFile));
+
+        }
       }
 
       // update collection
       this.recordings.next(recordings);
-      this.isRefreshing.next(false);
+      this.refreshProgress.next(0);
 
     }
     catch(err) {
       console.error(err);
-      this.isRefreshing.next(false);
+      this.refreshProgress.next(0);
     };
 
   }

@@ -1,10 +1,24 @@
 <ion-header>
+
   <ion-toolbar>
+
     <!-- menu button -->
     <ion-buttons slot="start">
-      <ion-menu-button auto-hide="false"></ion-menu-button>
+      <ion-menu-button auto-hide="false" />
     </ion-buttons>
+
     <!-- page title -->
     <ion-title>{{ title }}</ion-title>
+
+    <!-- load progressbar -->
+    <ng-container *ngIf="recordingsService.refreshProgress | async as value">
+      <ion-progress-bar
+        class="progress"
+        buffersss=".001"
+        [value]="value"
+      />
+    </ng-container>
+
   </ion-toolbar>
+
 </ion-header>
