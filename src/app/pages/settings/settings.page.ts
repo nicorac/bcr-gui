@@ -1,4 +1,5 @@
 import { SortMode } from 'src/app/pipes/recordings-sort.pipe';
+import { MessageBoxService } from 'src/app/services/message-box.service';
 import { RecordingsService } from 'src/app/services/recordings.service';
 import { Component } from '@angular/core';
 import { SettingsService } from '../../services/settings.service';
@@ -13,6 +14,7 @@ export class SettingsPage {
   SortMode = SortMode;
 
   constructor(
+    private mbs: MessageBoxService,
     protected settings: SettingsService,
     protected recordingsService: RecordingsService,
   ) { }
@@ -23,6 +25,16 @@ export class SettingsPage {
 
   selectRecordingsDirectory() {
     this.recordingsService.selectRecordingsDirectory();
+  }
+
+  clearCache() {
+    this.mbs.showConfirm({
+      header: 'Clear cache',
+      message: 'Do you really want to clear the cache and reload all recordings?',
+      onConfirm: () => {
+        this.recordingsService.refreshContent(true);
+      }
+    });
   }
 
 }

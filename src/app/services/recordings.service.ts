@@ -4,6 +4,7 @@ import { Injectable } from '@angular/core';
 import { AlertController, IonicSafeString } from '@ionic/angular';
 import { Recording } from '../models/recording';
 import { replaceExtension } from '../utils/filesystem';
+import { RecordingsCache } from '../utils/recordings-cache';
 import { MessageBoxService } from './message-box.service';
 import { SettingsService } from './settings.service';
 
@@ -20,45 +21,54 @@ export class RecordingsService {
    * value === 0    ==> no refresh running
    * 0 < value <=1  ==> refresh progress (%)
    */
-  public refreshProgress = new BehaviorSubject<number>(-1);
+  public refreshProgress = new BehaviorSubject<number>(0);
 
   constructor(
     private alertController: AlertController,
     private mbs: MessageBoxService,
     protected settings: SettingsService,
-  ) { }
+  ) {}
+
+  /**
+   * Initialize the recordings DB
+   */
+  async initialize() {
+
+    // read DB from cache
+    const cache = await RecordingsCache.load();
+    this.recordings.next(cache);
+
+  }
 
   /**
    * Refresh recordings list
    */
-  async refreshContent() {
+  async refreshContent(clearCache: boolean = false) {
 
-    if (!this.settings.recordingsDirectoryUri) {
-      const alert = await this.alertController.create({
-        header: 'Recordings directory not selected',
-        message: new IonicSafeString(
-          `This app needs access to BCR recordings directory.
-
-          Click <strong>OK</strong> and Android will show you the default folder-selector.
-
-          Now select the recordings directory used by BCR and allow access to its content...`
-          .replace(/[\r\n]/g, '<br/>')),
-        buttons: [
-          'Cancel',
-          {
-            text: 'OK',
-            handler: () => this.selectRecordingsDirectory(),
-          },
-        ],
-        backdropDismiss: false,
-      });
-
-      await alert.present();
+    // exit if we're already refreshing
+    if (this.refreshProgress.value) {
       return;
     }
 
-    this.refreshProgress.next(0.0000001); // immediately send a non-zero progress
+    if (!this.settings.recordingsDirectoryUri) {
+      this.selectRecordingsDirectory();
+      return;
+    }
+
+    // immediately send a non-zero progress
+    this.refreshProgress.next(0.0001);
     console.log("Reading files in folder:");
+
+    // save current DB and set statuses as 'deleted'
+    // (if a file with the same filename won't be found, then DB record must be removed)
+    let currentDB: Recording[];
+    if (clearCache) {
+      currentDB = [];
+    }
+    else {
+      currentDB = this.recordings.value;
+      currentDB.forEach(r => r.status = 'deleted');
+    }
 
     try {
       // keep files only (no directories)
@@ -68,9 +78,7 @@ export class RecordingsService {
       // extract supported audio file types
       const audioFiles = allFiles.filter(i => this.settings.supportedTypes.includes(i.type));
 
-      // compose an array of Recording class instances based on
-      // each audio file and its corresponding (optional) metadata file
-      const recordings: Recording[] = [];
+      // parse each audio file and its corresponding (optional) metadata file
       const count = audioFiles.length;
 
       // no files?
@@ -81,41 +89,41 @@ export class RecordingsService {
           // send progress update
           this.refreshProgress.next(++i / count);
 
-          // test if current file has a corresponding metadata .json file
+          // check if current audio file already exists in current DB
+          const dbRecord = currentDB.find(r => r.file.uri === file.uri);
+          if (dbRecord) {
+            // mark file as "unchanged" and continue
+            dbRecord.status = 'unchanged';
+            continue;
+          }
+
+          // check if audio file has a corresponding metadata .json file
+          if (file.name.startsWith('test_file_0086') || i >= 85) {
+            const a = 1;
+          }
           const metadataFileName = replaceExtension(file.name, '.json');
           const metadataFile = allFiles.find(i => i.name === metadataFileName);
 
-          // add to result array
-          recordings.push(await Recording.createInstance(file, metadataFile));
+          // add to currentDB
+          currentDB.push(await Recording.createInstance(file, metadataFile));
 
         }
       }
 
-      // update collection
-      this.recordings.next(recordings);
+      // remove deleted files
+      currentDB = currentDB.filter(r => r.status !== 'deleted');
+
+      // update collection & cache
+      this.recordings.next(currentDB);
+      await RecordingsCache.save(currentDB);
       this.refreshProgress.next(0);
 
     }
     catch(err) {
       console.error(err);
+      this.mbs.showError({ message: 'Error updating cache', error: err });
       this.refreshProgress.next(0);
     };
-
-  }
-
-  /**
-   * Open Android SAF directory selector to choose recordings dir
-   */
-  selectRecordingsDirectory() {
-
-    AndroidSAF.selectDirectory({})
-      .then(res => {
-        this.settings.recordingsDirectoryUri = res.selectedUri;
-        console.log('Selected folder:', this.settings.recordingsDirectoryUri);
-        this.settings.save();
-        this.recordings.next([]);
-        this.refreshContent();
-      });
 
   }
 
@@ -128,18 +136,62 @@ export class RecordingsService {
     const deleteFileFn = async (uri: string) => {
       try {
         await AndroidSAF.deleteFile({ uri });
+        return true;
       }
       catch(err) {
         this.mbs.showError({
           message: 'There was an error while deleting item: ' + uri,
           error: err,
         });
+        return false;
       }
     }
 
-    item && await deleteFileFn(item.file.uri);
-    item?.metadataFile && await deleteFileFn(item.metadataFile.uri);
+    if (
+      item && await deleteFileFn(item.file.uri)
+      && item?.metadataFile && await deleteFileFn(item.metadataFile.uri)
+    ){
+      // update DB
+      this.recordings.next(this.recordings.value.filter(r => r !== item));
+    }
 
+  }
+
+  /**
+   * Show user the SAF directory selection dialog
+   */
+  async selectRecordingsDirectory() {
+
+    const alert = await this.alertController.create({
+      header: 'Recordings directory not selected',
+      message: new IonicSafeString(
+        `This app needs access to BCR recordings directory.
+
+        Click <strong>OK</strong> and Android will show you the default folder-selector.
+
+        Now select the recordings directory used by BCR and allow access to its content...`
+        .replace(/[\r\n]/g, '<br/>')),
+      buttons: [
+        'Cancel',
+        {
+          text: 'OK',
+          handler: () => {
+            // show directory selector
+            AndroidSAF.selectDirectory({})
+              .then(res => {
+                this.settings.recordingsDirectoryUri = res.selectedUri;
+                console.log('Selected folder:', this.settings.recordingsDirectoryUri);
+                this.settings.save();
+                this.recordings.next([]);
+                this.refreshContent(true);
+              });
+          },
+        },
+      ],
+      backdropDismiss: false,
+    });
+
+    await alert.present();
   }
 
 }

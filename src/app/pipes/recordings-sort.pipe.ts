@@ -30,14 +30,14 @@ export class RecordingsSortPipe implements PipeTransform {
 
     switch (sortMode) {
       // date
-      case SortMode.Date_ASC: return (a: Recording, b: Recording) => (a.date.getTime() - b.date.getTime());
+      case SortMode.Date_ASC: return (a: Recording, b: Recording) => (a.date - b.date);
 
       // duration
       case SortMode.Duration_ASC: return (a: Recording, b: Recording) => (a.duration - b.duration);
       case SortMode.Duration_DESC: return (a: Recording, b: Recording) => (b.duration - a.duration);
 
       // Date_DESC is the default mode
-      default: return (a: Recording, b: Recording) => (b.date.getTime() - a.date.getTime());
+      default: return (a: Recording, b: Recording) => (b.date - a.date);
     }
   }
 

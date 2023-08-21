@@ -25,8 +25,8 @@ export class Recording {
   // Call direction
   direction!: 'in' | 'out' | 'conference' | '';
 
-  // Recording date
-  date: Date = new Date();
+  // Recording date (JS timestamp)
+  date: number = 0;
 
   // Recording duration (in seconds)
   duration: number = 0;
@@ -39,6 +39,9 @@ export class Recording {
 
   // Audio file MIME type
   mimeType: string = '';
+
+  // record status
+  status?: 'new' | 'unchanged' | 'deleted' = 'new';
 
   /**
    * Use createInstance()...
@@ -59,7 +62,7 @@ export class Recording {
     // save Android file props
     res.filesize = file.size;
     res.mimeType = file.type;
-    res.date = new Date(file.lastModified);
+    res.date = file.lastModified;
     res.opName = file.name;
     res.opNumber = file.name;
 
@@ -85,7 +88,7 @@ export class Recording {
     res.simSlot = metadata.sim_slot ?? 0;
     res.duration = Math.ceil(metadata.output?.recording?.duration_secs_total ?? 0);
     if (metadata.timestamp_unix_ms) {
-      res.date = new Date(metadata.timestamp_unix_ms);
+      res.date = metadata.timestamp_unix_ms;
     }
 
     // extract "other party" data

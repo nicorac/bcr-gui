@@ -4,7 +4,7 @@ import { MessageBoxService } from 'src/app/services/message-box.service';
 import { RecordingsService } from 'src/app/services/recordings.service';
 import { SettingsService } from 'src/app/services/settings.service';
 import { bringIntoView } from 'src/app/utils/scroll';
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import version from '../../version';
 
 @Component({
@@ -12,7 +12,7 @@ import version from '../../version';
   templateUrl: './main.page.html',
   styleUrls: ['./main.page.scss'],
 })
-export class MainPage implements OnInit {
+export class MainPage {
 
   version = version;
   selectedItem?: Recording;
@@ -22,10 +22,6 @@ export class MainPage implements OnInit {
     protected recordingsService: RecordingsService,
     protected settings: SettingsService,
   ) { }
-
-  ngOnInit(): void {
-    this.refreshList();
-  }
 
   refreshList() {
     this.recordingsService.refreshContent();
@@ -63,7 +59,6 @@ export class MainPage implements OnInit {
       confirmText: 'Delete',
       onConfirm: () => {
         this.recordingsService.deleteRecording(item);
-        this.recordingsService.refreshContent();
       }
     });
 

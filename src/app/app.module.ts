@@ -12,9 +12,10 @@ import { AboutPage } from './pages/about/about.page';
 import { MainPage } from './pages/main/main.page';
 import { SettingsPage } from './pages/settings/settings.page';
 import { FilesizePipe } from './pipes/filesize.pipe';
-import { ToHmsPipe } from './pipes/to-hms.pipe';
-import { SettingsService } from './services/settings.service';
 import { RecordingsSortPipe } from './pipes/recordings-sort.pipe';
+import { ToHmsPipe } from './pipes/to-hms.pipe';
+import { RecordingsService } from './services/recordings.service';
+import { SettingsService } from './services/settings.service';
 
 @NgModule({
   declarations: [
@@ -37,7 +38,7 @@ import { RecordingsSortPipe } from './pipes/recordings-sort.pipe';
     RouterModule,
   ],
   providers: [
-    { provide: APP_INITIALIZER, useFactory: appInitializer, deps: [ SettingsService ], multi: true },
+    { provide: APP_INITIALIZER, useFactory: appInitializer, deps: [ RecordingsService, SettingsService ], multi: true },
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     { provide: LOCALE_ID, useFactory: (settings: SettingsService) => settings.deviceCulture, deps: [ SettingsService ] },
   ],
@@ -50,10 +51,15 @@ export class AppModule {}
 /**
  * Load settings and set languages before app start
  */
-function appInitializer(settings: SettingsService) {
+function appInitializer(recordingsService: RecordingsService, settings: SettingsService) {
   return async () => {
+
+    // initialize recordings service
+    await recordingsService.initialize();
+
     // initialize settings
-    return await settings.initialize();
+    await settings.initialize();
+
   }
 }
 
