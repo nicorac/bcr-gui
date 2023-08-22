@@ -1,6 +1,11 @@
 {
   "root": true,
   "ignorePatterns": ["projects/**/*"],
+  "env": {
+    "browser": true,
+    "commonjs": true,
+    "es2021": true
+  },
   "overrides": [
     {
       "files": ["*.ts"],
