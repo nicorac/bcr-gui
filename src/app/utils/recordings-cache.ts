@@ -1,4 +1,4 @@
-import { Directory, Filesystem, WriteFileResult } from '@capacitor/filesystem';
+import { Directory, Encoding, Filesystem, WriteFileResult } from '@capacitor/filesystem';
 import { Recording } from '../models/recording';
 
 // filename of the cache
@@ -6,7 +6,7 @@ const DB_CACHE_FILENAME = 'db-cache.json';
 
 // version of cache schema
 // (must be changed if we need to "invalidate" cache content (eg: a new Recording field must be filled in)
-const CACHE_SCHEMA_VERSION = 1;
+const CACHE_SCHEMA_VERSION = 2;
 
 /**
  * Defines content of cache file
@@ -33,10 +33,10 @@ export class RecordingsCache {
     if (await RecordingsCache.checkFileExists(DB_CACHE_FILENAME)) {
 
       // read file content
-      const { data: cacheContent } = await Filesystem.readFile({ path: DB_CACHE_FILENAME, directory: Directory.Cache });
+      const { data: cacheContent } = await Filesystem.readFile({ path: DB_CACHE_FILENAME, directory: Directory.Cache, encoding: Encoding.UTF8 });
       let cacheData: Partial<CacheContent>;
       try {
-        cacheData = JSON.parse(atob(cacheContent as string)) as Partial<CacheContent>;
+        cacheData = JSON.parse(cacheContent as string) as Partial<CacheContent>;
       } catch (error) {
         cacheData = {};
       }
@@ -66,7 +66,8 @@ export class RecordingsCache {
     return Filesystem.writeFile({
       path: DB_CACHE_FILENAME,
       directory: Directory.Cache,
-      data: btoa(cacheContent),
+      data: cacheContent,
+      encoding: Encoding.UTF8,
     });
 
   }
