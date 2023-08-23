@@ -54,11 +54,11 @@ export class AppModule {}
 function appInitializer(recordingsService: RecordingsService, settings: SettingsService) {
   return async () => {
 
-    // initialize recordings service
-    await recordingsService.initialize();
-
     // initialize settings
     await settings.initialize();
+
+    // initialize recordings service
+    await recordingsService.initialize();
 
   }
 }

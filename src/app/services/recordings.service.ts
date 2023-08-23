@@ -38,6 +38,11 @@ export class RecordingsService {
     const cache = await RecordingsCache.load();
     this.recordings.next(cache);
 
+    // check if recordings directory has been selected
+    if (!this.settings.recordingsDirectoryUri) {
+      this.selectRecordingsDirectory();
+    }
+
   }
 
   /**
@@ -158,7 +163,8 @@ export class RecordingsService {
   }
 
   /**
-   * Show user the SAF directory selection dialog
+   * Show user the SAF directory selection dialog.
+   * After successful selection, the DB is refreshed (clearing the cache).
    */
   async selectRecordingsDirectory() {
 
