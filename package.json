@@ -29,6 +29,7 @@
     "@capacitor/device": "^5.0.6",
     "@capacitor/filesystem": "^5.1.2",
     "@capacitor/preferences": "^5.0.6",
+    "@capacitor/share": "^5.0.6",
     "@capacitor/status-bar": "^5.0.6",
     "@ionic/angular": "^7.3.0",
     "filesize": "^10.0.12",

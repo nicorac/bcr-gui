@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.DocumentsContract;
+import android.util.Base64;
 
 import androidx.activity.result.ActivityResult;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,10 +20,14 @@ import com.getcapacitor.annotation.ActivityCallback;
 import com.getcapacitor.annotation.CapacitorPlugin;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 @CapacitorPlugin(name = "AndroidSAF")
@@ -93,7 +98,7 @@ public class AndroidSAFPlugin extends Plugin {
       return;
     }
 
-    // Get a DocumentFile from the given TreeUri
+    // Get a DocumentFile from the given Uri
     var uri = Uri.parse(uriString);
     var folder = DocumentFile.fromTreeUri(getContext(), uri);
     if (!folder.exists()) {
@@ -123,13 +128,18 @@ public class AndroidSAFPlugin extends Plugin {
   public void readFile(PluginCall call) {
 
     // get input arguments
-    String fileUri = call.getString("uri", null);
+    var fileUri = call.getString("uri", null);
     if (fileUri == null) {
       call.reject("Invalid or missing uri", ERR_INVALID_URI);
       return;
     }
 
-    // Get a DocumentFile from the given TreeUri
+    // if an "encoding" has been specified, file content is returned as string
+    // otherwise it's returned as BASE64 string
+    var encoding = call.getString("encoding", null);
+    var charset = getEncoding(encoding);
+
+    // Get a DocumentFile from the given fileUri
     var uri = Uri.parse(fileUri);
     var file = DocumentFile.fromSingleUri(getContext(), uri);
     if (!file.exists()) {
@@ -138,13 +148,13 @@ public class AndroidSAFPlugin extends Plugin {
     }
 
     // load file content
-    var stringBuilder = new StringBuilder();
-    try (InputStream inputStream = getContext().getContentResolver().openInputStream(uri);
-         var reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(inputStream)))) {
-      String line;
-      while ((line = reader.readLine()) != null) {
-        stringBuilder.append(line);
-      }
+    String content = "";
+    try (
+      var is = getContext().getContentResolver().openInputStream(uri);
+    ) {
+      content = charset != null
+        ? readFileAsString(is, charset.name())
+        : readFileAsBase64EncodedData(is);
     }
     catch (FileNotFoundException e) {
       call.reject(e.toString(), ERR_NOT_FOUND);
@@ -156,7 +166,8 @@ public class AndroidSAFPlugin extends Plugin {
 
     // return file content
     var ret = new JSObject();
-    ret.put("content", stringBuilder.toString());
+    ret.put("encoding", encoding);
+    ret.put("content", content);
     call.resolve(ret);
 
   }
@@ -177,7 +188,7 @@ public class AndroidSAFPlugin extends Plugin {
       return;
     }
 
-    // Get a DocumentFile from the given TreeUri
+    // Get a DocumentFile from the given fileUri
     var uri = Uri.parse(fileUri);
     var file = DocumentFile.fromSingleUri(getContext(), uri);
     if (!file.exists()) {
@@ -243,6 +254,54 @@ public class AndroidSAFPlugin extends Plugin {
     }
 
     return result;
+  }
+
+  /****************************************************************************
+   * The code below comes from Filesystem Capacitor plugin (with some changes)
+   ****************************************************************************/
+  public Charset getEncoding(String encoding) {
+    if (encoding == null) {
+      return null;
+    }
+    switch (encoding) {
+      case "utf8":
+        return StandardCharsets.UTF_8;
+      case "utf16":
+        return StandardCharsets.UTF_16;
+      case "ascii":
+        return StandardCharsets.US_ASCII;
+    }
+    return null;
+  }
+
+  /**
+   * Utility function to read file content as string (with the given encoding)
+   */
+  private String readFileAsString(InputStream is, String encoding) throws IOException {
+    var outputStream = new ByteArrayOutputStream();
+    byte[] buffer = new byte[1024];
+    int length = 0;
+
+    while ((length = is.read(buffer)) != -1) {
+      outputStream.write(buffer, 0, length);
+    }
+    return outputStream.toString(encoding);
+  }
+
+  /**
+   * Utility function to read file content as BASE64 string
+   */
+  private String readFileAsBase64EncodedData(InputStream is) throws IOException {
+    var fileInputStreamReader = (FileInputStream) is;
+    ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+    byte[] buffer = new byte[1024];
+    int c;
+
+    while ((c = fileInputStreamReader.read(buffer)) != -1) {
+      byteStream.write(buffer, 0, c);
+    }
+    fileInputStreamReader.close();
+    return Base64.encodeToString(byteStream.toByteArray(), Base64.NO_WRAP);
   }
 
 }

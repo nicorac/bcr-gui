@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { APP_INITIALIZER, LOCALE_ID, NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
@@ -38,6 +38,8 @@ import { SettingsService } from './services/settings.service';
     RouterModule,
   ],
   providers: [
+    DatePipe,
+    ToHmsPipe,
     { provide: APP_INITIALIZER, useFactory: appInitializer, deps: [ RecordingsService, SettingsService ], multi: true },
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     { provide: LOCALE_ID, useFactory: (settings: SettingsService) => settings.deviceCulture, deps: [ SettingsService ] },

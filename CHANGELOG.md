@@ -3,7 +3,7 @@
 ## Version 0.0.5 (2023-08-23)
 
 - Fixed bad cache encoding (not supporting UTF-8 data)
-- At first start the app won't ask the user to select recordings directory
+- At first start the app doesn't ask the user to select recordings directory
 
 ## Version 0.0.4 (2023-08-23)
 

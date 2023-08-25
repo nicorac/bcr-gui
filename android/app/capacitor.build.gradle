@@ -14,6 +14,7 @@ dependencies {
     implementation project(':capacitor-device')
     implementation project(':capacitor-filesystem')
     implementation project(':capacitor-preferences')
+    implementation project(':capacitor-share')
     implementation project(':capacitor-status-bar')
 
 }

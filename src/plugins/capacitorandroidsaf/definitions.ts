@@ -14,7 +14,14 @@ export interface AndroidSAFPlugin {
    *
    * @param options ReadFileOptions
    */
-  readFile(options: ReadFileOptions): Promise<{ content: string }>;
+  readFile(options: ReadFileOptions): Promise<{ content: string, encoding?: Encodings }>;
+
+  /**
+   * Write file content
+   *
+   * @param options WriteFileOptions
+   */
+  writeFile(options: WriteFileOptions): Promise<void>;
 
   /**
    * Delete a file
@@ -29,11 +36,20 @@ export interface AndroidSAFPlugin {
 /**
  * Error codes returned on failures
  */
-export enum SAFErrorCode {
+export enum ErrorCode {
   ERR_CANCELED = "ERR_CANCELED",
   ERR_INVALID_URI = "ERR_INVALID_URI",
   ERR_NOT_FOUND = "ERR_NOT_FOUND",
   ERR_IO_EXCEPTION = "ERR_IO_EXCEPTION",
+}
+
+/**
+ * File encodings
+ */
+export enum Encodings {
+  ASCII = 'ascii',
+  UTF8 = 'utf8',
+  UTF16 = 'utf16',
 }
 
 interface BaseFilesOptions {
@@ -43,7 +59,25 @@ interface BaseFilesOptions {
 
 export interface ListFilesOptions extends BaseFilesOptions { }
 
-export interface ReadFileOptions extends BaseFilesOptions { }
+export interface ReadFileOptions extends BaseFilesOptions {
+  /**
+   * File content encoding.
+   * If undefined then the file is read as binary and returned as BASE64 encoded string.
+   */
+  encoding?: Encodings | undefined,
+}
+
+export interface WriteFileOptions extends BaseFilesOptions {
+  /**
+   * File content, as plain text (encoded with the given encoding) or BASE64 encoded.
+   */
+  content: string;
+  /**
+   * File content encoding.
+   * If undefined then "content" is considered as BASE64 encoded string.
+   */
+  encoding?: Encodings | undefined,
+}
 
 export interface DeleteFileOptions extends BaseFilesOptions { }
 

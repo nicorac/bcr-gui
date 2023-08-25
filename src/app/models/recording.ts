@@ -1,4 +1,4 @@
-import { AndroidSAF, IDocumentFile } from 'src/plugins/capacitorandroidsaf';
+import { AndroidSAF, Encodings, IDocumentFile } from 'src/plugins/capacitorandroidsaf';
 import { stripExtension } from '../utils/filesystem';
 import { BcrRecordingMetadata } from './BcrRecordingMetadata';
 
@@ -18,6 +18,8 @@ export class Recording {
    * "other party" of the call
    * - incoming calls: caller name (if known) and its number
    * - outgoing calls: callee name (if known) and its number
+   *
+   * opName is filled with contact name or its number (if no name can be retrieved)
    */
   opName: string = '';
   opNumber: string = '';
@@ -69,7 +71,7 @@ export class Recording {
     // if JSON metadata props are not available, try to extract them from filename
     let metadata: Partial<BcrRecordingMetadata> = {};
     if (metadataFile) {
-      const { content: metadataFileContent } = await AndroidSAF.readFile({ uri: metadataFile.uri });
+      const { content: metadataFileContent } = await AndroidSAF.readFile({ uri: metadataFile.uri, encoding: Encodings.UTF8 });
       try {
         metadata = JSON.parse(metadataFileContent);
         res.hasMetadata = true;
