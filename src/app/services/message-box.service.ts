@@ -67,7 +67,8 @@ export class MessageBoxService {
   }
 
   /**
-   * Show a generic error alert
+   * Show a generic error alert.
+   * Error message is also logget to console.
    */
   async showError(options: MessageBoxOptionsError): Promise<void> {
 
@@ -75,22 +76,26 @@ export class MessageBoxService {
     options = { ...new MessageBoxOptionsError(), ...options };
 
     // build error message details
-    const msg = [ options.message ?? '', '' ];
+    const msgLines = [ options.message ?? '', '' ];
     if (options.error?.code) {
-      msg.push(`Code: ${options.error.code}`);
+      msgLines.push(`Code: ${options.error.code}`);
     }
     if (options.error?.message) {
-      msg.push(`Error: ${options.error.message}`);
+      msgLines.push(`Error: ${options.error.message}`);
     }
 
+    // log to console
+    const msg = msgLines.join('\n').trim();
+    console.error(msg);
+
     // remove leading and trailing empty lines (preserving the ones between message and details)
-    const msgSafe = new IonicSafeString(msg.join('\n').trim().replace(/\n/g, '<br/>'));
+    const msgHtml = new IonicSafeString(msg.replace(/\n/g, '<br/>'));
 
     // show alert dialog
     const mb = await this.getAlert({
       cssClass: 'msgbox-error',
       header: options.header ?? 'Error',
-      message: msgSafe,
+      message: msgHtml,
       buttons: [
         { text: options.confirmText ?? 'Ok', handler: () => options.onConfirm?.() },
       ],
