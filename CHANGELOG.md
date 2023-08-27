@@ -1,5 +1,9 @@
 # Version history
 
+## Version 0.0.6 (2023-08-27)
+
+- New **Share** feature to share recordings audio files with other apps
+
 ## Version 0.0.5 (2023-08-23)
 
 - Fixed bad cache encoding (not supporting UTF-8 data)
