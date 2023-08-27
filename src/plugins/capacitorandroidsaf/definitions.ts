@@ -22,7 +22,7 @@ export interface AndroidSAFPlugin {
    * @param options DeleteFileOptions
    * @returns boolean true on success
    */
-  deleteFile(options: DeleteFileOptions): Promise<boolean>;
+  deleteFile(options: DeleteFileOptions): Promise<void>;
 
 }
 
