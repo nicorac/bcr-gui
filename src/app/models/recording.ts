@@ -2,6 +2,8 @@ import { AndroidSAF, Encodings, IDocumentFile } from 'src/plugins/capacitorandro
 import { stripExtension } from '../utils/filesystem';
 import { BcrRecordingMetadata } from './BcrRecordingMetadata';
 
+export type CallDirection = 'in' | 'out' | 'conference' | '';
+
 /**
  * Class describing a BCR recording
  */
@@ -25,7 +27,7 @@ export class Recording {
   opNumber: string = '';
 
   // Call direction
-  direction!: 'in' | 'out' | 'conference' | '';
+  direction!: CallDirection;
 
   // Recording date (JS timestamp)
   date: number = 0;

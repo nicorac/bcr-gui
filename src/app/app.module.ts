@@ -3,10 +3,11 @@ import { APP_INITIALIZER, LOCALE_ID, NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouteReuseStrategy, RouterModule } from '@angular/router';
-import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
+import { IonicModule, IonicRouteStrategy, Platform } from '@ionic/angular';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { AudioPlayerComponent } from './components/audio-player/audio-player.component';
+import { CallIconComponent } from './components/call-icon/call-icon.component';
 import { HeaderComponent } from './components/header/header.component';
 import { AboutPage } from './pages/about/about.page';
 import { MainPage } from './pages/main/main.page';
@@ -32,6 +33,7 @@ import { SettingsService } from './services/settings.service';
   imports: [
     AppRoutingModule,
     BrowserModule,
+    CallIconComponent,
     CommonModule,
     FormsModule,
     IonicModule.forRoot({ innerHTMLTemplatesEnabled: true }),
@@ -40,7 +42,7 @@ import { SettingsService } from './services/settings.service';
   providers: [
     DatePipe,
     ToHmsPipe,
-    { provide: APP_INITIALIZER, useFactory: appInitializer, deps: [ RecordingsService, SettingsService ], multi: true },
+    { provide: APP_INITIALIZER, useFactory: appInitializer, deps: [ RecordingsService, SettingsService, Platform ], multi: true },
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     { provide: LOCALE_ID, useFactory: (settings: SettingsService) => settings.deviceCulture, deps: [ SettingsService ] },
   ],
@@ -53,8 +55,11 @@ export class AppModule {}
 /**
  * Load settings and set languages before app start
  */
-function appInitializer(recordingsService: RecordingsService, settings: SettingsService) {
+function appInitializer(recordingsService: RecordingsService, settings: SettingsService, platform: Platform) {
   return async () => {
+
+    // wait for Ionic initialization
+    await platform.ready();
 
     // initialize settings
     await settings.initialize();

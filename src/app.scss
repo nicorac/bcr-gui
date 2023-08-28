@@ -1,21 +1,63 @@
-:root {
-  --app-main-color: #43a047;
-  --ion-color-primary: var(--app-main-color);
-  --ion-color-primary-rgb: 67, 160, 71;
+body {
+  // default mode
+  --ion-color-primary: #43a047;       // main color (buttons, ...)
+  --ion-text-color: #000000;          // text color
+  --ion-text-color-rgb: 0,0,0;          // text color (RGB form)
+  // pages
+  --ion-background-color: #d0efc3;
+  // toolbar
+  --ion-toolbar-color: #ffffff;
+  --ion-toolbar-color-rgb: 255,255,255;
+  --ion-toolbar-background: var(--ion-color-primary); // NOTE: this value must also be set in TOOLBAR_BACKGROUND_* const (app.component.ts)
+  // items
   --ion-item-background: #ffffff;
-  --ion-overlay-background-color: #ffffff;  // used by alerts...
-}
+  --ion-item-color: var(--ion-text-color);
+  --item-border-color: var(--ion-color-step-400);
+  --item-border-color-selected: var(--ion-color-step-800);
+  --item-shadow-color: var(--ion-color-step-800);
 
-ion-toolbar {
-  --color: #ffffff;
-  --ion-background-color: var(--app-main-color);
+  // dark mode (overrides)
+  &.dark {
+    --ion-color-primary: #43a047; //Svar(--ion-color-step-600);
+    --ion-text-color: var(--ion-color-step-950);
+    --ion-text-color-rgb: 198, 227, 184;  // used by menu icons
+    // pages
+    --ion-background-color: var(--ion-color-step-100);
+    // toolbar
+    --ion-toolbar-color: var(--ion-text-color);
+    --ion-toolbar-color-rgb: var(--ion-text-color-rgb);  // used by menu icons
+    --ion-toolbar-background: var(--ion-color-step-150); // NOTE: this value must also be set in TOOLBAR_BACKGROUND_* const (app.component.ts)
+    // items
+    --ion-item-background: var(--ion-color-step-150);
+    --ion-item-color: var(--ion-text-color);
+    --item-border-color: var(--ion-color-step-400);
+    --item-border-color-selected: var(--ion-color-step-800);
+    --item-shadow-color: var(--ion-color-step-800);
+  }
+
+  // items
+  --ion-item-border-color: var(--ion-background-color);
+
+  // menu
+  --menu-color: var(--ion-text-color);
+  --menu-color-rgb: var(--ion-text-color-rgb);
+  --menu-background: var(--ion-background-color);
+
+  // modals
+  --ion-overlay-background-color: var(--ion-item-background);
+
 }
 
 ion-menu {
-  --ion-background-color: var(--ion-color-step-800);  // menu background
-  --ion-item-background: var(--ion-background-color); // menu items background
-  --ion-item-color: #ffffff;              // menu items text
-  --ion-text-color-rgb: rgb(255,255,255); // menu icons
+  --ion-item-color: var(--menu-color);
+  --ion-text-color: var(--menu-color);
+  --ion-text-color-rgb: var(--menu-color-rgb);
+  --ion-background-color: var(--menu-background);
+  --ion-item-background: var(--menu-background); // menu items background
+}
+
+ion-item-divider {
+  --color: var(--ion-color-step-800);
 }
 
 .left-right-container {

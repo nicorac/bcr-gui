@@ -169,13 +169,13 @@ export class RecordingsService {
   async selectRecordingsDirectory() {
 
     const alert = await this.alertController.create({
-      header: 'Recordings directory not selected',
+      header: 'Select recordings directory',
       message: new IonicSafeString(
         `This app needs access to BCR recordings directory.
 
-        Click <strong>OK</strong> and Android will show you the default folder-selector.
+        If you click <strong>OK</strong>, Android will show you a directory selector.
 
-        Now select the recordings directory used by BCR and allow access to its content...`
+        Select the recordings directory used by BCR and allow access to its content...`
         .replace(/[\r\n]/g, '<br/>')),
       buttons: [
         'Cancel',
@@ -186,7 +186,7 @@ export class RecordingsService {
             AndroidSAF.selectDirectory({})
               .then(res => {
                 this.settings.recordingsDirectoryUri = res.selectedUri;
-                console.log('Selected folder:', this.settings.recordingsDirectoryUri);
+                console.log('Selected directory:', this.settings.recordingsDirectoryUri);
                 this.settings.save();
                 this.recordings.next([]);
                 this.refreshContent(true);

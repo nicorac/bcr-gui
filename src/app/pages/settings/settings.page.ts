@@ -20,6 +20,10 @@ export class SettingsPage {
   ) { }
 
   async ionViewWillLeave() {
+    await this.save();
+  }
+
+  async save() {
     await this.settings.save();
   }
 
