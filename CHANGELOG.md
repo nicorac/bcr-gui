@@ -1,5 +1,9 @@
 # Version history
 
+## Version 0.0.7 (2023-08-29)
+
+- Added support to dark theme (user can force light/dark theme or use the system default)
+
 ## Version 0.0.6 (2023-08-27)
 
 - New **Share** feature to share recordings audio files with other apps
