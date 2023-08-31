@@ -103,9 +103,6 @@ export class RecordingsService {
           }
 
           // check if audio file has a corresponding metadata .json file
-          if (file.name.startsWith('test_file_0086') || i >= 85) {
-            const a = 1;
-          }
           const metadataFileName = replaceExtension(file.name, '.json');
           const metadataFile = allFiles.find(i => i.name === metadataFileName);
 
