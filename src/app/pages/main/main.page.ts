@@ -1,4 +1,5 @@
 import { AudioPlayerComponent } from 'src/app/components/audio-player/audio-player.component';
+import { MetadataEditorComponent } from 'src/app/components/metadata-editor/metadata-editor.component';
 import { Recording } from 'src/app/models/recording';
 import { ToHmsPipe } from 'src/app/pipes/to-hms.pipe';
 import { MessageBoxService } from 'src/app/services/message-box.service';
@@ -10,6 +11,7 @@ import { DatePipe } from '@angular/common';
 import { Component } from '@angular/core';
 import { Directory, Filesystem } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
+import { ModalController } from '@ionic/angular';
 import version from '../../version';
 
 @Component({
@@ -25,6 +27,7 @@ export class MainPage {
   constructor(
     private datePipe: DatePipe,
     private mbs: MessageBoxService,
+    private modalCtrl: ModalController,
     private toHms: ToHmsPipe,
     protected recordingsService: RecordingsService,
     protected settings: SettingsService,
@@ -51,23 +54,39 @@ export class MainPage {
   }
 
   /**
-   * Deletes the given recording file (and its companion JSON metadata)
+   * Show dialog to edit recording metadata
    */
-  async deleteRecording(item: Recording, player: AudioPlayerComponent) {
+  async editMetadata(item: Recording) {
+    try {
 
-    // stop player
-    player.pause();
+      // show editor
+      const modal = await this.modalCtrl.create({
+        component: MetadataEditorComponent,
+        componentProps: {
+          recording: item,
+        },
+        backdropDismiss: false,
+      });
+      modal.present();
 
-    // show confirmation alert
-    await this.mbs.showConfirm({
-      header: 'Delete recording?',
-      message: 'Do you really want to delete this recording?',
-      cancelText: 'Cancel',
-      confirmText: 'Delete',
-      onConfirm: () => {
-        this.recordingsService.deleteRecording(item);
-      }
-    });
+      // const { data, role } = await modal.onWillDismiss();
+
+      // if (role === 'confirm') {
+      //   console.warn(`Hello, ${data}!`);
+      // }
+
+
+
+
+      //await this.recordingsService.updateRecording(item);
+    }
+    catch (error) {
+      this.mbs.showError({
+        message: 'Error updating metadata',
+        error: error,
+      });
+      return undefined;
+    }
 
   }
 
@@ -151,6 +170,27 @@ export class MainPage {
       await Filesystem.deleteFile(tempFile);
       console.log('Deleted temp file:', tempFile.path);
     }
+
+  }
+
+  /**
+   * Deletes the given recording file (and its companion JSON metadata)
+   */
+  async deleteRecording(item: Recording, player: AudioPlayerComponent) {
+
+    // stop player
+    player.pause();
+
+    // show confirmation alert
+    await this.mbs.showConfirm({
+      header: 'Delete recording?',
+      message: 'Do you really want to delete this recording?',
+      cancelText: 'Cancel',
+      confirmText: 'Delete',
+      onConfirm: () => {
+        this.recordingsService.deleteRecording(item);
+      }
+    });
 
   }
 

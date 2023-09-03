@@ -10,6 +10,7 @@ import { AppComponent } from './app.component';
 import { AudioPlayerComponent } from './components/audio-player/audio-player.component';
 import { CallIconComponent } from './components/call-icon/call-icon.component';
 import { HeaderComponent } from './components/header/header.component';
+import { MetadataEditorComponent } from './components/metadata-editor/metadata-editor.component';
 import { AboutPage } from './pages/about/about.page';
 import { MainPage } from './pages/main/main.page';
 import { SettingsPage } from './pages/settings/settings.page';
@@ -27,9 +28,10 @@ import { SettingsService } from './services/settings.service';
     FilesizePipe,
     HeaderComponent,
     MainPage,
+    MetadataEditorComponent,
+    RecordingsSortPipe,
     SettingsPage,
     ToHmsPipe,
-    RecordingsSortPipe,
   ],
   imports: [
     AppRoutingModule,

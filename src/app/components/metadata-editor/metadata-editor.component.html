@@ -1,0 +1,26 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Edit recording</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <ion-item>
+    <ion-input labelPlacement="floating" label="Number" [(ngModel)]="editedItem.opNumber" placeholder="Phone number" [readonly]="true" />
+  </ion-item>
+
+  <ion-item>
+    <ion-input labelPlacement="floating" label="Name" [(ngModel)]="editedItem.opName" placeholder="Other party name"/>
+  </ion-item>
+
+</ion-content>
+
+<ion-footer class="footer">
+  <ion-toolbar>
+    <ion-buttons slot="end">
+      <ion-button color="primary" (click)="cancel()">Cancel</ion-button>
+      <ion-button color="primary" (click)="save()">Save</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-footer>

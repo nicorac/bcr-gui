@@ -3,7 +3,6 @@ import { AndroidSAF } from 'src/plugins/capacitorandroidsaf';
 import { Injectable } from '@angular/core';
 import { AlertController, IonicSafeString } from '@ionic/angular';
 import { Recording } from '../models/recording';
-import { replaceExtension } from '../utils/filesystem';
 import { RecordingsCache } from '../utils/recordings-cache';
 import { MessageBoxService } from './message-box.service';
 import { SettingsService } from './settings.service';
@@ -103,7 +102,7 @@ export class RecordingsService {
           }
 
           // check if audio file has a corresponding metadata .json file
-          const metadataFileName = replaceExtension(file.name, '.json');
+          const metadataFileName = Recording.getMetadataFilename(file.name);
           const metadataFile = allFiles.find(i => i.name === metadataFileName);
 
           // add to currentDB
@@ -127,6 +126,14 @@ export class RecordingsService {
       this.refreshProgress.next(0);
     };
 
+  }
+
+  /**
+   * Update metadata of the given recording, both in DB and in cache
+   */
+  async updateRecording(item: Recording) {
+    await Recording.updateJSONMetadata(item, this.settings.recordingsDirectoryUri);
+    await RecordingsCache.save(this.recordings.value);
   }
 
   /**

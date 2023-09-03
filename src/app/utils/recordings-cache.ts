@@ -5,8 +5,8 @@ import { Recording } from '../models/recording';
 const DB_CACHE_FILENAME = 'db-cache.json';
 
 // version of cache schema
-// (must be changed if we need to "invalidate" cache content (eg: a new Recording field must be filled in)
-const CACHE_SCHEMA_VERSION = 2;
+// NOTE: must be changed each time we need to "invalidate" old cache content (eg: a new Recording field must be filled in)
+const CACHE_SCHEMA_VERSION = 3;
 
 /**
  * Defines content of cache file

@@ -5,7 +5,7 @@
   <!-- refresh FAB button -->
   <ion-fab slot="fixed" vertical="bottom" horizontal="end">
     <ion-fab-button (click)="refreshList()" class="fab">
-      <ion-icon name="refresh"></ion-icon>
+      <ion-icon name="refresh" />
     </ion-fab-button>
   </ion-fab>
 
@@ -46,11 +46,10 @@
         <div class="actions">
 
           <!-- edit -->
-          <!-- <ion-icon name="pencil"
+          <ion-icon name="pencil"
             class="action"
-            [class.disabled]="true"
-            (click)="onActionNotImplemented(item)"
-          /> -->
+            (click)="editMetadata(item)"
+          />
 
           <!-- share -->
           <ion-icon name="share-social"
