@@ -11,6 +11,7 @@ import { AudioPlayerComponent } from './components/audio-player/audio-player.com
 import { CallIconComponent } from './components/call-icon/call-icon.component';
 import { HeaderComponent } from './components/header/header.component';
 import { MetadataEditorComponent } from './components/metadata-editor/metadata-editor.component';
+import { TagsDatabaseComponent } from './components/tags-database/tags-database.component';
 import { AboutPage } from './pages/about/about.page';
 import { MainPage } from './pages/main/main.page';
 import { SettingsPage } from './pages/settings/settings.page';
@@ -31,6 +32,7 @@ import { SettingsService } from './services/settings.service';
     MetadataEditorComponent,
     RecordingsSortPipe,
     SettingsPage,
+    TagsDatabaseComponent,
     ToHmsPipe,
   ],
   imports: [

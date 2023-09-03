@@ -1,6 +1,7 @@
 import { BehaviorSubject } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { Preferences } from '@capacitor/preferences';
+import { getDefaultTags, Tag } from '../models/tag';
 import { SortMode } from '../pipes/recordings-sort.pipe';
 import { FromJSON, Serialized, ToJSON } from '../utils/json-serializer';
 
@@ -75,6 +76,12 @@ export class SettingsService {
    */
   @Serialized()
   public recordingsSortMode: SortMode = SortMode.Date_DESC;
+
+  /**
+   * Tags config
+   */
+  @Serialized()
+  public tags: Tag[] = getDefaultTags();
 
 
   /**

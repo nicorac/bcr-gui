@@ -1,7 +1,9 @@
+import { TagsDatabaseComponent } from 'src/app/components/tags-database/tags-database.component';
 import { SortMode } from 'src/app/pipes/recordings-sort.pipe';
 import { MessageBoxService } from 'src/app/services/message-box.service';
 import { RecordingsService } from 'src/app/services/recordings.service';
 import { Component } from '@angular/core';
+import { ModalController } from '@ionic/angular';
 import { AppDateTimeFormat, SettingsService } from '../../services/settings.service';
 
 @Component({
@@ -18,6 +20,7 @@ export class SettingsPage {
 
   constructor(
     private mbs: MessageBoxService,
+    private modalCtrl: ModalController,
     protected settings: SettingsService,
     protected recordingsService: RecordingsService,
   ) { }
@@ -49,6 +52,19 @@ export class SettingsPage {
    */
   updateDateTimeStyle(style: string, key: keyof AppDateTimeFormat) {
     this.settings.dateTimeStyle = { ...this.settings.dateTimeStyle, [key]: style === '' ? undefined : style }
+  }
+
+  async openTagsEditor() {
+    // show editor
+    const modal = await this.modalCtrl.create({
+      component: TagsDatabaseComponent,
+      // componentProps: {
+      //   recording: item,
+      // },
+      backdropDismiss: false,
+    });
+    modal.present();
+
   }
 
 }

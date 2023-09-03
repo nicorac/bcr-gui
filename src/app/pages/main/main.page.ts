@@ -58,7 +58,6 @@ export class MainPage {
    */
   async editMetadata(item: Recording) {
     try {
-
       // show editor
       const modal = await this.modalCtrl.create({
         component: MetadataEditorComponent,
@@ -66,19 +65,9 @@ export class MainPage {
           recording: item,
         },
         backdropDismiss: false,
+        cssClass: 'test-class',
       });
       modal.present();
-
-      // const { data, role } = await modal.onWillDismiss();
-
-      // if (role === 'confirm') {
-      //   console.warn(`Hello, ${data}!`);
-      // }
-
-
-
-
-      //await this.recordingsService.updateRecording(item);
     }
     catch (error) {
       this.mbs.showError({

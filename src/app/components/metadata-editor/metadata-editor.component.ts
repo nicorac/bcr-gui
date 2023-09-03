@@ -1,6 +1,6 @@
 import { Recording } from 'src/app/models/recording';
 import { RecordingsService } from 'src/app/services/recordings.service';
-import { Component, Input } from '@angular/core';
+import { Component, ElementRef, Input, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 
 @Component({
@@ -8,7 +8,7 @@ import { ModalController } from '@ionic/angular';
   templateUrl: './metadata-editor.component.html',
   styleUrls: ['./metadata-editor.component.scss'],
 })
-export class MetadataEditorComponent {
+export class MetadataEditorComponent implements OnInit {
 
   // original record as passed in by caller
   private originalItem!: Recording;
@@ -23,9 +23,14 @@ export class MetadataEditorComponent {
   }
 
   constructor(
+    private ref: ElementRef<HTMLElement>,
     private modalCtrl: ModalController,
     private recordingsService: RecordingsService,
   ) {}
+
+  ngOnInit(): void {
+    this.ref.nativeElement.parentElement?.classList.add('metadata-editor');
+  }
 
   cancel() {
     return this.modalCtrl.dismiss();

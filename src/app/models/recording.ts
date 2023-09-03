@@ -47,6 +47,9 @@ export class Recording {
   // record status
   status?: 'new' | 'unchanged' | 'deleted' = 'new';
 
+  // IDs of tags attached to this item
+  tags?: string[];
+
   /**
    * Use createInstance()...
    */
@@ -98,6 +101,9 @@ export class Recording {
       res.opNumber = calls0.phone_number_formatted ?? calls0.phone_number ?? '<unknown>';
       res.opName = calls0.contact_name ?? res.opNumber;
     }
+
+    // IDs of tags attached to this item
+    res.tags = [];
 
     return res;
   }
