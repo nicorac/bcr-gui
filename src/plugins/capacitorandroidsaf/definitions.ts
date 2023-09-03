@@ -14,7 +14,14 @@ export interface AndroidSAFPlugin {
    *
    * @param options ReadFileOptions
    */
-  readFile(options: ReadFileOptions): Promise<{ content: string, encoding?: Encodings }>;
+  readFile(options: ReadFileOptions): Promise<{ content: string, encoding?: Encoding }>;
+
+  /**
+   * Create a new file
+   *
+   * @returns Uri of the created file
+   */
+  createFile(options: CreateFileOptions): Promise<{ uri: string }>;
 
   /**
    * Write file content
@@ -39,6 +46,7 @@ export interface AndroidSAFPlugin {
 export enum ErrorCode {
   ERR_CANCELED = "ERR_CANCELED",
   ERR_INVALID_URI = "ERR_INVALID_URI",
+  ERR_INVALID_CONTENT = "ERR_INVALID_CONTENT",
   ERR_NOT_FOUND = "ERR_NOT_FOUND",
   ERR_IO_EXCEPTION = "ERR_IO_EXCEPTION",
 }
@@ -46,7 +54,7 @@ export enum ErrorCode {
 /**
  * File encodings
  */
-export enum Encodings {
+export enum Encoding {
   ASCII = 'ascii',
   UTF8 = 'utf8',
   UTF16 = 'utf16',
@@ -64,7 +72,31 @@ export interface ReadFileOptions extends BaseFilesOptions {
    * File content encoding.
    * If undefined then the file is read as binary and returned as BASE64 encoded string.
    */
-  encoding?: Encodings | undefined,
+  encoding?: Encoding | undefined,
+}
+
+export interface CreateFileOptions {
+  /**
+   * Uri of the directory where the file will be created
+   */
+  directory: string;
+  /**
+   * Name of the file to create
+   */
+  filename: string;
+  /**
+   * File content, as plain text (encoded with the given encoding) or BASE64 encoded.
+   */
+  content?: string;
+  /**
+   * File content encoding.
+   * If undefined then "content" is considered as BASE64 encoded string.
+   */
+  encoding?: Encoding,
+  /**
+   * MimeType of the file (only if file has to be created)
+   */
+  mimeType?: string;
 }
 
 export interface WriteFileOptions extends BaseFilesOptions {
@@ -76,7 +108,7 @@ export interface WriteFileOptions extends BaseFilesOptions {
    * File content encoding.
    * If undefined then "content" is considered as BASE64 encoded string.
    */
-  encoding?: Encodings | undefined,
+  encoding?: Encoding,
 }
 
 export interface DeleteFileOptions extends BaseFilesOptions { }

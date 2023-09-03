@@ -20,12 +20,18 @@ import com.getcapacitor.annotation.ActivityCallback;
 import com.getcapacitor.annotation.CapacitorPlugin;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
@@ -35,6 +41,8 @@ public class AndroidSAFPlugin extends Plugin {
 
   private static final String ERR_CANCELED = "ERR_CANCELED";
   private static final String ERR_INVALID_URI = "ERR_INVALID_URI";
+  private static final String ERR_INVALID_NAME = "ERR_INVALID_NAME";
+  private static final String ERR_INVALID_CONTENT = "ERR_INVALID_CONTENT";
   private static final String ERR_NOT_FOUND = "ERR_NOT_FOUND";
   private static final String ERR_IO_EXCEPTION = "ERR_IO_EXCEPTION";
 
@@ -92,7 +100,7 @@ public class AndroidSAFPlugin extends Plugin {
   public void listFiles(PluginCall call) {
 
     // get input arguments
-    String uriString = call.getString("uri", "");
+    var uriString = call.getString("uri", "");
     if (uriString == "") {
       call.reject("Invalid uri", ERR_INVALID_URI);
       return;
@@ -101,7 +109,7 @@ public class AndroidSAFPlugin extends Plugin {
     // Get a DocumentFile from the given Uri
     var uri = Uri.parse(uriString);
     var folder = DocumentFile.fromTreeUri(getContext(), uri);
-    if (!folder.exists()) {
+    if (folder == null || !folder.exists()) {
       call.reject("Folder not found", ERR_NOT_FOUND);
       return;
     }
@@ -173,6 +181,138 @@ public class AndroidSAFPlugin extends Plugin {
   }
 
   /**
+   * Create an empty file
+   *
+   * @param call
+   *  call.uri: URI of the file to create
+   */
+  @PluginMethod()
+  public void createFile(PluginCall call) {
+
+    // get input arguments
+    var directory = call.getString("directory", null);
+    if (directory == null) {
+      call.reject("Invalid or missing directory uri", ERR_INVALID_URI);
+      return;
+    }
+    // text if it exists
+    var directoryUri = Uri.parse(directory);
+    var directoryDf = DocumentFile.fromTreeUri(getContext(), directoryUri);
+    if (directoryDf == null || !directoryDf.exists()) {
+      call.reject("Invalid or missing directory", ERR_INVALID_URI);
+      return;
+    }
+
+    // get new filename
+    var filename = call.getString("filename", null);
+    if (filename == null) {
+      call.reject("Invalid or missing filename", ERR_INVALID_NAME);
+      return;
+    }
+
+    // get mimeType
+    var mimeType = call.getString("mimeType", "text/plain");
+    assert mimeType != null;
+
+    // if an "encoding" has been specified, file content is passed as string
+    // otherwise it's passed as BASE64 string
+    var encoding = call.getString("encoding", null);
+    var charset = getEncoding(encoding);
+
+    // get content
+    var content = call.getString("content", null);
+    if (content == null) {
+      call.reject("Invalid or missing content", ERR_INVALID_CONTENT);
+      return;
+    }
+
+    // create empty file & write content
+    var fileDf = directoryDf.createFile(mimeType, filename);
+    if (fileDf != null) {
+      try {
+        _writeFileContent(fileDf.getUri(), content, charset);
+      } catch (IOException e) {
+        call.reject("Error writing to file", ERR_IO_EXCEPTION);
+        return;
+      }
+      // return new file document uri
+      final var res = new JSObject();
+      res.put("uri", fileDf.getUri().toString());
+      call.resolve(res);
+    }
+    else {
+      call.reject("Error creating file", ERR_IO_EXCEPTION);
+    }
+
+  }
+
+  /**
+   * Write content to an existing file
+   *
+   * @param call
+   *  call.uri: URI of the file to read
+   */
+  @PluginMethod()
+  public void writeFile(PluginCall call) {
+
+    // get input arguments
+    var fileUri = call.getString("uri", null);
+    if (fileUri == null) {
+      call.reject("Invalid or missing uri", ERR_INVALID_URI);
+      return;
+    }
+    // if an "encoding" has been specified, file content is passed as string
+    // otherwise it's passed as BASE64 string
+    var encoding = call.getString("encoding", null);
+    var charset = getEncoding(encoding);
+
+    // Get a DocumentFile from the given fileUri
+    var uri = Uri.parse(fileUri);
+
+    // Get content
+    var content = call.getString("content", null);
+    if (content == null) {
+      call.reject("Invalid or missing content", ERR_INVALID_CONTENT);
+      return;
+    }
+
+    // write content (and resolve/reject call)
+    try {
+      _writeFileContent(uri, content, charset);
+    } catch (IOException e) {
+      call.reject("Error writing to file", ERR_IO_EXCEPTION);
+    }
+
+    call.resolve();
+  }
+
+  /**
+   * Write file content to existing file with the given URI
+   */
+  private void _writeFileContent(Uri uri, String content, Charset charset) throws IOException {
+    try (
+      var os = getContext().getContentResolver().openOutputStream(uri, "wt");
+    ) {
+      // if charset is not null assume its a plain text file the user wants to save
+      if (charset != null) {
+        try (
+          var osw = new OutputStreamWriter(os, charset);
+        ) {
+          osw.write(content);
+          osw.flush();
+        }
+      }
+      else {
+        // remove header from dataURL
+        if (content.contains(",")) {
+          content = content.split(",")[1];
+        }
+        os.write(Base64.decode(content, Base64.NO_WRAP));
+      }
+    }
+  }
+
+  /**
    * Delete file
    *
    * @param call
@@ -211,7 +351,7 @@ public class AndroidSAFPlugin extends Plugin {
    * More efficient method to retrieve directory content, avoiding calls to
    * slow DocumentFile methods like .getDisplayName()
    *
-   * @see https://stackoverflow.com/questions/42186820/why-is-documentfile-so-slow-and-what-should-i-use-instead
+   * @see "https://stackoverflow.com/questions/42186820/why-is-documentfile-so-slow-and-what-should-i-use-instead"
    *
    * @param folderUri URI of the folder to be scanned
    *
@@ -220,14 +360,12 @@ public class AndroidSAFPlugin extends Plugin {
   private JSArray listFileFaster(Uri folderUri) {
 
     final ContentResolver resolver = getContext().getContentResolver();
-    final Uri childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(folderUri, DocumentsContract.getDocumentId(folderUri));
+    final var childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(folderUri, DocumentsContract.getDocumentId(folderUri));
     final var result = new JSArray();
-    Cursor c;
 
     // load all of the needed data in a single shot
-    c = resolver.query(
-      childrenUri,
-      new String[] {
+    try (
+      Cursor c = resolver.query(childrenUri, new String[] {
         DocumentsContract.Document.COLUMN_DOCUMENT_ID,    // 0
         DocumentsContract.Document.COLUMN_DISPLAY_NAME,   // 1
         DocumentsContract.Document.COLUMN_MIME_TYPE,      // 2
@@ -235,24 +373,25 @@ public class AndroidSAFPlugin extends Plugin {
         DocumentsContract.Document.COLUMN_SIZE,           // 4
         DocumentsContract.Document.COLUMN_LAST_MODIFIED,  // 5
       }, null, null, null);
-    while (c.moveToNext()) {
-      final var item = new JSObject();
-      final var documentId = c.getString(0);
-      final var mimeType = c.getString(2);
-      final var flags = c.getInt(3);
+    ) {
+      while (c.moveToNext()) {
+        final var item = new JSObject();
+        final var documentId = c.getString(0);
+        final var mimeType = c.getString(2);
+        final var flags = c.getInt(3);
 
-      item.put("name", c.getString(1));
-      item.put("uri", DocumentsContract.buildDocumentUriUsingTree(folderUri, documentId).toString());
-      item.put("type", mimeType);
-      item.put("isDirectory", mimeType == DocumentsContract.Document.MIME_TYPE_DIR);
-      item.put("isVirtual", flags & DocumentsContract.Document.FLAG_VIRTUAL_DOCUMENT);
-      item.put("size", c.getLong(4));
-      item.put("lastModified", c.getLong(5));
+        item.put("name", c.getString(1));
+        item.put("uri", DocumentsContract.buildDocumentUriUsingTree(folderUri, documentId).toString());
+        item.put("type", mimeType);
+        item.put("isDirectory", mimeType == DocumentsContract.Document.MIME_TYPE_DIR);
+        item.put("isVirtual", flags & DocumentsContract.Document.FLAG_VIRTUAL_DOCUMENT);
+        item.put("size", c.getLong(4));
+        item.put("lastModified", c.getLong(5));
 
-      // append to result
-      result.put(item);
+        // append to result
+        result.put(item);
+      }
     }
-
     return result;
   }
 
