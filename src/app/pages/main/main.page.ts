@@ -108,16 +108,16 @@ export class MainPage {
     // temp local file
     const tempFile = {
       directory: Directory.Cache,
-      path: `${tempDir}/${item.file.name}`,
+      path: `${tempDir}/${item.audioFile}`,
     };
 
     // read audio file content
     let base64Content: string = '';
     try {
-      ({ content: base64Content } = await AndroidSAF.readFile({ uri: item.file.uri }));
+      ({ content: base64Content } = await AndroidSAF.readFile({ directory: this.settings.recordingsDirectoryUri, filename: item.audioFile }));
     } catch (error) {
       this.mbs.showError({
-        message: `Error reading audio file: ${item.file.uri}`,
+        message: `Error reading audio file: ${item.audioFile}`,
         error: error,
       });
       return;

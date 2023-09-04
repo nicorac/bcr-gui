@@ -37,16 +37,6 @@ export class SettingsPage {
     this.recordingsService.selectRecordingsDirectory();
   }
 
-  clearCache() {
-    this.mbs.showConfirm({
-      header: 'Clear cache',
-      message: 'Do you really want to clear the cache and reload all recordings?',
-      onConfirm: () => {
-        this.recordingsService.refreshContent(true);
-      }
-    });
-  }
-
   /**
    * Need to re-create the whole object to let pipes update
    */

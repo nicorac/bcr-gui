@@ -1,11 +1,21 @@
 import { BehaviorSubject } from 'rxjs';
 import { AndroidSAF } from 'src/plugins/capacitorandroidsaf';
 import { Injectable } from '@angular/core';
+import { Encoding } from '@capacitor/filesystem';
 import { AlertController, IonicSafeString } from '@ionic/angular';
 import { Recording } from '../models/recording';
-import { RecordingsCache } from '../utils/recordings-cache';
 import { MessageBoxService } from './message-box.service';
 import { SettingsService } from './settings.service';
+
+// database props
+const DB_FILENAME = '.bcr-gui-database.json';
+const DB_SCHEMA_VERSION = 1;
+
+// database structure
+type DbContent = {
+  schemaVersion: number,
+  data: Recording[],
+}
 
 @Injectable({
   providedIn: 'root'
@@ -33,13 +43,13 @@ export class RecordingsService {
    */
   async initialize() {
 
-    // read DB from cache
-    const cache = await RecordingsCache.load();
-    this.recordings.next(cache);
-
     // check if recordings directory has been selected
     if (!this.settings.recordingsDirectoryUri) {
-      this.selectRecordingsDirectory();
+      await this.selectRecordingsDirectory();
+    }
+    else {
+      // load existing database from storage
+      await this.load();
     }
 
   }
@@ -47,7 +57,7 @@ export class RecordingsService {
   /**
    * Refresh recordings list
    */
-  async refreshContent(clearCache: boolean = false) {
+  async refreshContent() {
 
     // exit if we're already refreshing
     if (this.refreshProgress.value) {
@@ -65,18 +75,12 @@ export class RecordingsService {
 
     // save current DB and set statuses as 'deleted'
     // (if a file with the same filename won't be found, then DB record must be removed)
-    let currentDB: Recording[];
-    if (clearCache) {
-      currentDB = [];
-    }
-    else {
-      currentDB = this.recordings.value;
-      currentDB.forEach(r => r.status = 'deleted');
-    }
+    let currentDB = this.recordings.value;
+    currentDB.forEach(r => r.status = 'deleted');
 
     try {
       // keep files only (no directories)
-      const allFiles = (await AndroidSAF.listFiles({ uri: this.settings.recordingsDirectoryUri }))
+      const allFiles = (await AndroidSAF.listFiles({ directory: this.settings.recordingsDirectoryUri }))
         ?.items.filter(i => !i.isDirectory);
 
       // extract supported audio file types
@@ -94,7 +98,7 @@ export class RecordingsService {
           this.refreshProgress.next(++i / count);
 
           // check if current audio file already exists in current DB
-          const dbRecord = currentDB.find(r => r.file.uri === file.uri);
+          const dbRecord = currentDB.find(r => r.audioFile === file.name);
           if (dbRecord) {
             // mark file as "unchanged" and continue
             dbRecord.status = 'unchanged';
@@ -106,7 +110,7 @@ export class RecordingsService {
           const metadataFile = allFiles.find(i => i.name === metadataFileName);
 
           // add to currentDB
-          currentDB.push(await Recording.createInstance(file, metadataFile));
+          currentDB.push(await Recording.createInstance(this.settings.recordingsDirectoryUri, file, metadataFile));
 
         }
       }
@@ -116,7 +120,7 @@ export class RecordingsService {
 
       // update collection & cache
       this.recordings.next(currentDB);
-      await RecordingsCache.save(currentDB);
+      await this.save();
       this.refreshProgress.next(0);
 
     }
@@ -129,27 +133,19 @@ export class RecordingsService {
   }
 
   /**
-   * Update metadata of the given recording, both in DB and in cache
-   */
-  async updateRecording(item: Recording) {
-    await Recording.updateJSONMetadata(item, this.settings.recordingsDirectoryUri);
-    await RecordingsCache.save(this.recordings.value);
-  }
-
-  /**
    * Deletes the given recording file and its optional JSON metadata
    */
   async deleteRecording(item: Recording) {
 
     // shared delete function
-    const deleteFileFn = async (uri: string) => {
+    const deleteFileFn = async (filename: string) => {
       try {
-        await AndroidSAF.deleteFile({ uri });
+        await AndroidSAF.deleteFile({ directory: this.settings.recordingsDirectoryUri, filename: filename });
         return true;
       }
       catch(err) {
         this.mbs.showError({
-          message: 'There was an error while deleting item: ' + uri,
+          message: 'There was an error while deleting item: ' + filename,
           error: err,
         });
         return false;
@@ -157,8 +153,8 @@ export class RecordingsService {
     }
 
     if (
-      item && await deleteFileFn(item.file.uri)
-      && item?.metadataFile && await deleteFileFn(item.metadataFile.uri)
+      item && await deleteFileFn(item.audioFile)
+      && item?.metadataFile && await deleteFileFn(item.metadataFile)
     ){
       // update DB
       this.recordings.next(this.recordings.value.filter(r => r !== item));
@@ -188,12 +184,11 @@ export class RecordingsService {
           handler: () => {
             // show directory selector
             AndroidSAF.selectDirectory({})
-              .then(res => {
+              .then(async res => {
                 this.settings.recordingsDirectoryUri = res.selectedUri;
                 console.log('Selected directory:', this.settings.recordingsDirectoryUri);
-                this.settings.save();
-                this.recordings.next([]);
-                this.refreshContent(true);
+                await this.settings.save();
+                await this.refreshContent();
               });
           },
         },
@@ -202,6 +197,97 @@ export class RecordingsService {
     });
 
     await alert.present();
+  }
+
+  /**
+   * Load recordings database from storage
+   */
+  private async load() {
+
+    try {
+
+      // test if DB file exists, then load it
+      const readFileOptions = {
+        directory: this.settings.recordingsDirectoryUri,
+        filename: DB_FILENAME,
+        encoding: Encoding.UTF8,
+      };
+
+      if ((await AndroidSAF.fileExists(readFileOptions)).exists) {
+        const { content } = await AndroidSAF.readFile(readFileOptions);
+        const dbContent: DbContent = JSON.parse(content);
+
+        // check DB version
+        if (dbContent.schemaVersion < DB_SCHEMA_VERSION) {
+          this.upgradeDb(dbContent);
+        }
+
+        // return DB
+        this.recordings.next(dbContent.data);
+      }
+
+    } catch (error) {
+      this.mbs.showError({
+        message: 'Error loading database',
+        error,
+      });
+    }
+
+  }
+
+  /**
+   * Save the recordings database to storage
+   */
+  public async save() {
+
+    try {
+
+      // serialize data
+      const content = JSON.stringify(<DbContent> {
+        schemaVersion: DB_SCHEMA_VERSION,
+        data: this.recordings.value,
+      }, null, 2);
+
+      // write content
+      await AndroidSAF.writeFile({
+        directory: this.settings.recordingsDirectoryUri,
+        filename: DB_FILENAME,
+        content: content,
+        encoding: Encoding.UTF8,
+      });
+
+    } catch (error) {
+      this.mbs.showError({
+        message: 'Error saving database',
+        error,
+      });
+    }
+
+  }
+
+  /**
+   * Upgrade DB version
+   */
+  private upgradeDb(dbContent: DbContent) {
+
+    // while (dbContent.schemaVersion < DB_SCHEMA_VERSION) {
+
+    //   switch (dbContent.schemaVersion) {
+
+    //     // upgrade ver. 1 --> 2
+    //     case 1:
+    //       dbContent.schemaVersion = 2;
+    //       break;
+
+    //       // upgrade ver. 2 --> 3
+    //       case 1:
+    //       dbContent.schemaVersion = 3;
+    //       break;
+
+    //   }
+
+    // }
+
   }
 
 }

@@ -1,5 +1,8 @@
 export interface AndroidSAFPlugin {
 
+  /**
+   * Open Android SAF directory picker to select a directory and give RW access
+   */
   selectDirectory(options?: { initialUri?: string }): Promise<{ selectedUri: string }>;
 
   /**
@@ -17,14 +20,25 @@ export interface AndroidSAFPlugin {
   readFile(options: ReadFileOptions): Promise<{ content: string, encoding?: Encoding }>;
 
   /**
-   * Create a new file
-   *
-   * @returns Uri of the created file
+   * Test if the given file exists
    */
-  createFile(options: CreateFileOptions): Promise<{ uri: string }>;
+  fileExists(options: FileOptions): Promise<{ exists: boolean }>;
 
   /**
-   * Write file content
+   * Get the URI for a file
+   */
+  getUri(options: FileOptions): Promise<{ uri: string }>;
+
+  // /**
+  //  * Create a new file
+  //  *
+  //  * @returns Uri of the created file
+  //  */
+  // createFile(options: CreateFileParameter): Promise<{ uri: string }>;
+
+  /**
+   * Write file content.
+   * The file is created if not already exists.
    *
    * @param options WriteFileOptions
    */
@@ -49,6 +63,7 @@ export enum ErrorCode {
   ERR_INVALID_CONTENT = "ERR_INVALID_CONTENT",
   ERR_NOT_FOUND = "ERR_NOT_FOUND",
   ERR_IO_EXCEPTION = "ERR_IO_EXCEPTION",
+  ERR_UNKNOWN = "ERR_UNKNOWN",
 }
 
 /**
@@ -61,13 +76,19 @@ export enum Encoding {
 }
 
 interface BaseFilesOptions {
-  // Item Uri
-  uri: string;
+  // URI of the base directory
+  // (obtained with selectDirectory() & Intent.ACTION_OPEN_DOCUMENT_TREE)
+  directory: string;
+}
+
+interface FileOptions extends BaseFilesOptions {
+  // filename
+  filename: string;
 }
 
 export interface ListFilesOptions extends BaseFilesOptions { }
 
-export interface ReadFileOptions extends BaseFilesOptions {
+export interface ReadFileOptions extends FileOptions {
   /**
    * File content encoding.
    * If undefined then the file is read as binary and returned as BASE64 encoded string.
@@ -75,31 +96,7 @@ export interface ReadFileOptions extends BaseFilesOptions {
   encoding?: Encoding | undefined,
 }
 
-export interface CreateFileOptions {
-  /**
-   * Uri of the directory where the file will be created
-   */
-  directory: string;
-  /**
-   * Name of the file to create
-   */
-  filename: string;
-  /**
-   * File content, as plain text (encoded with the given encoding) or BASE64 encoded.
-   */
-  content?: string;
-  /**
-   * File content encoding.
-   * If undefined then "content" is considered as BASE64 encoded string.
-   */
-  encoding?: Encoding,
-  /**
-   * MimeType of the file (only if file has to be created)
-   */
-  mimeType?: string;
-}
-
-export interface WriteFileOptions extends BaseFilesOptions {
+export interface WriteFileOptions extends FileOptions {
   /**
    * File content, as plain text (encoded with the given encoding) or BASE64 encoded.
    */
@@ -111,7 +108,7 @@ export interface WriteFileOptions extends BaseFilesOptions {
   encoding?: Encoding,
 }
 
-export interface DeleteFileOptions extends BaseFilesOptions { }
+export interface DeleteFileOptions extends FileOptions { }
 
 export interface IDocumentFile extends BaseFilesOptions {
   name: string,     // file/directory name

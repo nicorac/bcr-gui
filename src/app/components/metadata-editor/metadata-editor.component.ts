@@ -47,7 +47,7 @@ export class MetadataEditorComponent implements OnInit {
     }
     // save changes
     if (changed) {
-      await this.recordingsService.updateRecording(this.originalItem);
+      await this.recordingsService.save();
     }
     return this.modalCtrl.dismiss();
   }

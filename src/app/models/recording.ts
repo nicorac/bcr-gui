@@ -1,5 +1,5 @@
 import { AndroidSAF, Encoding, IDocumentFile } from 'src/plugins/capacitorandroidsaf';
-import { getFilename, replaceExtension, stripExtension } from '../utils/filesystem';
+import { replaceExtension, stripExtension } from '../utils/filesystem';
 import { BcrRecordingMetadata } from './BcrRecordingMetadata';
 
 export type CallDirection = 'in' | 'out' | 'conference' | '';
@@ -10,8 +10,8 @@ export type CallDirection = 'in' | 'out' | 'conference' | '';
 export class Recording {
 
   // original reference to underlying Android DocumentFile + optional JSON metadata
-  file!: IDocumentFile;
-  metadataFile?: IDocumentFile;
+  audioFile!: string;
+  metadataFile?: string;
 
   // recording has associated json metadata file
   hasMetadata = false;
@@ -58,13 +58,13 @@ export class Recording {
   /**
    * Create a new Recording instance from the given audio file and optional metadata file
    */
-  static async createInstance(file: IDocumentFile, metadataFile?: IDocumentFile) {
+  static async createInstance(directoryUri: string, file: IDocumentFile, metadataFile?: IDocumentFile) {
 
     const res = new Recording();
 
     // save files references
-    res.file = file;
-    res.metadataFile = metadataFile;
+    res.audioFile = file.name;
+    res.metadataFile = metadataFile?.name;
 
     // save Android file props
     res.filesize = file.size;
@@ -77,7 +77,7 @@ export class Recording {
     //props are not available, try to extract them from filename
     let metadata: Partial<BcrRecordingMetadata>|undefined = undefined;
     if (metadataFile) {
-      metadata = await Recording.loadJSONMetadata(metadataFile);
+      metadata = await Recording.loadJSONMetadata(directoryUri, metadataFile);
     }
     // if JSON file is missing or a parse error occurred then fallback to parsing filename
     if (metadata) {
@@ -111,9 +111,13 @@ export class Recording {
   /**
    * Load metadata JSON file and extract its contained data
    */
-  private static async loadJSONMetadata(metadataFile: IDocumentFile): Promise<Partial<BcrRecordingMetadata>|undefined> {
+  private static async loadJSONMetadata(directoryUri: string, metadataFile: IDocumentFile): Promise<Partial<BcrRecordingMetadata>|undefined> {
 
-    const { content: metadataFileContent } = await AndroidSAF.readFile({ uri: metadataFile.uri, encoding: Encoding.UTF8 });
+    const { content: metadataFileContent } = await AndroidSAF.readFile({
+      directory: directoryUri,
+      filename: metadataFile.name,
+      encoding: Encoding.UTF8,
+    });
     try {
       return JSON.parse(metadataFileContent);
     }
@@ -122,75 +126,6 @@ export class Recording {
       return undefined;
     }
 
-  }
-
-  /**
-   * Update existing (or create new) metadata JSON file and update its content.
-   * NOTE: this method is static because cache won't store full class instances.
-   *
-   * @throws IO Exception
-   */
-  public static async updateJSONMetadata(rec: Recording, folder: string): Promise<void> {
-
-    const metadataFilename = rec.metadataFile?.name ?? Recording.getMetadataFilename(rec.file.name);
-    let metadata: Partial<BcrRecordingMetadata> = {};
-
-    // read current metadata file content (if existing)
-    if (rec.hasMetadata) {
-      let metadataFileContent = '';
-      ({ content: metadataFileContent } = await AndroidSAF.readFile({ uri: rec.metadataFile!.uri, encoding: Encoding.UTF8 }));
-      metadata = JSON.parse(metadataFileContent);
-    }
-    else {
-      // create minimal metadata file from scratch
-      metadata = <BcrRecordingMetadata> {
-        timestamp_unix_ms: rec.date,
-        direction: rec.direction,
-        sim_slot: rec.simSlot,
-        calls: [ {} ],
-        output: {
-          format: {
-            type: rec.mimeType,
-          },
-          recording: {
-            duration_secs_total: rec.duration,
-          }
-        },
-        extra: {
-          dataSource: 'filename',
-        }
-      }
-    }
-
-    // update "editable" fields
-    if (metadata.calls?.[0]) {
-      metadata.calls[0].contact_name = rec.opName;
-      metadata.calls[0].phone_number = rec.opNumber;
-    }
-
-    // save to new/existing metadata file
-    const metadataContent = JSON.stringify(metadata, null, 2);
-    if (!rec.hasMetadata) {
-      const filename = getFilename(metadataFilename);
-      await AndroidSAF.createFile({ directory: folder, mimeType: 'text/json', filename, content: metadataContent, encoding: Encoding.UTF8 });
-    }
-    else {
-      await AndroidSAF.writeFile({ uri: rec.metadataFile!.uri, content: metadataContent, encoding: Encoding.UTF8 });
-    }
-
-    // update record
-    if (!rec.hasMetadata) {
-      rec.hasMetadata = true;
-      rec.metadataFile = <Required<IDocumentFile>> {
-        uri: metadataFilename,
-        lastModified: new Date().getDate(),
-        isDirectory: false,
-        isVirtual: false,
-        name: getFilename(metadataFilename),
-        size: metadataContent.length,
-        type: 'text/json',
-      };
-    }
   }
 
   /**
