@@ -1,5 +1,9 @@
 # Version history
 
+## Version x.x.x ()
+
+- App database is now stored in the same folder as recording audio files (`.bcr-gui.database.json` file); it allows app to be uninstalled/reinstalled preserving data (in anticipation of new features that will allow adding notes, tags, ... to recordings)
+
 ## Version 0.0.10 (2023-09-10)
 
 - Dark mode not applied when "Appearance = System preference"

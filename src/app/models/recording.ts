@@ -1,5 +1,5 @@
-import { AndroidSAF, Encodings, IDocumentFile } from 'src/plugins/capacitorandroidsaf';
-import { stripExtension } from '../utils/filesystem';
+import { AndroidSAF, Encoding, IDocumentFile } from 'src/plugins/capacitorandroidsaf';
+import { replaceExtension, stripExtension } from '../utils/filesystem';
 import { BcrRecordingMetadata } from './BcrRecordingMetadata';
 
 export type CallDirection = 'in' | 'out' | 'conference' | '';
@@ -10,8 +10,8 @@ export type CallDirection = 'in' | 'out' | 'conference' | '';
 export class Recording {
 
   // original reference to underlying Android DocumentFile + optional JSON metadata
-  file!: IDocumentFile;
-  metadataFile?: IDocumentFile;
+  audioFile!: string;
+  metadataFile?: string;
 
   // recording has associated json metadata file
   hasMetadata = false;
@@ -55,13 +55,13 @@ export class Recording {
   /**
    * Create a new Recording instance from the given audio file and optional metadata file
    */
-  static async createInstance(file: IDocumentFile, metadataFile?: IDocumentFile) {
+  static async createInstance(directoryUri: string, file: IDocumentFile, metadataFile?: IDocumentFile) {
 
     const res = new Recording();
 
     // save files references
-    res.file = file;
-    res.metadataFile = metadataFile;
+    res.audioFile = file.name;
+    res.metadataFile = metadataFile?.name;
 
     // save Android file props
     res.filesize = file.size;
@@ -70,18 +70,15 @@ export class Recording {
     res.opName = file.name;
     res.opNumber = file.name;
 
-    // if JSON metadata props are not available, try to extract them from filename
-    let metadata: Partial<BcrRecordingMetadata> = {};
+    // try to extract metadata from companion JSON file
+    //props are not available, try to extract them from filename
+    let metadata: Partial<BcrRecordingMetadata>|undefined = undefined;
     if (metadataFile) {
-      const { content: metadataFileContent } = await AndroidSAF.readFile({ uri: metadataFile.uri, encoding: Encodings.UTF8 });
-      try {
-        metadata = JSON.parse(metadataFileContent);
-        res.hasMetadata = true;
-      }
-      catch (error) {
-        res.hasMetadata = false;
-        console.error(error);
-      }
+      metadata = await Recording.loadJSONMetadata(directoryUri, metadataFile);
+    }
+    // if JSON file is missing or a parse error occurred then fallback to parsing filename
+    if (metadata) {
+      res.hasMetadata = true;
     }
     else {
       metadata = Recording.extractMetadataFromFilename(file.name);
@@ -98,11 +95,32 @@ export class Recording {
     // extract "other party" data
     const calls0 = metadata.calls?.[0];
     if (calls0) {
-      res.opNumber = calls0.phone_number_formatted ?? '<unknown>';
+      res.opNumber = calls0.phone_number_formatted ?? calls0.phone_number ?? '<unknown>';
       res.opName = calls0.contact_name ?? res.opNumber;
     }
 
     return res;
+  }
+
+
+  /**
+   * Load metadata JSON file and extract its contained data
+   */
+  private static async loadJSONMetadata(directoryUri: string, metadataFile: IDocumentFile): Promise<Partial<BcrRecordingMetadata>|undefined> {
+
+    const { content: metadataFileContent } = await AndroidSAF.readFile({
+      directory: directoryUri,
+      filename: metadataFile.name,
+      encoding: Encoding.UTF8,
+    });
+    try {
+      return JSON.parse(metadataFileContent);
+    }
+    catch (error) {
+      console.error(error);
+      return undefined;
+    }
+
   }
 
   /**
@@ -155,6 +173,13 @@ export class Recording {
     ];
 
     return res;
+  }
+
+  /**
+   * Return the filename of the JSON metadata file associated with the given audio filename
+   */
+  public static getMetadataFilename(audioFilename: string): string {
+    return replaceExtension(audioFilename, '.json');
   }
 
 }
