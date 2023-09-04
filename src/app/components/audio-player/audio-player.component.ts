@@ -1,6 +1,8 @@
 
 import { Subscription } from 'rxjs';
 import { Recording } from 'src/app/models/recording';
+import { SettingsService } from 'src/app/services/settings.service';
+import { AndroidSAF } from 'src/plugins/capacitorandroidsaf';
 import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { NativeAudio } from '@capacitor-community/native-audio';
 import { AlertController, Platform, RangeCustomEvent } from '@ionic/angular';
@@ -37,20 +39,19 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
   @Input({ required: true }) recording!: Recording;
 
   // props
-  get assetId() { return this.recording.file.uri; }
+  get assetId() { return this.recording.audioFile; }
 
 
   constructor(
     private alertController: AlertController,
     private cdr: ChangeDetectorRef,
     private platform: Platform,
+    private settings: SettingsService,
   ) { }
 
   async ngOnInit() {
 
     try {
-
-
       // when Android put app on the background we MUST unload audio
       // to avoid it automatically back to play once app restored (pause/stop doesn't work!)
       this._androidEventsSubs.add(this.platform.pause.subscribe(async () => {
@@ -80,9 +81,10 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
    */
   private async preloadAudio() {
 
+    const { uri: assetPath } = await AndroidSAF.getUri({ directory: this.settings.recordingsDirectoryUri, filename: this.recording.audioFile });
     await NativeAudio.preload({
       assetId: this.assetId,
-      assetPath: this.recording.file.uri,
+      assetPath,
       isUrl: false,
     });
 

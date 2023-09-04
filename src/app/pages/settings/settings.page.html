@@ -16,11 +16,6 @@
     </ion-item>
 
     <ion-item>
-      <ion-label>Cache</ion-label>
-      <ion-button [disabled]="recordingsService.refreshProgress | async" (click)="clearCache()">Clear</ion-button>
-    </ion-item>
-
-    <ion-item>
       <ion-select label="Appearance" [(ngModel)]="settings.appearance">
         <ion-select-option [value]="'system'">System preference</ion-select-option>
         <ion-select-option [value]="'light'">Light</ion-select-option>
