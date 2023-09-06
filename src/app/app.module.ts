@@ -1,5 +1,6 @@
+import { IntlModule } from 'angular-ecmascript-intl';
 import { CommonModule, DatePipe } from '@angular/common';
-import { APP_INITIALIZER, LOCALE_ID, NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouteReuseStrategy, RouterModule } from '@angular/router';
@@ -36,6 +37,7 @@ import { SettingsService } from './services/settings.service';
     CallIconComponent,
     CommonModule,
     FormsModule,
+    IntlModule,
     IonicModule.forRoot({ innerHTMLTemplatesEnabled: true }),
     RouterModule,
   ],
@@ -44,7 +46,6 @@ import { SettingsService } from './services/settings.service';
     ToHmsPipe,
     { provide: APP_INITIALIZER, useFactory: appInitializer, deps: [ RecordingsService, SettingsService, Platform ], multi: true },
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-    { provide: LOCALE_ID, useFactory: (settings: SettingsService) => settings.deviceCulture, deps: [ SettingsService ] },
   ],
   bootstrap: [
     AppComponent

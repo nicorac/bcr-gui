@@ -1,8 +1,5 @@
 import { BehaviorSubject } from 'rxjs';
-import { registerLocaleData } from '@angular/common';
-import localeIt from '@angular/common/locales/it';
 import { Injectable } from '@angular/core';
-import { Device } from '@capacitor/device';
 import { Preferences } from '@capacitor/preferences';
 import { SortMode } from '../pipes/recordings-sort.pipe';
 import { FromJSON, Serialized, ToJSON } from '../utils/json-serializer';
@@ -13,11 +10,6 @@ export type Appearance = 'system' | 'light' | 'dark';
   providedIn: 'root'
 })
 export class SettingsService {
-
-  // device language settings
-  public deviceLanguage: string = 'en';   // also used as default
-  public deviceCulture: string = 'en-US';
-  public readonly supportedLanguages = [ 'en', 'it' ];  // first one is the "fallback"
 
   /**
    * Uri of the selected recordingsDirectory
@@ -79,24 +71,6 @@ export class SettingsService {
    * Load app settings from storage
    */
   async initialize() {
-
-    // get current device language settings
-    const deviceLanguage = (await Device.getLanguageCode()).value;
-    if (this.supportedLanguages.includes(deviceLanguage)) {
-      // change language from the default english
-      this.deviceLanguage = deviceLanguage;
-      this.deviceCulture = (await Device.getLanguageTag()).value;
-    }
-
-    // init Angular lang classes
-    switch (deviceLanguage) {
-      // predefined, no need to load anything else
-      case 'en':
-        break;
-      case 'it':
-        registerLocaleData(localeIt);
-        break;
-    }
 
     // load settings
     const { value } = await Preferences.get({ key: 'settings' });
