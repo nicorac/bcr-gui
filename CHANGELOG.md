@@ -1,5 +1,10 @@
 # Version history
 
+## Version 0.0.8 (2023-09-07)
+
+- Fixed call icon rendering issues on old WebView versions
+- Recording date is now rendered with current culture format
+
 ## Version 0.0.7 (2023-08-29)
 
 - Added support to dark theme (user can force light/dark theme or use the system default)
