@@ -2,7 +2,7 @@ import { SortMode } from 'src/app/pipes/recordings-sort.pipe';
 import { MessageBoxService } from 'src/app/services/message-box.service';
 import { RecordingsService } from 'src/app/services/recordings.service';
 import { Component } from '@angular/core';
-import { SettingsService } from '../../services/settings.service';
+import { AppDateTimeFormat, SettingsService } from '../../services/settings.service';
 
 @Component({
   selector: 'app-settings',
@@ -12,6 +12,9 @@ import { SettingsService } from '../../services/settings.service';
 export class SettingsPage {
 
   SortMode = SortMode;
+
+  // sample datetime (last second of current year)
+  readonly dateTimeSample = new Date(new Date().getFullYear(), 11, 31, 23, 59, 59);
 
   constructor(
     private mbs: MessageBoxService,
@@ -39,6 +42,13 @@ export class SettingsPage {
         this.recordingsService.refreshContent(true);
       }
     });
+  }
+
+  /**
+   * Need to re-create the whole object to let pipes update
+   */
+  updateDateTimeStyle(style: string, key: keyof AppDateTimeFormat) {
+    this.settings.dateTimeStyle = { ...this.settings.dateTimeStyle, [key]: style === '' ? undefined : style }
   }
 
 }
