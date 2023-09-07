@@ -5,6 +5,7 @@ import { SortMode } from '../pipes/recordings-sort.pipe';
 import { FromJSON, Serialized, ToJSON } from '../utils/json-serializer';
 
 export type Appearance = 'system' | 'light' | 'dark';
+export type AppDateTimeFormat = Pick<Intl.DateTimeFormatOptions, 'dateStyle' | 'timeStyle'>;
 
 @Injectable({
   providedIn: 'root'
@@ -16,6 +17,15 @@ export class SettingsService {
    */
   @Serialized()
   public recordingsDirectoryUri: string = '';
+
+  /**
+   * Date/time format
+   */
+  @Serialized()
+  public dateTimeStyle: AppDateTimeFormat = {
+    dateStyle: 'medium',
+    timeStyle: 'medium',
+  };
 
   //#region Dark mode management
 

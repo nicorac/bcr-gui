@@ -28,6 +28,32 @@
       </ion-select>
     </ion-item>
 
+    <ion-item>
+      <ion-select label="Date style"
+        [ngModel]="settings.dateTimeStyle.dateStyle ?? ''"
+        (ngModelChange)="updateDateTimeStyle($event, 'dateStyle')"
+      >
+        <ion-select-option [value]="'full'">{{ dateTimeSample | intlDate:{ dateStyle:'full' } }}</ion-select-option>
+        <ion-select-option [value]="'long'">{{ dateTimeSample | intlDate:{ dateStyle:'long' } }}</ion-select-option>
+        <ion-select-option [value]="'medium'">{{ dateTimeSample | intlDate:{ dateStyle:'medium' } }}</ion-select-option>
+        <ion-select-option [value]="'short'">{{ dateTimeSample | intlDate:{ dateStyle:'short' } }}</ion-select-option>
+        <ion-select-option [value]="''">None</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-select label="Time style"
+        [ngModel]="settings.dateTimeStyle.timeStyle ?? ''"
+        (ngModelChange)="updateDateTimeStyle($event, 'timeStyle')"
+      >
+        <ion-select-option [value]="'full'">{{ dateTimeSample | intlDate:{ timeStyle:'full' } }}</ion-select-option>
+        <ion-select-option [value]="'long'">{{ dateTimeSample | intlDate:{ timeStyle:'long' } }}</ion-select-option>
+        <ion-select-option [value]="'medium'">{{ dateTimeSample | intlDate:{ timeStyle:'medium' } }}</ion-select-option>
+        <ion-select-option [value]="'short'">{{ dateTimeSample | intlDate:{ timeStyle:'short' } }}</ion-select-option>
+        <ion-select-option [value]="''">None</ion-select-option>
+      </ion-select>
+    </ion-item>
+
     <ion-item-divider>
       <h4>Recordings</h4>
     </ion-item-divider>
