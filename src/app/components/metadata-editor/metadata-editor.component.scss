@@ -1,3 +1,11 @@
 ::ng-deep ion-modal.metadata-editor {
-  --height: 50%;
+  --height: 66.6%;
 }
+
+ion-item {
+  --background: none;
+  ::ng-deep .label-text-wrapper {
+    color: var(--ion-color-step-400);
+  }
+}
+

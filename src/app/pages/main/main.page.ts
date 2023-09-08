@@ -8,7 +8,7 @@ import { SettingsService } from 'src/app/services/settings.service';
 import { bringIntoView } from 'src/app/utils/scroll';
 import { AndroidSAF } from 'src/plugins/capacitorandroidsaf';
 import { DatePipe } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Directory, Filesystem } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
 import { ModalController } from '@ionic/angular';
@@ -19,7 +19,7 @@ import version from '../../version';
   templateUrl: './main.page.html',
   styleUrls: ['./main.page.scss'],
 })
-export class MainPage {
+export class MainPage implements OnInit {
 
   version = version;
   selectedItem?: Recording;
@@ -32,6 +32,18 @@ export class MainPage {
     protected recordingsService: RecordingsService,
     protected settings: SettingsService,
   ) { }
+
+  async ngOnInit() {
+    //Called after the constructor, initializing input properties, and the first call to ngOnChanges.
+    //Add 'implements OnInit' to the class.
+    // if (!environment.production) {
+    //   setTimeout(async () => {
+    //     const rec = this.recordingsService.recordings.value[0];
+    //     await this.onItemClick(rec);
+    //     await this.editMetadata(rec);
+    //   }, 1000);
+    // }
+  }
 
   refreshList() {
     this.recordingsService.refreshContent();
@@ -124,10 +136,18 @@ export class MainPage {
     }
 
     // write local temp file
-    await Filesystem.writeFile({
-      ...tempFile,
-      data: base64Content,
-    });
+    try {
+      await Filesystem.writeFile({
+        ...tempFile,
+        data: base64Content,
+      });
+    } catch (error) {
+      this.mbs.showError({
+        message: `Error writing temporary copy`,
+        error: error,
+      });
+      return;
+    }
 
     // get full tempfile path
     const { uri:tempFileUri } = await Filesystem.getUri(tempFile);

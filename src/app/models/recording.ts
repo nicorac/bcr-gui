@@ -47,6 +47,9 @@ export class Recording {
   // record status
   status?: 'new' | 'unchanged' | 'deleted' = 'new';
 
+  // custom notes
+  notes?: string;
+
   // IDs of tags attached to this item
   tags?: string[];
 

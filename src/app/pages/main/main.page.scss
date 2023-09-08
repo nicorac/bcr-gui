@@ -41,6 +41,17 @@
     border-radius: .6em;
   }
 
+  .notes {
+    display: flex;
+    gap: .3em;
+    .content {
+      max-height: 4.5em;
+      line-height: 1.5em;
+      white-space: pre;
+      overflow: auto;
+    }
+  }
+
   .actions {
     display: flex;
     gap: 1.25em;

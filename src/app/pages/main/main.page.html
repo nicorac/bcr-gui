@@ -37,6 +37,10 @@
           <p>Type: {{ item.mimeType }}</p>
           <p>Size: {{ item.filesize | filesize }}</p>
           <p *ngIf="!item.hasMetadata"><i>Missing .json metadata file!</i></p>
+          <div *ngIf="item.notes" class="notes">
+            <div class="label">Notes:</div>
+            <div class="content">{{ item.notes }}</div>
+          </div>
         </div>
 
         <!-- audio player -->

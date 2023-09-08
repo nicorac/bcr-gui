@@ -6,20 +6,34 @@
 
 <ion-content class="ion-padding">
 
-  <ion-item>
-    <ion-input labelPlacement="floating" label="Number" [(ngModel)]="editedItem.opNumber" placeholder="Phone number" [readonly]="true" />
-  </ion-item>
+  <ion-input label="Number"
+    placeholder="Phone number..."
+    label-placement="fixed"
+    fill="outline"
+    [(ngModel)]="editedItem.opNumber"
+    [readonly]="true" />
 
-  <ion-item>
-    <ion-input labelPlacement="floating" label="Name" [(ngModel)]="editedItem.opName" placeholder="Other party name"/>
-  </ion-item>
+  <ion-input label="Name"
+    placeholder="Other party name..."
+    label-placement="fixed"
+    fill="outline"
+    [(ngModel)]="editedItem.opName"
+  />
+
+  <ion-textarea label="Notes"
+    placeholder="Notes for this recording..."
+    label-placement="fixed"
+    fill="outline"
+    [autoGrow]="true"
+    [(ngModel)]="editedItem.notes"
+  />
 
 </ion-content>
 
 <ion-footer class="footer">
   <ion-toolbar>
     <ion-buttons slot="end">
-      <ion-button color="primary" (click)="cancel()">Cancel</ion-button>
+      <ion-button color="primary" (click)="closeModal()">Cancel</ion-button>
       <ion-button color="primary" (click)="save()">Save</ion-button>
     </ion-buttons>
   </ion-toolbar>
