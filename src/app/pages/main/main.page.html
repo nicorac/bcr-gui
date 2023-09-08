@@ -5,12 +5,12 @@
   <!-- refresh FAB button -->
   <ion-fab slot="fixed" vertical="bottom" horizontal="end">
     <ion-fab-button (click)="refreshList()" class="fab">
-      <ion-icon name="refresh"></ion-icon>
+      <ion-icon name="refresh" />
     </ion-fab-button>
   </ion-fab>
 
   <!-- recordings list -->
-  <ion-list class="items" lines="full">
+  <ion-list class="items">
 
     <!-- recording list item -->
     <ion-card *ngFor="let item of recordingsService.recordings | async | recordingsSort:settings.recordingsSortMode"
@@ -19,24 +19,37 @@
       (click)="onItemClick(item)"
     >
       <ion-card-header>
-        <ion-card-title class="title">
+        <ion-card-title class="item-title" [class.collapsed]="item !== selectedItem">
           {{ item.opName }}
-          <app-call-icon class="call-direction-icon" [direction]="item?.direction ?? ''" />
+          <app-call-icon [direction]="item?.direction ?? ''" />
         </ion-card-title>
-        <ion-card-subtitle class="left-right-container subtitle">
+        <ion-card-subtitle class="left-right-container item-subtitle">
           <div>{{ item?.date | intlDate:settings.dateTimeStyle }}</div>
           <div *ngIf="item.duration">{{ item.duration | toHms }}</div>
         </ion-card-subtitle>
       </ion-card-header>
 
-      <ion-card-content *ngIf="item === selectedItem" class="content">
+      <ion-card-content *ngIf="item === selectedItem">
 
         <!-- details -->
         <div class="details">
-          <p *ngIf="item.opName !== item.opNumber">Number: {{ item.opNumber }}</p>
-          <p>Type: {{ item.mimeType }}</p>
-          <p>Size: {{ item.filesize | filesize }}</p>
-          <p *ngIf="!item.hasMetadata"><i>Missing .json metadata file!</i></p>
+
+          <ng-container *ngIf="item.opName !== item.opNumber">
+            <div class="label">Number:</div>
+            <div class="value">{{ item.opNumber }}</div>
+          </ng-container>
+
+          <ng-container *ngIf="item.notes">
+            <div class="label">Notes:</div>
+            <div class="value notes">{{ item.notes }}</div>
+          </ng-container>
+
+          <div class="label">Type:</div>
+          <div class="value">{{ item.mimeType }}</div>
+
+          <div class="label">Size:</div>
+          <div class="value">{{ item.filesize | filesize }}</div>
+
         </div>
 
         <!-- audio player -->
@@ -46,11 +59,10 @@
         <div class="actions">
 
           <!-- edit -->
-          <!-- <ion-icon name="pencil"
+          <ion-icon name="pencil"
             class="action"
-            [class.disabled]="true"
-            (click)="onActionNotImplemented(item)"
-          /> -->
+            (click)="editMetadata(item)"
+          />
 
           <!-- share -->
           <ion-icon name="share-social"

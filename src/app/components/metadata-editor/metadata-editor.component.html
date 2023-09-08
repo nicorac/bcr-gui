@@ -1,0 +1,41 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Edit recording</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <div class="edit-form">
+
+    <div class="label">Number</div>
+    <ion-label>{{ editedItem.opNumber }}</ion-label>
+
+    <div class="label">Date</div>
+    <ion-label>{{ editedItem.date | intlDate:settings.dateTimeStyle }}</ion-label>
+
+    <div class="label">Name</div>
+    <ion-input class="value"
+      placeholder="Other party name..."
+      [(ngModel)]="editedItem.opName"
+    />
+
+    <div class="label">Notes</div>
+    <ion-textarea class="value"
+      placeholder="Notes for this recording..."
+      [autoGrow]="true"
+      [(ngModel)]="editedItem.notes"
+    />
+
+  </div>
+
+</ion-content>
+
+<ion-footer class="footer">
+  <ion-toolbar>
+    <ion-buttons slot="end">
+      <ion-button color="primary" (click)="closeModal()">Cancel</ion-button>
+      <ion-button color="primary" (click)="save()">Save</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-footer>

@@ -1,4 +1,5 @@
 import { AudioPlayerComponent } from 'src/app/components/audio-player/audio-player.component';
+import { MetadataEditorComponent } from 'src/app/components/metadata-editor/metadata-editor.component';
 import { Recording } from 'src/app/models/recording';
 import { ToHmsPipe } from 'src/app/pipes/to-hms.pipe';
 import { MessageBoxService } from 'src/app/services/message-box.service';
@@ -7,9 +8,10 @@ import { SettingsService } from 'src/app/services/settings.service';
 import { bringIntoView } from 'src/app/utils/scroll';
 import { AndroidSAF } from 'src/plugins/capacitorandroidsaf';
 import { DatePipe } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Directory, Filesystem } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
+import { ModalController } from '@ionic/angular';
 import version from '../../version';
 
 @Component({
@@ -25,6 +27,7 @@ export class MainPage {
   constructor(
     private datePipe: DatePipe,
     private mbs: MessageBoxService,
+    private modalCtrl: ModalController,
     private toHms: ToHmsPipe,
     protected recordingsService: RecordingsService,
     protected settings: SettingsService,
@@ -46,6 +49,32 @@ export class MainPage {
     if (item !== this.selectedItem) {
       this.selectedItem = item;
       bringIntoView('.items .selected');
+    }
+
+  }
+
+  /**
+   * Show dialog to edit recording metadata
+   */
+  async editMetadata(item: Recording) {
+    try {
+      // show editor
+      const modal = await this.modalCtrl.create({
+        component: MetadataEditorComponent,
+        componentProps: {
+          recording: item,
+        },
+        backdropDismiss: false,
+        cssClass: 'test-class',
+      });
+      modal.present();
+    }
+    catch (error) {
+      this.mbs.showError({
+        message: 'Error updating metadata',
+        error: error,
+      });
+      return undefined;
     }
 
   }
@@ -116,10 +145,18 @@ export class MainPage {
     }
 
     // write local temp file
-    await Filesystem.writeFile({
-      ...tempFile,
-      data: base64Content,
-    });
+    try {
+      await Filesystem.writeFile({
+        ...tempFile,
+        data: base64Content,
+      });
+    } catch (error) {
+      this.mbs.showError({
+        message: `Error writing temporary copy`,
+        error: error,
+      });
+      return;
+    }
 
     // get full tempfile path
     const { uri:tempFileUri } = await Filesystem.getUri(tempFile);

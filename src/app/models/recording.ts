@@ -47,6 +47,12 @@ export class Recording {
   // record status
   status?: 'new' | 'unchanged' | 'deleted' = 'new';
 
+  // custom notes
+  notes?: string;
+
+  // IDs of tags attached to this item
+  tags?: string[];
+
   /**
    * Use createInstance()...
    */
@@ -99,9 +105,11 @@ export class Recording {
       res.opName = calls0.contact_name ?? res.opNumber;
     }
 
+    // IDs of tags attached to this item
+    res.tags = [];
+
     return res;
   }
-
 
   /**
    * Load metadata JSON file and extract its contained data

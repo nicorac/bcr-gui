@@ -1,18 +1,20 @@
-.title {
+$line-height: 16pt;
+
+.item-title {
   font-size: 14pt;
-  line-height: 16pt;
-  display: flex;
-  justify-content: space-between;
+  line-height: $line-height;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) max-content;
+  &.collapsed {
+    max-height: $line-height;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
 }
 
-.title,
-.subtitle {
+.item-title,
+.item-subtitle {
   color: RGB(var(--ion-text-color-rgb));
-}
-
-.call-direction-icon {
-  height: 16pt;
-  width: 16pt;
 }
 
 .items {
@@ -31,12 +33,6 @@
     box-shadow: 0 0 1em var(--item-shadow-color);
   }
 
-  .content {
-    display: flex;
-    flex-direction: column;
-    gap: 1em;
-  }
-
   .player {
     border-radius: .6em;
   }
@@ -51,4 +47,18 @@
     font-size: 2em;
     line-height: 2em;
   }
+}
+
+.details {
+  display: grid;
+  gap: .3em .8em;
+  grid-template-columns: max-content minmax(0, 1fr);
+}
+
+
+.value.notes {
+  max-height: 4.5em;
+  line-height: 1.5em;
+  white-space: pre-line;
+  overflow: auto;
 }

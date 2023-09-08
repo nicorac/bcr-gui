@@ -1,0 +1,24 @@
+::ng-deep ion-modal.metadata-editor {
+  --height: 66.6%;
+}
+
+.edit-form {
+  display: grid;
+  gap: 1em;
+  grid-template-columns: max-content minmax(0, 1fr);
+}
+
+.label {
+  font-weight: bold;
+  align-self: center;
+}
+
+.value {
+  --border-width: 0;
+  --padding-start: 1em;
+  --padding-end: 1em;
+  margin-bottom: -1px;
+  border-radius: .8em;
+  border: 1px solid var(--ion-color-step-300);
+  background-color: var(--ion-item-background);
+}

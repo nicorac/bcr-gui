@@ -77,3 +77,29 @@ ion-alert.msgbox-error {
     background: no-repeat 1em center / 2em url('assets/icons/alert-circle-outline-red.svg') ;
   }
 }
+
+// Modals
+ion-modal {
+  // set almost fullscreen, with custom aspect
+  --height: 95%;
+  --width: 95%;
+  --border-radius: 16px;
+  --box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+
+  &::part(backdrop) {
+    background: #000000;
+    --backdrop-opacity: 0.8;
+  }
+  // remove footer
+  .footer {
+    box-shadow: none;
+    ion-toolbar {
+      --background: transparent;
+      --padding-end: 1em;
+      --padding-bottom: 1em;
+    }
+    ion-buttons {
+      gap: .8em;
+    }
+  }
+}
