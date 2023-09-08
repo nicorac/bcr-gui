@@ -1,5 +1,9 @@
 # Version history
 
+## Version 0.0.9 (2023-09-08)
+
+- New settings to customize date and time format
+
 ## Version 0.0.8 (2023-09-07)
 
 - Fixed call icon rendering issues on old WebView versions
