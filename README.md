@@ -4,7 +4,7 @@
 
 BCR-GUI is a _companion app_ for the great [BCR](https://github.com/chenxiaolong/BCR) (Basic Call Recorder) Android application.
 
-<img src="docs/images/screenshot-main.jpg" height="600px">
+<img src="docs/images/screenshot-main.jpg?nocache=1" height="600px">
 
 
 To manage BCR call recordings, you actually need to use a file manager... and thats not so user-friendly 😉.
@@ -30,14 +30,15 @@ BCR-GUI is still in early development stage, but its already usable!
 
 Working:
 
-- list of calls
-- play each call straight from the list (no external player needed)
+- **list**: show an ordered list of your call recordings
+- **play**: play each call recording straight from the list (no external player needed)
+- **share**: share recording file with other apps, like messaging, email, ...
+- **delete**: delete recordings
 
-Still missing:
+Still missing (not ready yet...):
 
-- **share**: allow to share recording file with other apps, like messaging, email, ...
 - **edit**: allow user to add **own** data to call recording, like notes, tags, change _numeric_ caller name with a name, ...
-- **delete**: this requires **WRITE** access to recordings folder, so I'll implement it later, when the app is well-known and "accepted" by the community
+- **filter**: be able to filter list by tags, content, date range, length, ...
 
 Other things could be improved and added. \
 Feel free to share your thoughts!
