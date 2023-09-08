@@ -33,11 +33,12 @@ Working:
 - **list**: show an ordered list of your call recordings
 - **play**: play each call recording straight from the list (no external player needed)
 - **share**: share recording file with other apps, like messaging, email, ...
+- **edit**: add your **own notes** to each recording item
 - **delete**: delete recordings
 
 Still missing (not ready yet...):
 
-- **edit**: allow user to add **own** data to call recording, like notes, tags, change _numeric_ caller name with a name, ...
+- **edit (improve)**: add your own tags, replace unknown _numeric_ caller name with a real name, ...
 - **filter**: be able to filter list by tags, content, date range, length, ...
 
 Other things could be improved and added. \
