@@ -5,12 +5,15 @@ import { SortMode } from '../pipes/recordings-sort.pipe';
 import { FromJSON, Serialized, ToJSON } from '../utils/json-serializer';
 
 export type Appearance = 'system' | 'light' | 'dark';
+export type Theme = 'light' | 'dark';
 export type AppDateTimeFormat = Pick<Intl.DateTimeFormatOptions, 'dateStyle' | 'timeStyle'>;
 
 @Injectable({
   providedIn: 'root'
 })
 export class SettingsService {
+
+  private isInitialized = false;
 
   /**
    * Uri of the selected recordingsDirectory
@@ -43,20 +46,21 @@ export class SettingsService {
   };
   public set appearance(value: Appearance) {
     this._appearance = value;
-    this.updateDarkModeStatus();
+    this.updateModeStatus();
     this.save();
   }
   private _appearance: Appearance = 'system';
 
   // attach to system settings
-  private systemDarkModeChangeDetector?:MediaQueryList;
-  private systemDarkMode = false;
+  private systemThemeModeChangeDetector?:MediaQueryList;
+  private systemThemeMode: Theme = 'dark'; // set dark as default to avoid "light" flash at startup when dark is set
 
   /**
    * Current darkMode status
    * It's the combination of appAppearance and systemDarkMode
+   * NOTE: dark is set as default to avoid "light" flash at app startup
    */
-  public darkMode = new BehaviorSubject(false);
+  public themeMode = new BehaviorSubject<Theme>('dark');
 
   //#endregion
 
@@ -88,13 +92,17 @@ export class SettingsService {
       FromJSON(this, value);
     }
 
-    // set current darkMode value and attach to system appearance changes
-    this.systemDarkModeChangeDetector = window.matchMedia('(prefers-color-scheme: dark)');
-    this.systemDarkMode = this.systemDarkModeChangeDetector.matches;
-    this.systemDarkModeChangeDetector.addEventListener('change', (mediaQuery) => {
-      this.systemDarkMode = mediaQuery.matches;
-      this.updateDarkModeStatus();
+    // set current Mode value and attach to system appearance changes
+    this.systemThemeModeChangeDetector = window.matchMedia('(prefers-color-scheme: dark)');
+    this.systemThemeModeChangeDetector.addEventListener('change', (mediaQuery) => {
+      this.systemThemeMode = mediaQuery.matches ? 'dark' : 'light';
+      this.updateModeStatus();
     });
+    this.systemThemeMode = this.systemThemeModeChangeDetector.matches ? 'dark' : 'light';
+
+    // mark initialization as completed and update status
+    this.isInitialized = true;
+    this.updateModeStatus();
 
   }
 
@@ -109,11 +117,11 @@ export class SettingsService {
   /**
    * Update darkMode subject status
    */
-  private updateDarkModeStatus() {
-    const isDarkMode = this.appearance === 'system'
-      ? this.systemDarkMode
-      : this.appearance === 'dark';
-    this.darkMode.next(isDarkMode);
+  private updateModeStatus() {
+    if (this.isInitialized) {
+      const isDarkMode = this.appearance === 'system' ? this.systemThemeMode : this.appearance;
+      this.themeMode.next(isDarkMode);
+    }
   }
 
 }

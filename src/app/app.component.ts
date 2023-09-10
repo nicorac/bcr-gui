@@ -3,7 +3,7 @@ import { App } from '@capacitor/app';
 import { StatusBar } from '@capacitor/status-bar';
 import { IonRouterOutlet, Platform } from '@ionic/angular';
 import { AppRoutesEnum } from './app-routing.module';
-import { SettingsService } from './services/settings.service';
+import { SettingsService, Theme } from './services/settings.service';
 
 const TOOLBAR_BACKGROUND_LIGHT = '#43a047';
 const TOOLBAR_BACKGROUND_DARK = '#1f241d';
@@ -34,14 +34,14 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     // attach to darkMode status changes
-    this.settings.darkMode.subscribe(isDarkMode => this.updateDarkMode(isDarkMode));
+    this.settings.themeMode.subscribe(theme => this.updateDarkMode(theme));
   }
 
   /**
    * Add or remove the "dark" class on the document body
    */
-  private updateDarkMode(isDarkMode: boolean) {
-    document.body.classList.toggle('dark', isDarkMode);
-    StatusBar.setBackgroundColor({ color: isDarkMode ? TOOLBAR_BACKGROUND_DARK : TOOLBAR_BACKGROUND_LIGHT });
+  private updateDarkMode(theme: Theme) {
+    document.body.classList.toggle('dark', theme === 'dark');
+    StatusBar.setBackgroundColor({ color: theme ? TOOLBAR_BACKGROUND_DARK : TOOLBAR_BACKGROUND_LIGHT });
   }
 }
