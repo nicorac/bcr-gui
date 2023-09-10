@@ -14,8 +14,24 @@
 .title {
   font-size: 18pt;
   font-weight: bold;
+  padding-bottom: .5em;
 }
 
 .item {
   padding-bottom: 1em;
+}
+
+.donations {
+  display: flex;
+  flex-direction: column;
+  gap: .5em;
+
+  .images {
+    display: flex;
+    gap: 1em;
+  }
+
+  img {
+    border-radius: .3em;
+  }
 }
