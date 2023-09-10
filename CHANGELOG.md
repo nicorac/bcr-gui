@@ -1,5 +1,10 @@
 # Version history
 
+## Version 0.0.10 (2023-09-10)
+
+- Dark mode not applied when "Appearance = System preference"
+- App now starts "Dark" as default, to avoid startup "Light" flashing
+
 ## Version 0.0.9 (2023-09-08)
 
 - New settings to customize date and time format
