@@ -82,11 +82,18 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
   private async preloadAudio() {
 
     const { uri: assetPath } = await AndroidSAF.getUri({ directory: this.settings.recordingsDirectoryUri, filename: this.recording.audioFile });
-    await NativeAudio.preload({
-      assetId: this.assetId,
-      assetPath,
-      isUrl: false,
-    });
+    try {
+      await NativeAudio.preload({
+        assetId: this.assetId,
+        assetPath,
+        isUrl: false,
+      });
+    } catch (error: any) {
+      // the error "Audio Asset already exists" is thrown at page reload (in development) and can be ignored
+      if (error.message !== 'Audio Asset already exists') {
+        throw error;
+      }
+    }
 
     // subscribe to playComplete event
     await NativeAudio.addListener(
