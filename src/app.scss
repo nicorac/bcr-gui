@@ -103,3 +103,17 @@ ion-modal {
     }
   }
 }
+
+// useful styles
+.flex {
+  display: flex;
+  align-items: center;
+}
+
+.gap-s { gap: .3em; }
+.gap-m { gap: .6em; }
+.gap-l { gap: 1em; }
+
+.pad-s { padding: .3em; }
+.pad-m { padding: .6em; }
+.pad-l { padding: 1em; }

@@ -6,6 +6,7 @@ import { MessageBoxService } from 'src/app/services/message-box.service';
 import { RecordingsService } from 'src/app/services/recordings.service';
 import { SettingsService } from 'src/app/services/settings.service';
 import { bringIntoView } from 'src/app/utils/scroll';
+import { environment } from 'src/environments/environment';
 import { AndroidSAF } from 'src/plugins/capacitorandroidsaf';
 import { DatePipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
@@ -19,7 +20,7 @@ import version from '../../version';
   templateUrl: './main.page.html',
   styleUrls: ['./main.page.scss'],
 })
-export class MainPage {
+export class MainPage implements OnInit {
 
   version = version;
   selectedItem?: Recording;
@@ -32,6 +33,18 @@ export class MainPage {
     protected recordingsService: RecordingsService,
     protected settings: SettingsService,
   ) { }
+
+  ngOnInit(): void {
+    //Called after the constructor, initializing input properties, and the first call to ngOnChanges.
+    //Add 'implements OnInit' to the class.
+    if (!environment.production) {
+      setTimeout(() => {
+        const item = this.recordingsService.recordings.value.find(r => r.opNumber === '+39 123 5829248')!;
+        this.onItemClick(item);
+        this.editMetadata(item);
+      }, 500);
+    }
+  }
 
   refreshList() {
     this.recordingsService.refreshContent();

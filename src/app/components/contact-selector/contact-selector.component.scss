@@ -1,0 +1,18 @@
+::ng-deep ion-modal.contact-selector {
+  --width: 80%;
+  --height: fit-content;
+  --border-radius: 6px;
+  --box-shadow: 0 28px 48px rgba(0, 0, 0, 0.4);
+}
+
+.content {
+  padding: 1em;
+}
+
+ion-icon {
+  width: 48px;
+  height: 48px;
+  color: #aaaaaa;
+}
+
+.nowrap { white-space: nowrap; }

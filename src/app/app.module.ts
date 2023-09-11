@@ -9,6 +9,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { AudioPlayerComponent } from './components/audio-player/audio-player.component';
 import { CallIconComponent } from './components/call-icon/call-icon.component';
+import { ContactSelectorComponent } from './components/contact-selector/contact-selector.component';
 import { HeaderComponent } from './components/header/header.component';
 import { MetadataEditorComponent } from './components/metadata-editor/metadata-editor.component';
 import { TagsDatabaseComponent } from './components/tags-database/tags-database.component';
@@ -26,6 +27,7 @@ import { SettingsService } from './services/settings.service';
     AboutPage,
     AppComponent,
     AudioPlayerComponent,
+    ContactSelectorComponent,
     FilesizePipe,
     HeaderComponent,
     MainPage,

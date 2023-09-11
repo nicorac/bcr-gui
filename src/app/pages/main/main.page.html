@@ -20,7 +20,7 @@
     >
       <ion-card-header>
         <ion-card-title class="item-title" [class.collapsed]="item !== selectedItem">
-          {{ item.opName }}
+          <div>{{ item.opName.length ? item.opName : item.opNumber }}</div>
           <app-call-icon [direction]="item?.direction ?? ''" />
         </ion-card-title>
         <ion-card-subtitle class="left-right-container item-subtitle">

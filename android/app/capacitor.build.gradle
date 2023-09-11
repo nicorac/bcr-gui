@@ -9,6 +9,7 @@ android {
 
 apply from: "../capacitor-cordova-android-plugins/cordova.variables.gradle"
 dependencies {
+    implementation project(':capacitor-community-contacts')
     implementation project(':capacitor-community-native-audio')
     implementation project(':capacitor-app')
     implementation project(':capacitor-filesystem')
