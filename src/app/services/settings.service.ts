@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Preferences } from '@capacitor/preferences';
 import { SortMode } from '../pipes/recordings-sort.pipe';
 import { FromJSON, Serialized, ToJSON } from '../utils/json-serializer';
+import version from '../version';
 
 export type Appearance = 'system' | 'light' | 'dark';
 export type Theme = 'light' | 'dark';

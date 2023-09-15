@@ -13,9 +13,9 @@ export enum AppRoutesEnum {
 
 const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: AppRoutesEnum.Main },
-  { path: AppRoutesEnum.Main,     title: version.appName, component: MainPage },
-  { path: AppRoutesEnum.Settings, title: 'Settings',      component: SettingsPage },
-  { path: AppRoutesEnum.About,    title: 'About',         component: AboutPage },
+  { path: AppRoutesEnum.Main,     title: '' /* set by page itself */, component: MainPage },
+  { path: AppRoutesEnum.Settings, title: 'Settings', component: SettingsPage },
+  { path: AppRoutesEnum.About,    title: 'About',    component: AboutPage },
 ];
 
 @NgModule({

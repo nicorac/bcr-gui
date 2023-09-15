@@ -7,7 +7,7 @@
     <div>
       <div class="title">{{ version.appName }}</div>
       <div>
-        BCR-GUI is a companion app for
+        {{ version.appName }} is a companion app for
         <a href="https://github.com/chenxiaolong/BCR">BCR</a> (Basic Call Recorder)
         to ease management of its recordings database
       </div>
@@ -27,14 +27,14 @@
   <div class="item">
     <ion-label class="ion-text-wrap">
       <h2>Copyright</h2>
-      <p>{{ version.copyright }} (<a href="{{ version.website }}">{{ version.website }}</a>)</p>
+      <p>{{ version.copyright }} (<a href="{{ version.websiteUri }}">{{ version.websiteUri }}</a>)</p>
     </ion-label>
   </div>
 
   <div class="item">
     <ion-label class="ion-text-wrap">
       <h2>Source code</h2>
-      <p>GitHub (<a href="{{ version.sources }}">{{ version.sources }}</a>)</p>
+      <p>GitHub (<a href="{{ version.sourcesUri }}">{{ version.sourcesUri }}</a>)</p>
     </ion-label>
   </div>
 

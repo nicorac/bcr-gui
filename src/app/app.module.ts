@@ -18,6 +18,7 @@ import { RecordingsSortPipe } from './pipes/recordings-sort.pipe';
 import { ToHmsPipe } from './pipes/to-hms.pipe';
 import { RecordingsService } from './services/recordings.service';
 import { SettingsService } from './services/settings.service';
+import version from './version';
 
 @NgModule({
   declarations: [
@@ -62,7 +63,8 @@ function appInitializer(recordingsService: RecordingsService, settings: Settings
     // wait for Ionic initialization
     await platform.ready();
 
-    // initialize settings
+    // initialize version & settings
+    await version.initialize();
     await settings.initialize();
 
     // initialize recordings service

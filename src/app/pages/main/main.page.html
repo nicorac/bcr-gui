@@ -1,4 +1,4 @@
-<app-header />
+<app-header [title]="version.appName" />
 
 <ion-content id="main-content" class="ion-padding" [class.disabled]="recordingsService.refreshProgress | async">
 
