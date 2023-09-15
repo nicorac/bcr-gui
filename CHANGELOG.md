@@ -1,9 +1,24 @@
 # Version history
 
+## Version 0.0.11 (2023-09-15)
+
+New features:
+
+- Application now also sets _Android navigation bar_ background color to match with theme
+
+Bug fixes:
+
+- Background color of Android status bar was not set correctly (always dark)
+
 ## Version 0.0.10 (2023-09-10)
 
-- Dark mode not applied when "Appearance = System preference"
+New features:
+
 - App now starts "Dark" as default, to avoid startup "Light" flashing
+
+Bug fixes:
+
+- Dark mode not applied when "Appearance = System preference"
 
 ## Version 0.0.9 (2023-09-08)
 
