@@ -79,12 +79,18 @@ ion-alert.msgbox-error {
 }
 
 // Modals
-ion-modal {
+.modal-base {
   // set almost fullscreen, with custom aspect
   --height: 95%;
   --width: 95%;
   --border-radius: 16px;
   --box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+
+  > .ion-page {
+    // border
+    border: 1px solid var(--ion-color-step-300);
+    border-radius: var(--border-radius);
+  }
 
   &::part(backdrop) {
     background: #000000;
@@ -96,7 +102,6 @@ ion-modal {
     ion-toolbar {
       --background: transparent;
       --padding-end: 1em;
-      --padding-bottom: 1em;
     }
     ion-buttons {
       gap: .8em;

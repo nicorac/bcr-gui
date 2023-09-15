@@ -4,16 +4,30 @@
   </ion-toolbar>
 </ion-header>
 
-<div class="content">
+<div lines="none" class="content">
 
   <p>The following contact(s) have a number like <span class="nowrap">{{ recording.opNumber }}</span></p>
-  <p>Select the one you want to associate to this recording.</p>
 
-  <div *ngFor="let contact of contacts" class="flex gap-m pad-m" (click)="associate(contact)">
-    <ion-icon name="person-circle" />
-    <ion-label>{{contact}}</ion-label>
+  <div class="contacts">
+    <div *ngFor="let contact of contacts" class="flex gap-m pad-m" (click)="associate(contact)">
+      <ion-icon name="person-circle" />
+      <ion-label>{{contact}}</ion-label>
+    </div>
+    <div *ngFor="let contact of contacts" class="flex gap-m pad-m" (click)="associate(contact)">
+      <ion-icon name="person-circle" />
+      <ion-label>{{contact}}</ion-label>
+    </div>
+    <div *ngFor="let contact of contacts" class="flex gap-m pad-m" (click)="associate(contact)">
+      <ion-icon name="person-circle" />
+      <ion-label>{{contact}}</ion-label>
+    </div>
+    <div *ngFor="let contact of contacts" class="flex gap-m pad-m" (click)="associate(contact)">
+      <ion-icon name="person-circle" />
+      <ion-label>{{contact}}</ion-label>
+    </div>
   </div>
 </div>
+
 
 <ion-footer class="footer">
   <ion-toolbar>

@@ -21,7 +21,7 @@ export abstract class ModalBaseComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit() {
-    this.ref.nativeElement.parentElement?.classList.add(this.dialogClass);
+    this.ref.nativeElement.parentElement?.classList.add('modal-base', this.dialogClass);
     this.backSubs = this.platform.backButton.subscribeWithPriority(999, async() => {
       this.closeModal();
     });

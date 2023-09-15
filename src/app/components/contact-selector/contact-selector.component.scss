@@ -1,12 +1,29 @@
 ::ng-deep ion-modal.contact-selector {
   --width: 80%;
   --height: fit-content;
+  --max-height: 70vh;
   --border-radius: 6px;
   --box-shadow: 0 28px 48px rgba(0, 0, 0, 0.4);
 }
 
+:host {
+  display: grid;
+  grid-template-rows: min-content minmax(0, 1fr) min-content;
+  max-height: var(--max-height);
+}
+
 .content {
   padding: 1em;
+  display: grid;
+  grid-template-rows: min-content minmax(0, 1fr);
+  height: 100%;
+  max-height: 100%;
+}
+
+.contacts {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
 }
 
 ion-icon {

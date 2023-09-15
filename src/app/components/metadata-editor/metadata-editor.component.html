@@ -9,22 +9,22 @@
   <div class="edit-form">
 
     <div class="label">Number</div>
-    <ion-label>{{ editedItem.opNumber }}</ion-label>
+    <div class="number-wrapper">
+      <ion-label>{{ editedItem.opNumber }}</ion-label>
+      <ion-button fill="clear" (click)="searchNumber(editedItem)"><ion-icon name="search-sharp" /></ion-button>
+    </div>
 
     <div class="label">Date</div>
     <ion-label>{{ editedItem.date | intlDate:settings.dateTimeStyle }}</ion-label>
 
     <div class="label">Name</div>
-    <div class="flex">
-      <ion-input class="value"
-        placeholder="Other party name..."
-        [(ngModel)]="editedItem.opName"
-      />
-      <ion-button fill="clear" (click)="searchNumber(editedItem)"><ion-icon name="search-sharp" /></ion-button>
-    </div>
+    <ion-input class="value"
+      placeholder="Other party name..."
+      [(ngModel)]="editedItem.opName"
+    />
 
     <div class="label">Notes</div>
-    <ion-textarea class="value"
+    <ion-textarea class="value notes"
       placeholder="Notes for this recording..."
       [autoGrow]="true"
       [(ngModel)]="editedItem.notes"

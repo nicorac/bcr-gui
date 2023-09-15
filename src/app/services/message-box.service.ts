@@ -68,7 +68,7 @@ export class MessageBoxService {
 
   /**
    * Show a generic error alert.
-   * Error message is also logget to console.
+   * Error message is also logged to console.
    */
   async showError(options: MessageBoxOptionsError): Promise<void> {
 

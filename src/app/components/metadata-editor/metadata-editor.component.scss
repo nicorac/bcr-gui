@@ -1,5 +1,5 @@
 ::ng-deep ion-modal.metadata-editor {
-  --height: 66.6%;
+  aa--height: 66.6%;
 }
 
 .edit-form {
@@ -21,4 +21,18 @@
   border-radius: .8em;
   border: 1px solid var(--ion-color-step-300);
   background-color: var(--ion-item-background);
+}
+
+.notes { max-height: 7em; }
+.notes ::ng-deep textarea {
+  max-height: 6.5em;
+  overflow: auto !important;
+}
+
+.number-wrapper {
+  display: flex;
+  align-items: center;
+  ion-label {
+    flex-grow: 1;
+  }
 }

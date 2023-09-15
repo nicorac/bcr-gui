@@ -2,6 +2,7 @@ import { Recording } from 'src/app/models/recording';
 import { MessageBoxService } from 'src/app/services/message-box.service';
 import { RecordingsService } from 'src/app/services/recordings.service';
 import { SettingsService } from 'src/app/services/settings.service';
+import { ToastService } from 'src/app/services/toast.service';
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Contacts } from '@capacitor-community/contacts';
 import { ContactSelectorComponent } from '../contact-selector/contact-selector.component';
@@ -32,6 +33,7 @@ export class MetadataEditorComponent extends ModalBaseComponent implements OnIni
   constructor(
     private mbs: MessageBoxService,
     private recordingsService: RecordingsService,
+    private toastService: ToastService,
     protected settings: SettingsService,
   ) {
     super('metadata-editor');
@@ -117,8 +119,7 @@ export class MetadataEditorComponent extends ModalBaseComponent implements OnIni
       await selector.present();
     }
     else {
-      await this.mbs.showError({
-        header: 'No contact found',
+      await this.toastService.showWarning({
         message: 'No contact has been found with this phone number.'
       });
     }
