@@ -1,6 +1,7 @@
 import { Component, OnInit, Optional } from '@angular/core';
 import { App } from '@capacitor/app';
 import { StatusBar } from '@capacitor/status-bar';
+import { NavigationBar } from '@capgo/capacitor-navigation-bar';
 import { IonRouterOutlet, Platform } from '@ionic/angular';
 import { AppRoutesEnum } from './app-routing.module';
 import { SettingsService, Theme } from './services/settings.service';
@@ -41,7 +42,9 @@ export class AppComponent implements OnInit {
    * Add or remove the "dark" class on the document body
    */
   private updateDarkMode(theme: Theme) {
+    const androidColor = { color: theme === 'dark' ? TOOLBAR_BACKGROUND_DARK : TOOLBAR_BACKGROUND_LIGHT };
     document.body.classList.toggle('dark', theme === 'dark');
-    StatusBar.setBackgroundColor({ color: theme ? TOOLBAR_BACKGROUND_DARK : TOOLBAR_BACKGROUND_LIGHT });
+    StatusBar.setBackgroundColor(androidColor);
+    NavigationBar.setNavigationBarColor(androidColor);
   }
 }
