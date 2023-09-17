@@ -5,12 +5,13 @@ import { MessageBoxService } from 'src/app/services/message-box.service';
 import { RecordingsService } from 'src/app/services/recordings.service';
 import { SettingsService } from 'src/app/services/settings.service';
 import { bringIntoView } from 'src/app/utils/scroll';
-import version from '../../version';
 import { AndroidSAF } from 'src/plugins/capacitorandroidsaf';
 import { DatePipe } from '@angular/common';
 import { Component } from '@angular/core';
 import { Directory, Filesystem } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
+import { RefresherCustomEvent } from '@ionic/angular';
+import version from '../../version';
 
 @Component({
   selector: 'app-main',
@@ -30,8 +31,9 @@ export class MainPage {
     protected settings: SettingsService,
   ) { }
 
-  refreshList() {
-    this.recordingsService.refreshContent();
+  async refreshList(event: RefresherCustomEvent) {
+    event.target.complete();
+    await this.recordingsService.refreshContent();
   }
 
   clearSelection() {

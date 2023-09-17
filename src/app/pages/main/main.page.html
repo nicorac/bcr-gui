@@ -2,12 +2,20 @@
 
 <ion-content id="main-content" class="ion-padding" [class.disabled]="recordingsService.refreshProgress | async">
 
-  <!-- refresh FAB button -->
-  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-    <ion-fab-button (click)="refreshList()" class="fab">
-      <ion-icon name="refresh"></ion-icon>
-    </ion-fab-button>
-  </ion-fab>
+  <!-- pull down the list to refresh content -->
+  <ion-refresher slot="fixed"
+    pullFactor=".5"
+    pullMin="60"
+    pullMax="120"
+    (ionRefresh)="refreshList($any($event))"
+  >
+    <ion-refresher-content
+      pullingIcon="refresh"
+      apullingText="Pull to refresh"
+      refreshingSpinner="circles"
+      refreshingText="Refreshing..."
+    >
+  </ion-refresher-content>  </ion-refresher>
 
   <!-- recordings list -->
   <ion-list class="items" lines="full">
