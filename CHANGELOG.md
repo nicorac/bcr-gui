@@ -1,5 +1,13 @@
 # Version history
 
+## Version 0.0.12 (2023-09-20)
+
+New features:
+
+- Recordings list can now be updated with a pull-down gesture
+- Recordings list now supports multiselection mode; long press on an element to activate it
+- Batch delete of recordings (thanks to multiselection feature above)
+
 ## Version 0.0.11 (2023-09-15)
 
 New features:
