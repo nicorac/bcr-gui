@@ -47,6 +47,9 @@ export class Recording {
   // record status
   status?: 'new' | 'unchanged' | 'deleted' = 'new';
 
+  // UI only fields
+  selected?: boolean = false;
+
   /**
    * Use createInstance()...
    */

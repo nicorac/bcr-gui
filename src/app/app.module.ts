@@ -10,6 +10,7 @@ import { AppComponent } from './app.component';
 import { AudioPlayerComponent } from './components/audio-player/audio-player.component';
 import { CallIconComponent } from './components/call-icon/call-icon.component';
 import { HeaderComponent } from './components/header/header.component';
+import { LongPressDirective } from './directives/long-press.directive';
 import { AboutPage } from './pages/about/about.page';
 import { MainPage } from './pages/main/main.page';
 import { SettingsPage } from './pages/settings/settings.page';
@@ -40,6 +41,7 @@ import version from './version';
     FormsModule,
     IntlModule,
     IonicModule.forRoot({ innerHTMLTemplatesEnabled: true }),
+    LongPressDirective,
     RouterModule,
   ],
   providers: [

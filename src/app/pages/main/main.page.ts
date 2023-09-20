@@ -1,4 +1,5 @@
 import { AudioPlayerComponent } from 'src/app/components/audio-player/audio-player.component';
+import { ActionButton } from 'src/app/components/header/header.component';
 import { Recording } from 'src/app/models/recording';
 import { ToHmsPipe } from 'src/app/pipes/to-hms.pipe';
 import { MessageBoxService } from 'src/app/services/message-box.service';
@@ -21,7 +22,19 @@ import version from '../../version';
 export class MainPage {
 
   version = version;
-  selectedItem?: Recording;
+  multiselect = false;
+  actionButtons: ActionButton[] = [
+    {
+      icon: 'trash',
+      visible: () => this.multiselect,
+      onClick: () => { }
+    },
+    {
+      icon: 'close',
+      visible: () => this.multiselect,
+      onClick: () => { this.clearSelection(); this.multiselect = false; }
+    },
+  ];
 
   constructor(
     private datePipe: DatePipe,
@@ -33,11 +46,17 @@ export class MainPage {
 
   async refreshList(event: RefresherCustomEvent) {
     event.target.complete();
+    this.clearSelection();
     await this.recordingsService.refreshContent();
   }
 
   clearSelection() {
-    this.selectedItem = undefined;
+    this.recordingsService.recordings.value.forEach(r => r.selected = false);
+    this.multiselect = false;
+  }
+
+  getSelectedItems(): Recording[] {
+    return this.recordingsService.recordings.value.filter(r => r.selected);
   }
 
   /**
@@ -45,9 +64,23 @@ export class MainPage {
    */
   async onItemClick(item: Recording) {
 
-    if (item !== this.selectedItem) {
-      this.selectedItem = item;
-      bringIntoView('.items .selected');
+    if (item.selected) {
+      if (this.multiselect) {
+        item.selected = false;
+      }
+      // disable multiselection if no element is still selected
+      if (!this.getSelectedItems().length) {
+        this.multiselect = false;
+      }
+    }
+    else {
+      if (!this.multiselect) {
+        this.clearSelection();
+      }
+      item.selected = true;
+      if (!this.multiselect) {
+        bringIntoView('.items .selected');
+      }
     }
 
   }
@@ -55,19 +88,20 @@ export class MainPage {
   /**
    * Deletes the given recording file (and its companion JSON metadata)
    */
-  async deleteRecording(item: Recording, player: AudioPlayerComponent) {
+  async deleteItems(items: Recording[], player?: AudioPlayerComponent) {
 
     // stop player
-    player.pause();
+    player?.pause();
 
     // show confirmation alert
     await this.mbs.showConfirm({
       header: 'Delete recording?',
-      message: 'Do you really want to delete this recording?',
+      message: items.length === 1 ? 'Do you really want to delete selected recording?' : `Do you really want to delete ${items.length} recordings?`,
       cancelText: 'Cancel',
       confirmText: 'Delete',
       onConfirm: () => {
-        this.recordingsService.deleteRecording(item);
+        this.recordingsService.deleteRecording(items);
+        this.clearSelection();
       }
     });
 
@@ -167,6 +201,19 @@ Date: ${this.datePipe.transform(item.date, 'medium')}
 Duration: ${this.toHms.transform(item.duration)}
 `.trim();
 
+  }
+
+  /**
+   * Start multiselection and select the given item
+   */
+  protected startMultiselection(item?: Recording) {
+    if (!this.multiselect) {
+      this.clearSelection()
+      this.multiselect = true;
+      if (item) {
+        item.selected = true;
+      }
+    }
   }
 
 }

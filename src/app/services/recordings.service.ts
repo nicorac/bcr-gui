@@ -132,7 +132,7 @@ export class RecordingsService {
   /**
    * Deletes the given recording file and its optional JSON metadata
    */
-  async deleteRecording(item: Recording) {
+  async deleteRecording(deleteItems: Recording[]) {
 
     // shared delete function
     const deleteFileFn = async (uri: string) => {
@@ -149,13 +149,20 @@ export class RecordingsService {
       }
     }
 
-    if (
-      item && await deleteFileFn(item.file.uri)
-      && item?.metadataFile && await deleteFileFn(item.metadataFile.uri)
-    ){
-      // update DB
-      this.recordings.next(this.recordings.value.filter(r => r !== item));
+    // delete all items
+    let tmpDb = this.recordings.value;
+    for (const item of deleteItems) {
+      if (
+        item && await deleteFileFn(item.file.uri)
+        && item?.metadataFile && await deleteFileFn(item.metadataFile.uri)
+      ) {
+        // remove item from DB
+        tmpDb = tmpDb.filter(i => i !== item);
+      }
     }
+
+    // update db
+    this.recordings.next(tmpDb);
 
   }
 

@@ -1,4 +1,26 @@
-<app-header [title]="version.appName" />
+<app-header
+  [title]="version.appName"
+  [actionButtons]="actionButtons"
+  [showCustomContent]="multiselect"
+>
+  <!-- custom toolbar content -->
+
+  <!-- stop multiselection -->
+  <ion-buttons slot="start">
+    <ion-button (click)="clearSelection()">
+      <ion-icon icon="close" slot="icon-only" />
+    </ion-button>
+  </ion-buttons>
+
+  <!-- action buttons -->
+  <ion-buttons slot="end">
+      <ion-button (click)="deleteItems(getSelectedItems())" >
+        <ion-icon icon="trash" slot="icon-only" />
+      </ion-button>
+  </ion-buttons>
+
+</app-header>
+
 
 <ion-content id="main-content" class="ion-padding" [class.disabled]="recordingsService.refreshProgress | async">
 
@@ -23,58 +45,69 @@
     <!-- recording list item -->
     <ion-card *ngFor="let item of recordingsService.recordings | async | recordingsSort:settings.recordingsSortMode"
       class="item"
-      [class.selected]="item === selectedItem"
+      [class.selected]="item.selected"
       (click)="onItemClick(item)"
+      longPress
+      (longPress)="startMultiselection(item)"
     >
-      <ion-card-header>
-        <ion-card-title class="title">
-          {{ item.opName }}
-          <app-call-icon class="call-direction-icon" [direction]="item?.direction ?? ''" />
-        </ion-card-title>
-        <ion-card-subtitle class="left-right-container subtitle">
-          <div>{{ item?.date | intlDate:settings.dateTimeStyle }}</div>
-          <div *ngIf="item.duration">{{ item.duration | toHms }}</div>
-        </ion-card-subtitle>
-      </ion-card-header>
+      <!-- multiselect checkbox -->
+      <div>
+        <ion-checkbox *ngIf="multiselect" class="checkbox" [(ngModel)]="item.selected" />
+      </div>
 
-      <ion-card-content *ngIf="item === selectedItem" class="content">
+      <div>
+        <!-- card content -->
+        <ion-card-header>
+          <ion-card-title class="title">
+            {{ item.opName }}
+            <app-call-icon class="call-direction-icon" [direction]="item?.direction ?? ''" />
+          </ion-card-title>
+          <ion-card-subtitle class="left-right-container subtitle">
+            <div>{{ item?.date | intlDate:settings.dateTimeStyle }}</div>
+            <div *ngIf="item.duration">{{ item.duration | toHms }}</div>
+          </ion-card-subtitle>
+        </ion-card-header>
 
-        <!-- details -->
-        <div class="details">
-          <p *ngIf="item.opName !== item.opNumber">Number: {{ item.opNumber }}</p>
-          <p>Type: {{ item.mimeType }}</p>
-          <p>Size: {{ item.filesize | filesize }}</p>
-          <p *ngIf="!item.hasMetadata"><i>Missing .json metadata file!</i></p>
-        </div>
+        <ion-card-content *ngIf="!multiselect && item.selected" class="content">
 
-        <!-- audio player -->
-        <app-audio-player #audioPlayer class="player" [recording]="item" />
+          <!-- details -->
+          <div class="details">
+            <p *ngIf="item.opName !== item.opNumber">Number: {{ item.opNumber }}</p>
+            <p>Type: {{ item.mimeType }}</p>
+            <p>Size: {{ item.filesize | filesize }}</p>
+            <p *ngIf="!item.hasMetadata"><i>Missing .json metadata file!</i></p>
+          </div>
 
-        <!-- action buttons -->
-        <div class="actions">
+          <!-- audio player -->
+          <app-audio-player #audioPlayer class="player" [recording]="item" />
 
-          <!-- edit -->
-          <!-- <ion-icon name="pencil"
-            class="action"
-            [class.disabled]="true"
-            (click)="onActionNotImplemented(item)"
-          /> -->
+          <!-- action buttons -->
+          <div class="actions">
 
-          <!-- share -->
-          <ion-icon name="share-social"
-            class="action"
-            (click)="shareRecording(item)"
-          />
+            <!-- edit -->
+            <!-- <ion-icon name="pencil"
+              class="action"
+              [class.disabled]="true"
+              (click)="onActionNotImplemented(item)"
+            /> -->
 
-          <!-- delete -->
-          <ion-icon name="trash"
-            class="action"
-            (click)="deleteRecording(item, audioPlayer)"
-          />
+            <!-- share -->
+            <ion-icon name="share-social"
+              class="action"
+              (click)="shareRecording(item)"
+            />
 
-        </div>
+            <!-- delete -->
+            <ion-icon name="trash"
+              class="action"
+              (click)="deleteItems([item], audioPlayer)"
+            />
 
-      </ion-card-content>
+          </div>
+
+        </ion-card-content>
+
+      </div>
 
     </ion-card>
 

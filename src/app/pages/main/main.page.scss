@@ -21,6 +21,9 @@
 }
 
 .item {
+  display: grid;
+  grid-template-columns: min-content minmax(0, 1fr);
+  align-items: center;
   border: 1px solid var(--item-border-color);
   border-radius: .8em;
   box-shadow: 0 0 .2em var(--item-shadow-color);
@@ -29,6 +32,10 @@
   &.selected {
     border-color: var(--item-border-color-selected);
     box-shadow: 0 0 1em var(--item-shadow-color);
+  }
+
+  .checkbox {
+    margin-left: 1em;
   }
 
   .content {

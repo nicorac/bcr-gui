@@ -2,13 +2,20 @@
 
   <ion-toolbar>
 
-    <!-- menu button -->
-    <ion-buttons slot="start">
-      <ion-menu-button auto-hide="false" />
-    </ion-buttons>
+    <ng-container *ngIf="!showCustomContent">
 
-    <!-- page title -->
-    <ion-title>{{ title }}</ion-title>
+      <!-- menu button -->
+      <ion-buttons slot="start">
+        <ion-menu-button auto-hide="false" />
+      </ion-buttons>
+
+      <!-- page title -->
+      <ion-title>{{ title }}</ion-title>
+
+    </ng-container>
+
+    <!-- custom content -->
+    <ng-content *ngIf="showCustomContent"></ng-content>
 
     <!-- load progressbar -->
     <ng-container *ngIf="recordingsService.refreshProgress | async as value">
