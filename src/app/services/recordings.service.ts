@@ -3,20 +3,12 @@ import { AndroidSAF } from 'src/plugins/capacitorandroidsaf';
 import { Injectable } from '@angular/core';
 import { Encoding } from '@capacitor/filesystem';
 import { AlertController, IonicSafeString } from '@ionic/angular';
+import { DB_FILENAME, DB_SCHEMA_VERSION, DbContent } from '../models/dbContent';
 import { Recording } from '../models/recording';
 import { replaceExtension } from '../utils/filesystem';
+import { deserializeObject, serializeObject } from '../utils/json-serializer';
 import { MessageBoxService } from './message-box.service';
 import { SettingsService } from './settings.service';
-
-// database props
-const DB_FILENAME = '.bcr-gui-database.json';
-const DB_SCHEMA_VERSION = 1;
-
-// database structure
-type DbContent = {
-  schemaVersion: number,
-  data: Recording[],
-}
 
 @Injectable({
   providedIn: 'root'
@@ -218,15 +210,21 @@ export class RecordingsService {
     try {
 
       // test if DB file exists, then load it
-      const readFileOptions = {
+      const readDbFileOptions = {
         directory: this.settings.recordingsDirectoryUri,
         filename: DB_FILENAME,
         encoding: Encoding.UTF8,
       };
 
-      if ((await AndroidSAF.fileExists(readFileOptions)).exists) {
-        const { content } = await AndroidSAF.readFile(readFileOptions);
-        const dbContent: DbContent = JSON.parse(content);
+      if ((await AndroidSAF.fileExists(readDbFileOptions)).exists) {
+        const dbContent = new DbContent();
+        try {
+          const { content: jsonContent } = await AndroidSAF.readFile(readDbFileOptions);
+          const jsonObj = JSON.parse(jsonContent);
+          deserializeObject(jsonObj, dbContent);
+        } catch (error) {
+          this.mbs.showError({ error, message: 'Error reading database content' });
+        }
 
         // check DB version
         if (dbContent.schemaVersion < DB_SCHEMA_VERSION) {
@@ -256,18 +254,15 @@ export class RecordingsService {
   public async save() {
 
     try {
-
       // serialize data
-      const content = JSON.stringify(<DbContent> {
-        schemaVersion: DB_SCHEMA_VERSION,
-        data: this.recordings.value,
-      }, null, 2);
+      const dbContent = new DbContent(this.recordings.value);
+      const jsonObj = serializeObject(dbContent);
 
       // write content
       await AndroidSAF.writeFile({
         directory: this.settings.recordingsDirectoryUri,
         filename: DB_FILENAME,
-        content: content,
+        content: JSON.stringify(jsonObj),
         encoding: Encoding.UTF8,
       });
 

@@ -2,8 +2,8 @@ import { BehaviorSubject } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { Preferences } from '@capacitor/preferences';
 import { SortMode } from '../pipes/recordings-sort.pipe';
-import { FromJSON, Serialized, ToJSON } from '../utils/json-serializer';
-import version from '../version';
+import { deserializeObject, JsonProperty, serializeObject } from '../utils/json-serializer';
+import { MessageBoxService } from './message-box.service';
 
 export type Appearance = 'system' | 'light' | 'dark';
 export type Theme = 'light' | 'dark';
@@ -15,17 +15,18 @@ export type AppDateTimeFormat = Pick<Intl.DateTimeFormatOptions, 'dateStyle' | '
 export class SettingsService {
 
   private isInitialized = false;
+  private isLoadingSaving = false;
 
   /**
    * Uri of the selected recordingsDirectory
    */
-  @Serialized()
+  @JsonProperty()
   public recordingsDirectoryUri: string = '';
 
   /**
    * Date/time format
    */
-  @Serialized()
+  @JsonProperty()
   public dateTimeStyle: AppDateTimeFormat = {
     dateStyle: 'medium',
     timeStyle: 'medium',
@@ -41,7 +42,7 @@ export class SettingsService {
    *
    * NOTE: use setAppearance() to change this value
    */
-  @Serialized()
+  @JsonProperty()
   public get appearance(): Appearance {
     return this._appearance;
   };
@@ -78,9 +79,12 @@ export class SettingsService {
   /**
    * Recordings list sort mode
    */
-  @Serialized()
+  @JsonProperty()
   public recordingsSortMode: SortMode = SortMode.Date_DESC;
 
+  constructor(
+    private mbs: MessageBoxService,
+  ) {}
 
   /**
    * Load app settings from storage
@@ -88,9 +92,17 @@ export class SettingsService {
   async initialize() {
 
     // load settings
-    const { value } = await Preferences.get({ key: 'settings' });
-    if (value) {
-      FromJSON(this, value);
+    const { value: jsonContent } = await Preferences.get({ key: 'settings' });
+    if (jsonContent) {
+      try {
+        this.isLoadingSaving = true;
+        let jsonObj = JSON.parse(jsonContent);
+        deserializeObject(jsonObj, this);
+      } catch (error) {
+        this.mbs.showError({ error: error, message: 'Error reading settings' });
+      } finally {
+        this.isLoadingSaving = false;
+      }
     }
 
     // set current Mode value and attach to system appearance changes
@@ -111,8 +123,16 @@ export class SettingsService {
    * Save app settings to storage
    */
   async save() {
-    const jsonValue = ToJSON(this);
-    return Preferences.set({ key: 'settings', value: jsonValue });
+    if (this.isLoadingSaving) return;
+    try {
+      this.isLoadingSaving = true;
+      const jsonObj = serializeObject(this);
+      return Preferences.set({ key: 'settings', value: JSON.stringify(jsonObj) });
+    } catch (error) {
+      this.mbs.showError({ error, message: 'Error saving settings'});
+    } finally {
+      this.isLoadingSaving = false;
+    }
   }
 
   /**

@@ -1,5 +1,6 @@
 import { AndroidSAF, Encoding, IDocumentFile } from 'src/plugins/capacitorandroidsaf';
 import { replaceExtension, stripExtension } from '../utils/filesystem';
+import { JsonProperty } from '../utils/json-serializer';
 import { BcrRecordingMetadata } from './BcrRecordingMetadata';
 
 export type CallDirection = 'in' | 'out' | 'conference' | '';
@@ -10,11 +11,11 @@ export type CallDirection = 'in' | 'out' | 'conference' | '';
 export class Recording {
 
   // original reference to underlying Android DocumentFile + optional JSON metadata
-  audioFile!: string;
-  metadataFile?: string;
+  @JsonProperty() audioFile!: string;
+  @JsonProperty() metadataFile?: string;
 
-  // recording has associated json metadata file
-  hasMetadata = false;
+  // test if this recording has an associated metadata file
+  get hasMetadata() { return this.metadataFile !== undefined };
 
   /**
    * "other party" of the call
@@ -23,37 +24,32 @@ export class Recording {
    *
    * opName is filled with contact name or its number (if no name can be retrieved)
    */
-  opName: string = '';
-  opNumber: string = '';
+  @JsonProperty() opName: string = '';
+  @JsonProperty() opNumber: string = '';
 
   // Call direction
-  direction!: CallDirection;
+  @JsonProperty() direction!: CallDirection;
 
   // Recording date (JS timestamp)
-  date: number = 0;
+  @JsonProperty() date: number = 0;
 
   // Recording duration (in seconds)
-  duration: number = 0;
+  @JsonProperty() duration: number = 0;
 
   // SIM used for the call
-  simSlot: number = 0;
+  @JsonProperty() simSlot: number = 0;
 
   // Recording file size (in bytes)
-  filesize: number = 0;
+  @JsonProperty() filesize: number = 0;
 
   // Audio file MIME type
-  mimeType: string = '';
-
-  // record status
-  status?: 'new' | 'unchanged' | 'deleted' = 'new';
+  @JsonProperty() mimeType: string = '';
 
   // UI only fields
+  status?: 'new' | 'unchanged' | 'deleted' = 'new';
   selected?: boolean = false;
 
-  /**
-   * Use createInstance()...
-   */
-  private constructor() {}
+  public constructor() {}
 
   /**
    * Create a new Recording instance from the given audio file and optional metadata file
@@ -80,10 +76,7 @@ export class Recording {
       metadata = await Recording.loadJSONMetadata(directoryUri, metadataFile);
     }
     // if JSON file is missing or a parse error occurred then fallback to parsing filename
-    if (metadata) {
-      res.hasMetadata = true;
-    }
-    else {
+    if (!metadata) {
       metadata = Recording.extractMetadataFromFilename(file.name);
     }
 
