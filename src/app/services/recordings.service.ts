@@ -130,7 +130,7 @@ export class RecordingsService {
   }
 
   /**
-   * Deletes the given recording file and its optional JSON metadata
+   * Deletes the given recordings (and their optional JSON metadata)
    */
   async deleteRecording(deleteItems: Recording[]) {
 
@@ -161,7 +161,8 @@ export class RecordingsService {
       }
     }
 
-    // update db
+    // save db & send update event
+    await RecordingsCache.save(tmpDb);
     this.recordings.next(tmpDb);
 
   }
