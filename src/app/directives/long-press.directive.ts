@@ -18,8 +18,15 @@ export class LongPressDirective implements OnInit, OnDestroy {
 
   private ne!: HTMLElement;
   private holdTimeout?: ReturnType<typeof setTimeout>;
-  private onStartPressHandler = () => this.onStartPress();
-  private onEndPressHandler = () => this.onEndPress();
+  private onStartPressHandler = (ev: PointerEvent) => this.onStartPress();
+  private onEndPressHandler = (ev: PointerEvent) => this.onEndPress();
+  private onMoveHandler = (ev: PointerEvent) => {
+    // discard first "fake" move event raised just after "press" on some devices
+    if (!(ev.movementX || ev.movementY)) {
+      return;
+    }
+    this.onEndPress();
+  }
 
   constructor(
     ref: ElementRef<any>,
@@ -30,26 +37,30 @@ export class LongPressDirective implements OnInit, OnDestroy {
   ngOnInit() {
     this.ne.addEventListener('pointerdown', this.onStartPressHandler, { passive: true });
     this.ne.addEventListener('pointerup', this.onEndPressHandler, { passive: true });
-    this.ne.addEventListener('pointermove', this.onEndPressHandler, { passive: true });
+    this.ne.addEventListener('pointermove', this.onMoveHandler, { passive: true });
   }
 
   ngOnDestroy() {
     this.ne.removeEventListener('pointerdown', this.onStartPressHandler);
     this.ne.removeEventListener('pointerup', this.onEndPressHandler);
-    this.ne.removeEventListener('pointermove', this.onEndPressHandler);
+    this.ne.removeEventListener('pointermove', this.onMoveHandler);
   }
 
   private onStartPress() {
+    console.warn('Start press');
     if (this.holdTimeout) {
       this.onEndPress();
     }
+    console.warn('Start timeout');
     this.holdTimeout = setTimeout(() => {
+      console.warn('Timeout handler');
       this.onEndPress();
       this.longPress.emit();
     }, this.holdTime);
   }
 
   private onEndPress() {
+    console.warn('End press');
     if (this.holdTimeout) {
       clearTimeout(this.holdTimeout);
       this.holdTimeout = undefined;
