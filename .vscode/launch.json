@@ -8,7 +8,7 @@
       "name": "External device (WebView debug)",
       "type": "android-webview",
       "request": "attach",
-      "application": "com.github.nicorac.bcrgui",
+      "application": "com.github.nicorac.bcrgui.debug",
       "webRoot": "${workspaceFolder}",
       "connectTimeout": 60000,
       "preLaunchTask": "Ionic run (ext device)",

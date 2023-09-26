@@ -47,6 +47,10 @@ android {
     }
   }
   buildTypes {
+    debug {
+      applicationIdSuffix '.debug'
+      versionNameSuffix "-debug"
+    }
     release {
       minifyEnabled false
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -68,16 +72,14 @@ android {
       manifest.srcFile 'src/main/AndroidManifest.xml'
       res.srcDirs = ['src/main/res']
     }
-
     debug {
-      manifest.srcFile 'src/main/debug/AndroidManifest.xml'
-      //res.srcDirs = ['src/main/debug/res']
+      manifest.srcFile 'src/debug/AndroidManifest.xml'
+      res.srcDirs = ['src/debug/res']
     }
-
-    // release {
-    //    manifest.srcFile 'src/main/release/AndroidManifest.xml'
-    //    res.srcDirs = ['src/main/release/res']
-    // }
+//    release {
+//      manifest.srcFile 'src/release/AndroidManifest.xml'
+//      res.srcDirs = ['src/release/res']
+//    }
   }
 }
 
