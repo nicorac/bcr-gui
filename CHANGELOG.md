@@ -1,8 +1,17 @@
 # Version history
 
-## Version x.x.x ()
+## Version 0.0.13 (2023-09-26)
 
-- App database is now stored in the same folder as recording audio files (`.bcr-gui.database.json` file); it allows app to be uninstalled/reinstalled preserving data (in anticipation of new features that will allow adding notes, tags, ... to recordings)
+New features:
+
+- App recordings database is now an accessible file (`.bcr-gui.database.json`) stored in the same folder as BCR audio files; it allows app to be uninstalled/reinstalled/moved preserving its database content (in anticipation of new features that will allow adding notes, tags, ... to recordings)
+
+- Improved database management
+
+Bug fixes:
+
+- Recordings database is not updated after a delete
+- Long press not working on some devices
 
 ## Version 0.0.12 (2023-09-20)
 
