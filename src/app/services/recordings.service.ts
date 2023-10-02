@@ -3,7 +3,7 @@ import { AndroidSAF } from 'src/plugins/capacitorandroidsaf';
 import { Injectable } from '@angular/core';
 import { Encoding } from '@capacitor/filesystem';
 import { AlertController, IonicSafeString } from '@ionic/angular';
-import { DB_FILENAME, DB_SCHEMA_VERSION, DbContent } from '../models/dbContent';
+import { DB_FILENAME, DB_SCHEMA_VERSION, DbContent, Tags } from '../models/dbContent';
 import { Recording } from '../models/recording';
 import { replaceExtension } from '../utils/filesystem';
 import { deserializeObject, serializeObject } from '../utils/json-serializer';
@@ -17,6 +17,9 @@ export class RecordingsService {
 
   // recordings database
   public recordings = new BehaviorSubject<Recording[]>([]);
+
+  // tags database
+  public tags = new BehaviorSubject<Tags>({});
 
   /**
    * Refresh status:
@@ -228,11 +231,13 @@ export class RecordingsService {
 
         // check DB version
         if (dbContent.schemaVersion < DB_SCHEMA_VERSION) {
-          this.upgradeDb(dbContent);
+          dbContent.upgradeDb();
+          await this.save();
         }
 
         // return DB
         this.recordings.next(dbContent.data);
+        this.tags.next(dbContent.tags);
       }
       else {
         // refresh content
@@ -255,7 +260,7 @@ export class RecordingsService {
 
     try {
       // serialize data
-      const dbContent = new DbContent(this.recordings.value);
+      const dbContent = new DbContent(this.recordings.value, this.tags.value);
       const jsonObj = serializeObject(dbContent);
 
       // write content
@@ -272,31 +277,6 @@ export class RecordingsService {
         error,
       });
     }
-
-  }
-
-  /**
-   * Upgrade DB version
-   */
-  private upgradeDb(dbContent: DbContent) {
-
-    // while (dbContent.schemaVersion < DB_SCHEMA_VERSION) {
-
-    //   switch (dbContent.schemaVersion) {
-
-    //     // upgrade ver. 1 --> 2
-    //     case 1:
-    //       dbContent.schemaVersion = 2;
-    //       break;
-
-    //       // upgrade ver. 2 --> 3
-    //       case 1:
-    //       dbContent.schemaVersion = 3;
-    //       break;
-
-    //   }
-
-    // }
 
   }
 

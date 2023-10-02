@@ -16,7 +16,7 @@ import { AboutPage } from './pages/about/about.page';
 import { MainPage } from './pages/main/main.page';
 import { SettingsPage } from './pages/settings/settings.page';
 import { FilesizePipe } from './pipes/filesize.pipe';
-import { RecordingsSortPipe } from './pipes/recordings-sort.pipe';
+import { RecordingsSortFilterPipe } from './pipes/recordings-sort-filter.pipe';
 import { ToHmsPipe } from './pipes/to-hms.pipe';
 import { RecordingsService } from './services/recordings.service';
 import { SettingsService } from './services/settings.service';
@@ -32,7 +32,7 @@ import version from './version';
     MainPage,
     SettingsPage,
     ToHmsPipe,
-    RecordingsSortPipe,
+    RecordingsSortFilterPipe,
   ],
   imports: [
     AppRoutingModule,

@@ -8,19 +8,38 @@ export enum SortMode {
   Duration_DESC = 21, // call duration (descending)
 }
 
+export interface Filter {
+  search?: string,
+  dateFrom?: Date,
+  dateTo?: Date,
+  // UI only
+  // isActive: boolean;
+}
+
 @Pipe({
-  name: 'recordingsSort'
+  name: 'recordingsSortFilter'
 })
-export class RecordingsSortPipe implements PipeTransform {
+export class RecordingsSortFilterPipe implements PipeTransform {
 
   /**
    * Returns a sorted copy of the given array
    */
-  transform(list: Recording[] | null, sortMode: SortMode = SortMode.Date_DESC): Recording[] {
-    // sort a copy of the original array
-    return list
-    ? [...list].sort(RecordingsSortPipe.getSortFunction(sortMode))
-    : [];
+  transform(list: Recording[]|null, sortMode: SortMode = SortMode.Date_DESC, filter: Filter): Recording[] {
+
+    // work on a copy of the original array (because of the final sort)
+    if (filter.search) {
+      const searchString = filter.search.toLowerCase();
+      list = list?.filter(r => r.opName.toLowerCase().includes(searchString)) ?? []
+    }
+    else {
+      list = list ? [...list] : [];
+    }
+
+    // sort the final list
+    list.sort(RecordingsSortFilterPipe.getSortFunction(sortMode));
+
+    // return
+    return list;
   }
 
   /**

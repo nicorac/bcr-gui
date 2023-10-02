@@ -3,7 +3,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 export type ActionButton = {
-  icon: string,
+  icon: string | (() => string),
   visible?: () => boolean,
   onClick: () => void,
 };
@@ -35,6 +35,10 @@ export class HeaderComponent implements OnInit {
 
   protected actionButtonClick(btn: ActionButton) {
     btn.onClick();
+  }
+
+  protected getIcon(button: ActionButton): string | undefined {
+    return typeof button.icon === 'function' ? button.icon() : button.icon;
   }
 
 }

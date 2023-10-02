@@ -1,7 +1,7 @@
 import { BehaviorSubject } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { Preferences } from '@capacitor/preferences';
-import { SortMode } from '../pipes/recordings-sort.pipe';
+import { SortMode } from '../pipes/recordings-sort-filter.pipe';
 import { deserializeObject, JsonProperty, serializeObject } from '../utils/json-serializer';
 import { MessageBoxService } from './message-box.service';
 

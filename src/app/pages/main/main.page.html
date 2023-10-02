@@ -1,28 +1,60 @@
 <app-header
   [title]="version.appName"
   [actionButtons]="actionButtons"
-  [showCustomContent]="multiselect"
+  [showCustomContent]="isMultiselect"
+  [actionButtons]="actionButtons"
 >
-  <!-- custom toolbar content -->
+  <!-- custom toolbar content (multiselect) -->
+  <ng-container *ngIf="isMultiselect">
 
-  <!-- stop multiselection -->
-  <ion-buttons slot="start">
-    <ion-button (click)="clearSelection()">
-      <ion-icon icon="close" slot="icon-only" />
-    </ion-button>
-  </ion-buttons>
-
-  <!-- action buttons -->
-  <ion-buttons slot="end">
-      <ion-button (click)="deleteItems(getSelectedItems())" >
-        <ion-icon icon="trash" slot="icon-only" />
+    <!-- stop multiselection -->
+    <ion-buttons slot="start">
+      <ion-button (click)="clearSelection()">
+        <ion-icon icon="close" slot="icon-only" />
       </ion-button>
-  </ion-buttons>
+    </ion-buttons>
+
+    <!-- action buttons -->
+    <ion-buttons slot="end">
+        <ion-button (click)="deleteItems(getSelectedItems())" >
+          <ion-icon icon="trash" slot="icon-only" />
+        </ion-button>
+    </ion-buttons>
+
+  </ng-container>
+
+  <!-- filter -->
+
+    <!-- search -->
+    <ion-toolbar *ngIf="isFilterVisible" additionalToolbars class="filter-container">
+      <ion-searchbar
+        show-clear-button="always"
+        search-icon="search-circle"
+        placeholder="Filter by name or number"
+        [value]="filter.search"
+        [debounce]="500"
+        (ionInput)="onSearchChanged($event)"
+      />
+
+      <!-- tags filter -->
+      <ion-select label="Tags" placeholder="Filter by tags" [multiple]="true">
+        <ion-select-option *ngFor="let tag of recordingsService.tags.value | keyvalue"
+          value="tag.key"
+          [ngStyle]="{ color: tag.value.color }"
+        >{{ tag.key }}</ion-select-option>
+      </ion-select>
+
+    </ion-toolbar>
 
 </app-header>
 
 
+<!-- main list -->
 <ion-content id="main-content" class="ion-padding" [class.disabled]="recordingsService.refreshProgress | async">
+
+  <pre>
+    {{ recordingsService.tags.value | json }}
+  </pre>
 
   <!-- pull down the list to refresh content -->
   <ion-refresher slot="fixed"
@@ -43,7 +75,7 @@
   <ion-list class="items" lines="full">
 
     <!-- recording list item -->
-    <ion-card *ngFor="let item of recordingsService.recordings | async | recordingsSort:settings.recordingsSortMode"
+    <ion-card *ngFor="let item of recordingsService.recordings | async | recordingsSortFilter:settings.recordingsSortMode:filter"
       class="item"
       [class.selected]="item.selected"
       (click)="onItemClick(item)"
@@ -52,7 +84,7 @@
     >
       <!-- multiselect checkbox -->
       <div>
-        <ion-checkbox *ngIf="multiselect" class="checkbox" [(ngModel)]="item.selected" />
+        <ion-checkbox *ngIf="isMultiselect" class="checkbox" [(ngModel)]="item.selected" />
       </div>
 
       <div>
@@ -68,7 +100,7 @@
           </ion-card-subtitle>
         </ion-card-header>
 
-        <ion-card-content *ngIf="!multiselect && item.selected" class="content">
+        <ion-card-content *ngIf="!isMultiselect && item.selected" class="content">
 
           <!-- details -->
           <div class="details">

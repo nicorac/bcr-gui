@@ -1,6 +1,7 @@
 import { AudioPlayerComponent } from 'src/app/components/audio-player/audio-player.component';
 import { ActionButton } from 'src/app/components/header/header.component';
 import { Recording } from 'src/app/models/recording';
+import { Filter, SortMode } from 'src/app/pipes/recordings-sort-filter.pipe';
 import { ToHmsPipe } from 'src/app/pipes/to-hms.pipe';
 import { MessageBoxService } from 'src/app/services/message-box.service';
 import { RecordingsService } from 'src/app/services/recordings.service';
@@ -22,17 +23,18 @@ import version from '../../version';
 export class MainPage {
 
   version = version;
-  multiselect = false;
+  SortMode = SortMode;
+  isMultiselect = false;
+  isFilterVisible = true;
+
+  // recordings filter
+  filter: Filter = {};
+
   actionButtons: ActionButton[] = [
     {
-      icon: 'trash',
-      visible: () => this.multiselect,
-      onClick: () => { }
-    },
-    {
-      icon: 'close',
-      visible: () => this.multiselect,
-      onClick: () => { this.clearSelection(); this.multiselect = false; }
+      icon: () => this.filter.search ? 'filter-circle' : 'filter-circle-outline',
+      //visible: () => this.isMultiselect,
+      onClick: () => { this.isFilterVisible = !this.isFilterVisible }
     },
   ];
 
@@ -52,7 +54,7 @@ export class MainPage {
 
   clearSelection() {
     this.recordingsService.recordings.value.forEach(r => r.selected = false);
-    this.multiselect = false;
+    this.isMultiselect = false;
   }
 
   getSelectedItems(): Recording[] {
@@ -65,20 +67,20 @@ export class MainPage {
   async onItemClick(item: Recording) {
 
     if (item.selected) {
-      if (this.multiselect) {
+      if (this.isMultiselect) {
         item.selected = false;
       }
       // disable multiselection if no element is still selected
       if (!this.getSelectedItems().length) {
-        this.multiselect = false;
+        this.isMultiselect = false;
       }
     }
     else {
-      if (!this.multiselect) {
+      if (!this.isMultiselect) {
         this.clearSelection();
       }
       item.selected = true;
-      if (!this.multiselect) {
+      if (!this.isMultiselect) {
         bringIntoView('.items .selected');
       }
     }
@@ -207,13 +209,29 @@ Duration: ${this.toHms.transform(item.duration)}
    * Start multiselection and select the given item
    */
   protected startMultiselection(item?: Recording) {
-    if (!this.multiselect) {
+    if (!this.isMultiselect) {
       this.clearSelection()
-      this.multiselect = true;
+      this.isMultiselect = true;
       if (item) {
         item.selected = true;
       }
     }
   }
+
+  /**
+   * Called by the searchbox
+   */
+  onSearchChanged($event: any) {
+    this.clearSelection();
+    this.filter = {
+      ...this.filter,
+      search: $event.target.value,
+    };
+    // this.updateFilterStatus();
+  }
+
+  // updateFilterStatus() {
+  //   this.filter.isActive = !!this.filter.search;
+  // }
 
 }

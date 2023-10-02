@@ -59,3 +59,13 @@
     line-height: 2em;
   }
 }
+
+.filter-container {
+  padding-inline: 1.5em;
+  display: flex;
+  flex-direction: column;
+  gap: .2em;
+  > * {
+    padding: 0;
+  }
+}

@@ -1,4 +1,4 @@
-import { SortMode } from 'src/app/pipes/recordings-sort.pipe';
+import { SortMode } from 'src/app/pipes/recordings-sort-filter.pipe';
 import { MessageBoxService } from 'src/app/services/message-box.service';
 import { RecordingsService } from 'src/app/services/recordings.service';
 import { Component } from '@angular/core';

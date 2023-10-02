@@ -12,20 +12,29 @@
       <!-- page title -->
       <ion-title>{{ title }}</ion-title>
 
+      <!-- action buttons -->
+      <ion-buttons slot="end">
+        <ion-button *ngFor="let button of actionButtons" [class.hidden]="button.visible !== undefined && !button.visible" (click)="button.onClick()">
+          <ion-icon [icon]="getIcon(button)" slot="icon-only" />
+        </ion-button>
+      </ion-buttons>
+
     </ng-container>
 
     <!-- custom content -->
-    <ng-content *ngIf="showCustomContent"></ng-content>
+    <ng-content *ngIf="showCustomContent" []></ng-content>
 
     <!-- load progressbar -->
     <ng-container *ngIf="recordingsService.refreshProgress | async as value">
       <ion-progress-bar
         class="progress"
-        buffersss=".001"
         [value]="value"
       />
     </ng-container>
 
   </ion-toolbar>
+
+  <!-- additional toolbars -->
+  <ng-content select="[additionalToolbars]"></ng-content>
 
 </ion-header>
