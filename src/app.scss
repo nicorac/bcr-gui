@@ -70,6 +70,14 @@ ion-item-divider {
   justify-content: end;
 }
 
+.buttons-container {
+  padding-inline-start: 8px;
+  padding-inline-end: 8px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  box-sizing: border-box;
+}
+
 .disabled {
   opacity: .5;
   pointer-events: none;
@@ -82,3 +90,11 @@ ion-alert.msgbox-error {
     background: no-repeat 1em center / 2em url('assets/icons/alert-circle-outline-red.svg') ;
   }
 }
+
+// layout
+.flex { display: flex; align-items: center; }
+.flex-v { display: flex; flex-direction: column; }
+.gap-5 { gap: .5em; }
+.gap-10 { gap: 1em; }
+.gap-15 { gap: 1.5em; }
+.gap-20 { gap: 2em; }

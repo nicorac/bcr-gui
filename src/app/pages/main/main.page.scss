@@ -68,4 +68,15 @@
   > * {
     padding: 0;
   }
+
+  .clear-button {
+    color: var(--ion-text-color);
+  }
+}
+
+.icon {
+  min-height: 1em;
+  min-width: 1em;
+  width: 1em;
+  height: 1em;
 }

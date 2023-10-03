@@ -3,8 +3,9 @@ import { AndroidSAF } from 'src/plugins/capacitorandroidsaf';
 import { Injectable } from '@angular/core';
 import { Encoding } from '@capacitor/filesystem';
 import { AlertController, IonicSafeString } from '@ionic/angular';
-import { DB_FILENAME, DB_SCHEMA_VERSION, DbContent, Tags } from '../models/dbContent';
+import { DB_FILENAME, DB_SCHEMA_VERSION, DbContent } from '../models/dbContent';
 import { Recording } from '../models/recording';
+import { Tags } from '../models/tags';
 import { replaceExtension } from '../utils/filesystem';
 import { deserializeObject, serializeObject } from '../utils/json-serializer';
 import { MessageBoxService } from './message-box.service';
@@ -19,7 +20,7 @@ export class RecordingsService {
   public recordings = new BehaviorSubject<Recording[]>([]);
 
   // tags database
-  public tags = new BehaviorSubject<Tags>({});
+  public tags: Tags = {};
 
   /**
    * Refresh status:
@@ -232,12 +233,19 @@ export class RecordingsService {
         // check DB version
         if (dbContent.schemaVersion < DB_SCHEMA_VERSION) {
           dbContent.upgradeDb();
-          await this.save();
+          await this.save(dbContent);
         }
 
-        // return DB
+        // merge DB data to this instance
         this.recordings.next(dbContent.data);
-        this.tags.next(dbContent.tags);
+        this.tags = dbContent.tags;
+        // // debug code
+        // if (!environment.production) {
+        //   for (let i = 1; i < 200; ++i) {
+        //     this.tags[`tag-long-name-${i}`] = { color: '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0') };
+        //   }
+        // }
+
       }
       else {
         // refresh content
@@ -256,12 +264,12 @@ export class RecordingsService {
   /**
    * Save the recordings database to storage
    */
-  public async save() {
+  public async save(dbContent?: DbContent) {
 
     try {
       // serialize data
-      const dbContent = new DbContent(this.recordings.value, this.tags.value);
-      const jsonObj = serializeObject(dbContent);
+      const data = dbContent ?? new DbContent(this.recordings.value, this.tags);
+      const jsonObj = serializeObject(data);
 
       // write content
       await AndroidSAF.writeFile({

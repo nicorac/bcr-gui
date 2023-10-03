@@ -1,0 +1,31 @@
+::ng-deep ion-modal.tag-selector-modal {
+  --width: fit-content;
+  --min-width: 75vw;
+  --height: fit-content;
+  --max-height: 75vh;
+  --border-radius: 6px;
+  --box-shadow: 0 28px 48px rgba(0, 0, 0, 0.4);
+  --background: var(--ion-item-background);
+}
+.container {
+  padding: .5em;
+  display: flex;
+  align-items: center;
+  gap: .5em;
+}
+
+.readonly {
+  pointer-events: none;
+}
+
+.modal-wrapper {
+  max-height: var(--max-height);
+  display: grid;
+  grid-template-rows: min-content minmax(0, 1fr);
+}
+
+.tags-list {
+  padding-inline-start: 1.5em;
+  overflow-y: auto;
+}
+

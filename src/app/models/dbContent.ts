@@ -1,16 +1,17 @@
 import { JsonProperty } from '../utils/json-serializer';
 import { Recording } from './recording';
-
-export type Tags = Record<string, { color: string }>;
+import { Tags } from './tags';
 
 // database props
 export const DB_FILENAME = '.bcr-gui-database.json';
 export const DB_SCHEMA_VERSION = 2;
 
-// database structure
+/**
+ * This class is used to (de)serialize app database (from)to JSON file
+ */
 export class DbContent {
 
-  @JsonProperty({ deserialize: false })
+  @JsonProperty()
   schemaVersion: number = DB_SCHEMA_VERSION;
 
   @JsonProperty({ isArray: true, type: Recording })
@@ -21,7 +22,7 @@ export class DbContent {
 
   constructor(data: Recording[] = [], tags: Tags = {}) {
     this.data = data;
-    // this.tags = tags;
+    this.tags = tags;
   }
 
 
@@ -37,7 +38,7 @@ export class DbContent {
         // upgrade ver. 1 --> 2
         // - initialize tags database
         case 1:
-          if (!this.tags) {
+          if (!this.tags || Object.keys(this.tags).length === 0) {
             this.tags = {
               'private':  { color: '#00ff00' },
               'public':   { color: '#ff0000' },

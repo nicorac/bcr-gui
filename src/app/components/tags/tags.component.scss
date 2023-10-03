@@ -1,0 +1,18 @@
+:host {
+  padding: .5em 0;
+  display: flex;
+  align-items: center;
+  gap: .5em;
+  overflow-x: scroll;
+}
+
+.modal-wrapper {
+  max-height: var(--max-height);
+  display: grid;
+  grid-template-rows: min-content minmax(0, 1fr);
+}
+
+.tags-list {
+  overflow-y: auto;
+}
+

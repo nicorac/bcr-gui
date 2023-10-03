@@ -1,5 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { Recording } from '../models/recording';
+import { TagReference } from '../models/tags';
 
 export enum SortMode {
   Date_ASC = 10,      // call date
@@ -8,12 +9,9 @@ export enum SortMode {
   Duration_DESC = 21, // call duration (descending)
 }
 
-export interface Filter {
-  search?: string,
-  dateFrom?: Date,
-  dateTo?: Date,
-  // UI only
-  // isActive: boolean;
+export class Filter {
+  search: string = '';
+  tags: TagReference[] = [];
 }
 
 @Pipe({

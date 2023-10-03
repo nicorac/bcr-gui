@@ -1,5 +1,6 @@
 import { AudioPlayerComponent } from 'src/app/components/audio-player/audio-player.component';
 import { ActionButton } from 'src/app/components/header/header.component';
+import { TagsComponent } from 'src/app/components/tags/tags.component';
 import { Recording } from 'src/app/models/recording';
 import { Filter, SortMode } from 'src/app/pipes/recordings-sort-filter.pipe';
 import { ToHmsPipe } from 'src/app/pipes/to-hms.pipe';
@@ -25,16 +26,18 @@ export class MainPage {
   version = version;
   SortMode = SortMode;
   isMultiselect = false;
-  isFilterVisible = true;
+  isFilterPanelVisible = false;
+  isFilterActive = false;
 
   // recordings filter
-  filter: Filter = {};
+  filter = new Filter();
 
   actionButtons: ActionButton[] = [
     {
-      icon: () => this.filter.search ? 'filter-circle' : 'filter-circle-outline',
-      //visible: () => this.isMultiselect,
-      onClick: () => { this.isFilterVisible = !this.isFilterVisible }
+      // show filter button
+      icon: () => this.isFilterActive ? 'filter-circle' : 'filter-circle-outline',
+      visible: () => !this.isMultiselect,
+      onClick: () => { this.isFilterPanelVisible = !this.isFilterPanelVisible }
     },
   ];
 
@@ -227,11 +230,20 @@ Duration: ${this.toHms.transform(item.duration)}
       ...this.filter,
       search: $event.target.value,
     };
-    // this.updateFilterStatus();
+    this.updateFilterStatus();
   }
 
-  // updateFilterStatus() {
-  //   this.filter.isActive = !!this.filter.search;
-  // }
+  showTagsSelector(tagsComponent: TagsComponent) {
+    tagsComponent.showSelector();
+  }
+
+  clearFilter() {
+    this.filter = new Filter();
+    this.isFilterActive = false;
+  }
+
+  updateFilterStatus() {
+    this.isFilterActive = !!this.filter.search || this.filter.tags?.length > 0;
+  }
 
 }

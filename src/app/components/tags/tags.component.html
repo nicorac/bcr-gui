@@ -1,0 +1,4 @@
+<div *ngIf="(selectedTags?.length ?? 0) === 0">no tags</div>
+<div *ngFor="let tr of selectedTags" class="tag" [style]="tags[tr].color | tagColor">
+  {{ tr }}
+</div>

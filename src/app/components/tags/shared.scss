@@ -1,0 +1,12 @@
+.tag {
+  border: 1px solid darkgray; // color will be overridden by tagColor pipe
+  box-shadow: 0 0 10px 0px #0000005c;
+  border-radius: .5em;
+  padding: .2em .5em;
+  white-space: nowrap;
+  text-overflow: clip;
+}
+
+.tag.limited-w {
+  max-width: 5em;
+}

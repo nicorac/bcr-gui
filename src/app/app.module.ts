@@ -11,12 +11,15 @@ import { AppComponent } from './app.component';
 import { AudioPlayerComponent } from './components/audio-player/audio-player.component';
 import { CallIconComponent } from './components/call-icon/call-icon.component';
 import { HeaderComponent } from './components/header/header.component';
+import { TagSelectorModalComponent } from './components/tags/tag-selector-modal.component';
+import { TagsComponent } from './components/tags/tags.component';
 import { LongPressDirective } from './directives/long-press.directive';
 import { AboutPage } from './pages/about/about.page';
 import { MainPage } from './pages/main/main.page';
 import { SettingsPage } from './pages/settings/settings.page';
 import { FilesizePipe } from './pipes/filesize.pipe';
 import { RecordingsSortFilterPipe } from './pipes/recordings-sort-filter.pipe';
+import { TagColorPipe } from './pipes/tag-color.pipe';
 import { ToHmsPipe } from './pipes/to-hms.pipe';
 import { RecordingsService } from './services/recordings.service';
 import { SettingsService } from './services/settings.service';
@@ -30,9 +33,12 @@ import version from './version';
     FilesizePipe,
     HeaderComponent,
     MainPage,
-    SettingsPage,
-    ToHmsPipe,
     RecordingsSortFilterPipe,
+    SettingsPage,
+    TagColorPipe,
+    TagsComponent,
+    TagSelectorModalComponent,
+    ToHmsPipe,
   ],
   imports: [
     AppRoutingModule,

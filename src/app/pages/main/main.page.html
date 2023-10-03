@@ -26,23 +26,31 @@
   <!-- filter -->
 
     <!-- search -->
-    <ion-toolbar *ngIf="isFilterVisible" additionalToolbars class="filter-container">
-      <ion-searchbar
-        show-clear-button="always"
-        search-icon="search-circle"
-        placeholder="Filter by name or number"
-        [value]="filter.search"
-        [debounce]="500"
-        (ionInput)="onSearchChanged($event)"
-      />
+    <ion-toolbar *ngIf="isFilterPanelVisible" additionalToolbars>
 
-      <!-- tags filter -->
-      <ion-select label="Tags" placeholder="Filter by tags" [multiple]="true">
-        <ion-select-option *ngFor="let tag of recordingsService.tags.value | keyvalue"
-          value="tag.key"
-          [ngStyle]="{ color: tag.value.color }"
-        >{{ tag.key }}</ion-select-option>
-      </ion-select>
+      <div class="filter-container">
+
+        <ion-searchbar
+          show-clear-button="always"
+          search-icon="search-circle"
+          placeholder="Filter by name or number"
+          [value]="filter.search"
+          [debounce]="500"
+          (ionInput)="onSearchChanged($event)"
+        />
+
+        <!-- tags filter -->
+        <div class="flex gap-10" (click)="tags.showSelector()">
+          <ion-icon class="icon" src="assets/icons/tag.svg" />
+          <app-tags #tags [(selectedTags)]="filter.tags" (selectedTagsChange)="updateFilterStatus()"/>
+        </div>
+
+        <!-- clear button -->
+        <div class="right-container">
+          <ion-button class="clear-button" fill="clear" (click)="clearFilter()">Clear</ion-button>
+        </div>
+
+      </div>
 
     </ion-toolbar>
 
@@ -52,9 +60,9 @@
 <!-- main list -->
 <ion-content id="main-content" class="ion-padding" [class.disabled]="recordingsService.refreshProgress | async">
 
-  <pre>
+  <!-- <pre>
     {{ recordingsService.tags.value | json }}
-  </pre>
+  </pre> -->
 
   <!-- pull down the list to refresh content -->
   <ion-refresher slot="fixed"
