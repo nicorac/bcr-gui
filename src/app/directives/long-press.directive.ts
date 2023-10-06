@@ -47,11 +47,11 @@ export class LongPressDirective implements OnInit, OnDestroy {
   }
 
   private onStartPress() {
-    console.warn('Start press');
+    // console.warn('Start press');
     if (this.holdTimeout) {
       this.onEndPress();
     }
-    console.warn('Start timeout');
+    // console.warn('Start timeout');
     this.holdTimeout = setTimeout(() => {
       console.warn('Timeout handler');
       this.onEndPress();
@@ -60,7 +60,7 @@ export class LongPressDirective implements OnInit, OnDestroy {
   }
 
   private onEndPress() {
-    console.warn('End press');
+    // console.warn('End press');
     if (this.holdTimeout) {
       clearTimeout(this.holdTimeout);
       this.holdTimeout = undefined;
