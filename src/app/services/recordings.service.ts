@@ -150,7 +150,7 @@ export class RecordingsService {
     for (const item of deleteItems) {
       if (
         item && await deleteFileFn(item.audioFile)
-        && item?.metadataFile && await deleteFileFn(item.metadataFile)
+        && (!item.metadataFile || (item?.metadataFile && await deleteFileFn(item.metadataFile)))
       ) {
         // remove item from DB
         tmpDb = tmpDb.filter(i => i !== item);
