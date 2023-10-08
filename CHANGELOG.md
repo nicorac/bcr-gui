@@ -1,5 +1,13 @@
 # Version history
 
+## Version 0.0.14 (2023-10-08)
+
+Bug fixes:
+
+- Fixed NativeAudio plugin to avoid other audio applications be pauses at app start
+
+- Deleting entries from list does not update DB for entries without metadata file
+
 ## Version 0.0.13 (2023-09-26)
 
 New features:
