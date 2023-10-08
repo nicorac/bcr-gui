@@ -51,6 +51,10 @@ export class RecordingsService {
 
   }
 
+  public getTagsCount(): number {
+    return Object.keys(this.tags ?? {})?.length;
+  }
+
   /**
    * Refresh recordings list
    */

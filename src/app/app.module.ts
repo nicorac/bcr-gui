@@ -11,6 +11,7 @@ import { AppComponent } from './app.component';
 import { AudioPlayerComponent } from './components/audio-player/audio-player.component';
 import { CallIconComponent } from './components/call-icon/call-icon.component';
 import { HeaderComponent } from './components/header/header.component';
+import { TagEditorComponent } from './components/tags/tag-editor.component';
 import { TagSelectorModalComponent } from './components/tags/tag-selector-modal.component';
 import { TagsComponent } from './components/tags/tags.component';
 import { LongPressDirective } from './directives/long-press.directive';
@@ -37,6 +38,7 @@ import version from './version';
     SettingsPage,
     TagColorPipe,
     TagsComponent,
+    TagEditorComponent,
     TagSelectorModalComponent,
     ToHmsPipe,
   ],

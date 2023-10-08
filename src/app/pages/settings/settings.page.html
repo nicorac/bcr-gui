@@ -62,6 +62,14 @@
       </ion-select>
     </ion-item>
 
+    <ion-item>
+      <ion-label>Tags</ion-label>
+      <ion-button (click)="showTagsEditor()">
+        <span *ngIf="tagsCount; else noTags">{{ tagsCount }} tags defined</span>
+        <ng-template #noTags>no tags defined</ng-template>
+      </ion-button>
+    </ion-item>
+
     <!-- <ion-button (click)="settings.save()">SAVE</ion-button> -->
 
   </ion-list>

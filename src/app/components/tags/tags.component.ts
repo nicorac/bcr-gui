@@ -39,8 +39,8 @@ export class TagsComponent {
     this.selector = await this.modalController.create({
       component: TagSelectorModalComponent,
       backdropDismiss: false,
-      componentProps: {
-        selection: this.selectedTags,
+      componentProps: <TagSelectorModalComponent> {
+        selectedTags: this.selectedTags,
         confirmHandler: (sel: TagReference[]) => {
           // this.selectedTags = sel;
           this.selectedTagsChange.next(sel);

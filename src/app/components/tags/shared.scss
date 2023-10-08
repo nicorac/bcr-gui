@@ -1,5 +1,5 @@
 .tag {
-  border: 1px solid darkgray; // color will be overridden by tagColor pipe
+  border: 1px solid var(--ion-color-step-800); // color will be overridden by tagColor pipe
   box-shadow: 0 0 10px 0px #0000005c;
   border-radius: .5em;
   padding: .2em .5em;

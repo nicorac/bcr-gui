@@ -6,7 +6,7 @@ import { ModalController } from '@ionic/angular';
 @Component({
   selector: 'app-tag-selector-modal',
   templateUrl: './tag-selector-modal.component.html',
-  styleUrls: ['./tag-selector-modal.component.scss', './shared.scss'],
+  styleUrls: ['./shared.scss','./tag-selector-modal.component.scss'],
 })
 export class TagSelectorModalComponent implements OnInit {
 
