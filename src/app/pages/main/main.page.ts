@@ -1,6 +1,6 @@
 import { AudioPlayerComponent } from 'src/app/components/audio-player/audio-player.component';
 import { ActionButton } from 'src/app/components/header/header.component';
-import { TagsComponent } from 'src/app/components/tags/tags.component';
+import { TagsComponent } from 'src/app/components/tags-component/tags.component';
 import { Recording } from 'src/app/models/recording';
 import { Filter, SortMode } from 'src/app/pipes/recordings-sort-filter.pipe';
 import { ToHmsPipe } from 'src/app/pipes/to-hms.pipe';

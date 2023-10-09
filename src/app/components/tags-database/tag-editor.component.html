@@ -1,0 +1,31 @@
+<div class="modal-wrapper">
+
+  <ion-header>
+    <ion-toolbar>
+      <ion-title>{{ title }}</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <div class="content">
+
+    <ion-label>Label:</ion-label>
+    <ion-input fill="outline" type="text" [(ngModel)]="tagRef" />
+
+    <ion-label>Color:</ion-label>
+    <div id="open-color-selector" class="tag" [style]="tagData.color | tagColor">{{ tagRef }}</div>
+    <ion-popover #colorSelector trigger="open-color-selector">
+      <ng-template>
+        <div class="palette-container">
+          <div *ngFor="let c of colorPalette" class="palette-item" [style.backgroundColor]="c" (click)="tagData.color = c; colorSelector.dismiss();"></div>
+        </div>
+      </ng-template>
+    </ion-popover>
+
+  </div>
+
+  <div class="buttons-container align-end">
+    <ion-button color="primary" fill="clear" (click)="cancel()">Cancel</ion-button>
+    <ion-button color="primary" fill="clear" (click)="confirm()">Ok</ion-button>
+  </div>
+
+</div>

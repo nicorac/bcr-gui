@@ -1,0 +1,52 @@
+$height: 50vh;
+$width: 75vw;
+
+::ng-deep ion-modal.tag-editor {
+  --width: fit-content;
+  --min-width: #{$width};
+  --max-width: #{$width};
+  --height: fit-content;
+  --min-height: #{$height};
+  --max-height: #{$height};
+  --border-radius: 6px;
+  --box-shadow: 0 28px 48px rgba(0, 0, 0, 0.4) !important;
+  --background: var(--ion-item-background);
+}
+
+.modal-wrapper {
+  max-height: var(--max-height);
+  min-height: $height;
+  display: grid;
+  grid-template-rows: min-content minmax(0, 1fr);
+}
+
+.content {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  grid-auto-rows: min-content;
+  align-items: center;
+  gap: 1em;
+  padding: 1em;
+}
+
+.tag {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 2em;
+  min-width: 4em;
+  width: min-content;
+}
+
+.palette-container {
+  display: grid;
+  grid-template: repeat(8, 1fr) / repeat(8, 1fr);
+  gap: .5em;
+  padding: .5em;
+}
+
+.palette-item {
+  height: 2em;
+  width: 2em;
+  border-radius: 1em;
+}

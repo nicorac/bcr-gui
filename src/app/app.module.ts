@@ -11,9 +11,10 @@ import { AppComponent } from './app.component';
 import { AudioPlayerComponent } from './components/audio-player/audio-player.component';
 import { CallIconComponent } from './components/call-icon/call-icon.component';
 import { HeaderComponent } from './components/header/header.component';
-import { TagSelectorModalComponent } from './components/tags/tag-selector-modal.component';
-import { TagsDatabaseComponent } from './components/tags/tags-database.component';
-import { TagsComponent } from './components/tags/tags.component';
+import { TagSelectorModalComponent } from './components/tags-component/tag-selector-modal.component';
+import { TagsComponent } from './components/tags-component/tags.component';
+import { TagEditorComponent } from './components/tags-database/tag-editor.component';
+import { TagsDatabaseComponent } from './components/tags-database/tags-database.component';
 import { LongPressDirective } from './directives/long-press.directive';
 import { AboutPage } from './pages/about/about.page';
 import { MainPage } from './pages/main/main.page';
@@ -37,6 +38,7 @@ import version from './version';
     RecordingsSortFilterPipe,
     SettingsPage,
     TagColorPipe,
+    TagEditorComponent,
     TagsComponent,
     TagsDatabaseComponent,
     TagSelectorModalComponent,

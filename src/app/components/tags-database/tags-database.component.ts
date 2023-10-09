@@ -1,12 +1,13 @@
-import { TagReference, Tags } from 'src/app/models/tags';
+import { TagData, TagReference, Tags } from 'src/app/models/tags';
 import { RecordingsService } from 'src/app/services/recordings.service';
 import { Component, ElementRef, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
+import { TagEditorComponent } from './tag-editor.component';
 
 @Component({
   selector: 'app-tags-database',
   templateUrl: './tags-database.component.html',
-  styleUrls: ['./shared.scss','./tags-database.component.scss'],
+  styleUrls: ['../tags-component/shared.scss','./tags-database.component.scss'],
 })
 export class TagsDatabaseComponent implements OnInit {
 
@@ -15,9 +16,10 @@ export class TagsDatabaseComponent implements OnInit {
   protected tagRefs: TagReference[] = [];
   protected selectedRef?: TagReference;
 
+  protected editor?: HTMLIonModalElement;
 
   constructor(
-    protected mc: ModalController,
+    protected modalController: ModalController,
     protected recordingsService: RecordingsService,
     protected ref: ElementRef<HTMLIonModalElement>,
   ) { }
@@ -34,12 +36,30 @@ export class TagsDatabaseComponent implements OnInit {
   }
 
 
-  add() {
-    throw new Error('Method not implemented.');
+  async add() {
+
   }
 
-  edit() {
-    throw new Error('Method not implemented.');
+  async edit() {
+
+    if (!this.selectedRef) return;
+
+    this.editor = await this.modalController.create({
+      component: TagEditorComponent,
+      backdropDismiss: false,
+      componentProps: <TagEditorComponent> {
+        title: 'Edit tag',
+        tagRef: this.selectedRef,
+        tagData: {... this.tags[this.selectedRef] },
+        onConfirm: (tagRef: TagReference, tagData: TagData) => {
+        //   // this.selectedTags = sel;
+        //   this.selectedTagsChange.next(sel);
+        },
+      }
+    });
+    this.editor.onWillDismiss().then(() => this.editor = undefined);
+    this.editor.present();
+
   }
 
   delete() {
@@ -47,7 +67,7 @@ export class TagsDatabaseComponent implements OnInit {
   }
 
   onClose() {
-    this.mc.dismiss();
+    this.modalController.dismiss();
   }
 
 }

@@ -1,4 +1,4 @@
-import { TagsDatabaseComponent } from 'src/app/components/tags/tags-database.component';
+import { TagsDatabaseComponent } from 'src/app/components/tags-database/tags-database.component';
 import { SortMode } from 'src/app/pipes/recordings-sort-filter.pipe';
 import { RecordingsService } from 'src/app/services/recordings.service';
 import { environment } from 'src/environments/environment';
