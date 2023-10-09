@@ -4,13 +4,13 @@ import { Component, ElementRef, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 
 @Component({
-  selector: 'app-tag-editor',
-  templateUrl: './tag-editor.component.html',
-  styleUrls: ['./shared.scss','./tag-editor.component.scss'],
+  selector: 'app-tags-database',
+  templateUrl: './tags-database.component.html',
+  styleUrls: ['./shared.scss','./tags-database.component.scss'],
 })
-export class TagEditorComponent implements OnInit {
+export class TagsDatabaseComponent implements OnInit {
 
-  // copies of the Tags DB
+  // references to Tags DB
   protected tags: Tags = {};
   protected tagRefs: TagReference[] = [];
   protected selectedRef?: TagReference;
@@ -25,10 +25,10 @@ export class TagEditorComponent implements OnInit {
   ngOnInit() {
 
     // set own class
-    this.ref.nativeElement.parentElement?.classList.add('tag-editor');
+    this.ref.nativeElement.parentElement?.classList.add('tags-database-modal');
 
     // fill sorted & cloned tags DB
-    this.tags = {...this.recordingsService.tags };
+    this.tags = this.recordingsService.tags;
     this.tagRefs = Object.keys(this.tags);
     this.tagRefs.sort();
   }
@@ -38,11 +38,11 @@ export class TagEditorComponent implements OnInit {
     throw new Error('Method not implemented.');
   }
 
-  delete() {
+  edit() {
     throw new Error('Method not implemented.');
   }
 
-  onConfirm() {
+  delete() {
     throw new Error('Method not implemented.');
   }
 

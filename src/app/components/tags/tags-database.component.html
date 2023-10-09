@@ -1,0 +1,26 @@
+<div class="modal-wrapper">
+
+  <ion-header>
+    <ion-toolbar>
+      <ion-title>Tags</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <div class="tags-list">
+    <div *ngFor="let tr of tagRefs" class="tag-container" [class.selected]="tr === selectedRef" (click)="selectedRef = tr">
+      <span class="tag" [style]="tags[tr].color | tagColor">{{ tr }}</span>
+    </div>
+  </div>
+
+  <div class="left-right-container pad-h-10 pad-v-5">
+    <div class="icon-buttons-container">
+      <ion-icon color="primary" icon="add" (click)="add()" />
+      <ion-icon color="primary" icon="pencil" (click)="edit()" [class.disabled]="!selectedRef" />
+      <ion-icon color="primary" icon="trash" (click)="delete()" [class.disabled]="!selectedRef" />
+    </div>
+    <div class="buttons-container align-end">
+      <ion-button color="primary" fill="clear" (click)="onClose()">Close</ion-button>
+    </div>
+  </div>
+
+</div>

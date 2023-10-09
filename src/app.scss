@@ -70,13 +70,26 @@ ion-item-divider {
   justify-content: end;
 }
 
-.buttons-container {
+.buttons-container,
+.icon-buttons-container {
+  display: flex;
   margin-inline: 0;
-  padding-inline-start: 4px;
-  padding-inline-end: 4px;
   padding-top: 8px;
   padding-bottom: 8px;
-  box-sizing: border-box;
+  align-items: center;
+  &.align-end {
+    justify-content: flex-end;
+  }
+}
+
+.icon-buttons-container {
+  gap: 1.25em;
+
+  > ion-icon {
+    font-size: 1.8em;
+    line-height: 1.8em;
+  }
+
 }
 
 .disabled {
@@ -99,3 +112,7 @@ ion-alert.msgbox-error {
 .gap-10 { gap: 1em; }
 .gap-15 { gap: 1.5em; }
 .gap-20 { gap: 2em; }
+.pad-h-5 { padding-left: .5em; padding-right: .5em; }
+.pad-h-10 { padding-left: 1em; padding-right: 1em; }
+.pad-v-5 { padding-top: .5em; padding-bottom: .5em; }
+.pad-v-10 { padding-top: 1em; padding-bottom: 1em; }

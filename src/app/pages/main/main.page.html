@@ -122,24 +122,24 @@
           <app-audio-player #audioPlayer class="player" [recording]="item" />
 
           <!-- action buttons -->
-          <div class="actions">
+          <div class="icon-buttons-container align-end">
 
             <!-- edit -->
             <!-- <ion-icon name="pencil"
-              class="action"
+              class="icon-button"
               [class.disabled]="true"
               (click)="onActionNotImplemented(item)"
             /> -->
 
             <!-- share -->
             <ion-icon name="share-social"
-              class="action"
+              class="icon-button"
               (click)="shareRecording(item)"
             />
 
             <!-- delete -->
             <ion-icon name="trash"
-              class="action"
+              class="icon-button"
               (click)="deleteItems([item], audioPlayer)"
             />
 

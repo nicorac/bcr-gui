@@ -1,7 +1,7 @@
 $height: 75vh;
 $width: 75vw;
 
-::ng-deep ion-modal.tag-editor {
+::ng-deep ion-modal.tags-database-modal {
   --width: fit-content;
   --min-width: #{$width};
   --max-width: #{$width};
@@ -26,12 +26,18 @@ $width: 75vw;
   grid-template-columns: repeat(2, 0.5fr);
   grid-auto-rows: min-content;
   flex-wrap: wrap;
+  padding: 1em;
+  overflow-y: scroll;
+  max-height: 100%;
 }
 
 .tag-container {
   display: flex;
   padding: 1em;
   height: min-content;
+  max-width: $width;
+  min-width: calc(($width - 2em) / 2);  // ensure 2 columns are drawn
+  place-content: center;
 }
 
 .selected {

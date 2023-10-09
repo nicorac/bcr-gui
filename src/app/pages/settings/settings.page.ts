@@ -1,4 +1,4 @@
-import { TagEditorComponent } from 'src/app/components/tags/tag-editor.component';
+import { TagsDatabaseComponent } from 'src/app/components/tags/tags-database.component';
 import { SortMode } from 'src/app/pipes/recordings-sort-filter.pipe';
 import { RecordingsService } from 'src/app/services/recordings.service';
 import { environment } from 'src/environments/environment';
@@ -62,9 +62,9 @@ export class SettingsPage {
     if (this.tagEditor) return;
 
     this.tagEditor = await this.modalController.create({
-      component: TagEditorComponent,
+      component: TagsDatabaseComponent,
       backdropDismiss: false,
-      componentProps: <TagEditorComponent> {
+      componentProps: <TagsDatabaseComponent> {
         // selection: this.selectedTags,
         // confirmHandler: (sel: TagReference[]) => {
         //   // this.selectedTags = sel;

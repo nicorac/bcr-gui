@@ -1,19 +1,18 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
-
-import { TagEditorComponent } from './tag-editor.component';
+import { TagsDatabaseComponent } from './tags-database.component';
 
 describe('TagEditorComponent', () => {
-  let component: TagEditorComponent;
-  let fixture: ComponentFixture<TagEditorComponent>;
+  let component: TagsDatabaseComponent;
+  let fixture: ComponentFixture<TagsDatabaseComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ TagEditorComponent ],
+      declarations: [ TagsDatabaseComponent ],
       imports: [IonicModule.forRoot()]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(TagEditorComponent);
+    fixture = TestBed.createComponent(TagsDatabaseComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   }));
