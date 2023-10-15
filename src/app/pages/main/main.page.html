@@ -21,96 +21,125 @@
 
 </app-header>
 
+<ion-content #content
+  id="main-content"
+  class="ion-padding main-content"
+  [class.disabled]="recordingsService.refreshProgress | async"
+  [scrollY]="false"
+>
+  <div class="content-wrapper">
 
-<ion-content id="main-content" class="ion-padding" [class.disabled]="recordingsService.refreshProgress | async">
-
-  <!-- pull down the list to refresh content -->
-  <ion-refresher slot="fixed"
-    pullFactor=".5"
-    pullMin="60"
-    pullMax="120"
-    (ionRefresh)="refreshList($any($event))"
-  >
-    <ion-refresher-content
-      pullingIcon="refresh"
-      apullingText="Pull to refresh"
-      refreshingSpinner="circles"
-      refreshingText="Refreshing..."
+    <ion-list #list class="items"
+      lines="full"
+      style="height: 100%; min-height: 100%;"
+      [style.--item-height]="itemHeight + 'px'"
+      [style.--item-height-selected]="itemHeightSelected + 'px'"
+      [style.--item-gap]="itemGap + 'px'"
     >
-  </ion-refresher-content>  </ion-refresher>
 
-  <!-- recordings list -->
-  <ion-list class="items" lines="full">
+      <ion-refresher slot="fixed"
+        pullFactor=".5"
+        pullMin="60"
+        pullMax="120"
+        [disabled]="topIndex !== 0"
+        (ionRefresh)="refreshList($any($event))"
+      >
+        <ion-refresher-content
+          pullingIcon="refresh"
+          pullingText="Pull to refresh"
+          refreshingSpinner="circles"
+          refreshingText="Refreshing..."
+        />
+      </ion-refresher>
 
-    <!-- recording list item -->
-    <ion-card *ngFor="let item of recordingsService.recordings | async | recordingsSort:settings.recordingsSortMode"
-      class="item"
-      [class.selected]="item.selected"
-      (click)="onItemClick(item)"
-      longPress
-      (longPress)="startMultiselection(item)"
-    >
-      <!-- multiselect checkbox -->
-      <div>
-        <ion-checkbox *ngIf="multiselect" class="checkbox" [(ngModel)]="item.selected" />
-      </div>
+      <cdk-virtual-scroll-viewport
+        class="virtual-scroll-viewport ion-content-scroll-host"
+        [maxBufferPx]="1500"
+        [minBufferPx]="1000"
+        [itemSize]="itemHeight + itemGap"
+        (scrolledIndexChange)="onScroll($event)"
+      >
 
-      <div>
-        <!-- card content -->
-        <ion-card-header>
-          <ion-card-title class="title">
-            {{ item.opName }}
-            <app-call-icon class="call-direction-icon" [direction]="item?.direction ?? ''" />
-          </ion-card-title>
-          <ion-card-subtitle class="left-right-container subtitle">
-            <div>{{ item?.date | intlDate:settings.dateTimeStyle }}</div>
-            <div *ngIf="item.duration">{{ item.duration | toHms }}</div>
-          </ion-card-subtitle>
-        </ion-card-header>
-
-        <ion-card-content *ngIf="!multiselect && item.selected" class="content">
-
-          <!-- details -->
-          <div class="details">
-            <p *ngIf="item.opName !== item.opNumber">Number: {{ item.opNumber }}</p>
-            <p>Type: {{ item.mimeType }}</p>
-            <p>Size: {{ item.filesize | filesize }}</p>
-            <p *ngIf="!item.hasMetadata"><i>Missing .json metadata file!</i></p>
+        <ion-card *cdkVirtualFor="let item of items; let index = index"
+          class="item"
+          [class.selected]="item.selected && !multiselect"
+          (click)="onItemClick(item)"
+          longPress
+          (longPress)="startMultiselection(item)"
+        >
+          <!-- multiselect checkbox -->
+          <div>
+            <ion-checkbox *ngIf="multiselect" class="checkbox" [(ngModel)]="item.selected" />
           </div>
 
-          <!-- audio player -->
-          <app-audio-player #audioPlayer class="player" [recording]="item" />
+          <div>
+            <!-- card content -->
+            <ion-card-header>
+              <ion-card-title class="title">
+                {{ item.opName }}
+                <app-call-icon class="call-direction-icon" [direction]="item?.direction ?? ''" />
+              </ion-card-title>
+              <ion-card-subtitle class="left-right-container subtitle">
+                <div>{{ item?.date | intlDate:settings.dateTimeStyle }}</div>
+                <div *ngIf="item.duration">{{ item.duration | toHms }}</div>
+              </ion-card-subtitle>
+            </ion-card-header>
 
-          <!-- action buttons -->
-          <div class="actions">
+            <ion-card-content *ngIf="!multiselect && item.selected" class="content">
 
-            <!-- edit -->
-            <!-- <ion-icon name="pencil"
-              class="action"
-              [class.disabled]="true"
-              (click)="onActionNotImplemented(item)"
-            /> -->
+              <!-- details -->
+              <div class="details">
+                <p *ngIf="item.opName !== item.opNumber">Number: {{ item.opNumber }}</p>
+                <p>Type: {{ item.mimeType }}</p>
+                <p>Size: {{ item.filesize | filesize }}</p>
+                <p *ngIf="!item.hasMetadata"><i>Missing .json metadata file!</i></p>
+              </div>
 
-            <!-- share -->
-            <ion-icon name="share-social"
-              class="action"
-              (click)="shareRecording(item)"
-            />
+              <!-- audio player -->
+              <app-audio-player #audioPlayer class="player" [recording]="item" />
 
-            <!-- delete -->
-            <ion-icon name="trash"
-              class="action"
-              (click)="deleteItems([item], audioPlayer)"
-            />
+              <!-- action buttons -->
+              <div class="actions">
+
+                <!-- edit -->
+                <!-- <ion-icon name="pencil"
+                  class="action"
+                  [class.disabled]="true"
+                  (click)="onActionNotImplemented(item)"
+                /> -->
+
+                <!-- share -->
+                <ion-icon name="share-social"
+                  class="action"
+                  (click)="shareRecording(item)"
+                />
+
+                <!-- delete -->
+                <ion-icon name="trash"
+                  class="action"
+                  (click)="deleteItems([item], audioPlayer)"
+                />
+
+              </div>
+
+            </ion-card-content>
 
           </div>
 
-        </ion-card-content>
+        </ion-card>
 
-      </div>
+      </cdk-virtual-scroll-viewport>
 
-    </ion-card>
+    </ion-list>
 
-  </ion-list>
+    <app-virtual-scrollbar class="virtual-scrollbar"
+      [list]="list"
+      [min]="0"
+      [max]="items.length"
+      [value]="topIndex"
+      (valueChange)="onScrollbarDrag($event)"
+    />
+
+  </div>
 
 </ion-content>

@@ -1,3 +1,4 @@
+import { Subscription } from 'rxjs';
 import { AudioPlayerComponent } from 'src/app/components/audio-player/audio-player.component';
 import { ActionButton } from 'src/app/components/header/header.component';
 import { Recording } from 'src/app/models/recording';
@@ -5,10 +6,12 @@ import { ToHmsPipe } from 'src/app/pipes/to-hms.pipe';
 import { MessageBoxService } from 'src/app/services/message-box.service';
 import { RecordingsService } from 'src/app/services/recordings.service';
 import { SettingsService } from 'src/app/services/settings.service';
+import { sortRecordings } from 'src/app/utils/recordings-sorter';
 import { bringIntoView } from 'src/app/utils/scroll';
 import { AndroidSAF } from 'src/plugins/capacitorandroidsaf';
+import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { DatePipe } from '@angular/common';
-import { Component } from '@angular/core';
+import { AfterViewInit, Component, ViewChild } from '@angular/core';
 import { Directory, Filesystem } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
 import { RefresherCustomEvent } from '@ionic/angular';
@@ -19,7 +22,7 @@ import version from '../../version';
   templateUrl: './main.page.html',
   styleUrls: ['./main.page.scss'],
 })
-export class MainPage {
+export class MainPage implements AfterViewInit {
 
   version = version;
   multiselect = false;
@@ -35,6 +38,16 @@ export class MainPage {
       onClick: () => { this.clearSelection(); this.multiselect = false; }
     },
   ];
+  protected itemsAll: Recording[] = [];
+  protected items: Recording[] = [];
+  protected topIndex = 0; // index of top shown recording
+  protected itemHeight = 78;
+  protected itemHeightSelected = this.itemHeight + 180;
+  protected itemGap = 12;
+
+  private _subs = new Subscription();
+
+  @ViewChild(CdkVirtualScrollViewport) scrollViewport!: CdkVirtualScrollViewport;
 
   constructor(
     private datePipe: DatePipe,
@@ -43,6 +56,20 @@ export class MainPage {
     protected recordingsService: RecordingsService,
     protected settings: SettingsService,
   ) { }
+
+  ionViewWillEnter() {
+    // subscribe
+    [
+      this.recordingsService.recordings.subscribe((res) => {
+        this.itemsAll = res;
+        this.updateFilter();
+      })
+    ].forEach(s => this._subs.add(s));
+  }
+
+  async ngAfterViewInit() {
+    await this.recordingsService.initialize();
+  }
 
   async refreshList(event: RefresherCustomEvent) {
     event.target.complete();
@@ -57,6 +84,10 @@ export class MainPage {
 
   getSelectedItems(): Recording[] {
     return this.recordingsService.recordings.value.filter(r => r.selected);
+  }
+
+  updateFilter() {
+    this.items = sortRecordings(this.itemsAll, this.settings.recordingsSortMode);
   }
 
   /**
@@ -136,7 +167,7 @@ export class MainPage {
     // temp local file
     const tempFile = {
       directory: Directory.Cache,
-      path: `${tempDir}/${item.audioUri}`,
+      path: `${tempDir}/${item.audioDisplayName}`,
     };
 
     // read audio file content
@@ -215,5 +246,20 @@ Duration: ${this.toHms.transform(item.duration)}
       }
     }
   }
+
+  /**
+   * Default list scroll
+   */
+  onScroll(index: number) {
+    this.topIndex = index;
+  }
+
+  /**
+   * Scroll invoked by virtual scrollbar
+   */
+  onScrollbarDrag(index: number) {
+    this.scrollViewport.scrollToIndex(index);
+  }
+
 
 }

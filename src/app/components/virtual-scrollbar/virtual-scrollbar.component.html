@@ -1,0 +1,13 @@
+<div #cursor class="cursor"
+  (touchstart)="touchStart($event)"
+  (pointerdown)="pointerDown($event)"
+  (pointerup)="pointerUp($event)"
+  (pointermove)="pointerMove($event)"
+  [class.notouch]="isDragging"
+  [style.top]="cursorYPos + 'px'"
+>
+  <div class="cursor-knob"
+    [style.height]="cursorHeight + 'px'"
+    [style.min-height]="cursorHeight + 'px'"
+  ></div>
+</div>

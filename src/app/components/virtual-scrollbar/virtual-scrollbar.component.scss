@@ -1,0 +1,25 @@
+:host {
+  display: block;
+  background-color: var(--background-color, transparent);
+  height: 100%;
+  min-height: 100%;
+  position: relative;
+  // defaults
+  --cursor-width: 1.3em;
+  --cursor-margin: 0 .3em;
+  --cursor-color: var(--ion-color-step-500);
+}
+
+.cursor {
+  position: relative;
+}
+.cursor-knob {
+  min-width: var(--cursor-width);
+  border-radius: calc(var(--cursor-width) / 2);
+  background-color: var(--cursor-color);
+  margin: var(--cursor-margin);
+}
+
+.notouch {
+  touch-action: none;
+}

@@ -1,6 +1,6 @@
-import { SortMode } from 'src/app/pipes/recordings-sort.pipe';
 import { MessageBoxService } from 'src/app/services/message-box.service';
 import { RecordingsService } from 'src/app/services/recordings.service';
+import { SortModeEnum } from 'src/app/utils/recordings-sorter';
 import { Component } from '@angular/core';
 import { AppDateTimeFormat, SettingsService } from '../../services/settings.service';
 
@@ -11,7 +11,7 @@ import { AppDateTimeFormat, SettingsService } from '../../services/settings.serv
 })
 export class SettingsPage {
 
-  SortMode = SortMode;
+  SortMode = SortModeEnum;
 
   // sample datetime (last second of current year)
   readonly dateTimeSample = new Date(new Date().getFullYear(), 11, 31, 23, 59, 59);
@@ -31,7 +31,7 @@ export class SettingsPage {
   }
 
   selectRecordingsDirectory() {
-    this.recordingsService.selectRecordingsDirectory();
+    this.recordingsService.selectRecordingsDirectory(() => this.recordingsService.initialize());
   }
 
   /**

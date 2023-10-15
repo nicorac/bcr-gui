@@ -1,5 +1,5 @@
 import { BehaviorSubject } from 'rxjs';
-import { AndroidSAF, AndroidSAFUtils, GetFileUriOptions, ReadFileOptions } from 'src/plugins/capacitorandroidsaf';
+import { AndroidSAF, AndroidSAFUtils, ErrorCode, GetFileUriOptions, ReadFileOptions } from 'src/plugins/capacitorandroidsaf';
 import { Injectable } from '@angular/core';
 import { Encoding } from '@capacitor/filesystem';
 import { AlertController, IonicSafeString } from '@ionic/angular';
@@ -14,6 +14,8 @@ import { SettingsService } from './settings.service';
   providedIn: 'root'
 })
 export class RecordingsService {
+
+  initialized = false;
 
   // recordings database
   public recordings = new BehaviorSubject<Recording[]>([]);
@@ -38,11 +40,16 @@ export class RecordingsService {
 
     // check if recordings directory has been selected
     if (!this.settings.recordingsDirectoryUri) {
-      await this.selectRecordingsDirectory();
+      await this.selectRecordingsDirectory(() => this.initialize());
+      return;
     }
-    else {
-      // load existing database from storage
-      await this.load();
+
+    // load existing database from storage
+    if (!this.initialized) {
+      if (!await this.load()) {
+        await this.refreshContent();
+      }
+      this.initialized = true;
     }
 
   }
@@ -58,7 +65,7 @@ export class RecordingsService {
     }
 
     if (!this.settings.recordingsDirectoryUri) {
-      this.selectRecordingsDirectory();
+      this.selectRecordingsDirectory(() => this.refreshContent());
       return;
     }
 
@@ -121,15 +128,14 @@ export class RecordingsService {
       // update collection & cache
       this.recordings.next(Object.values(currentDbObj));
       await this.save();
-      this.refreshProgress.next(0);
 
     }
     catch(err) {
       console.error(err);
       this.mbs.showError({ message: 'Error updating cache', error: err });
-      this.refreshProgress.next(0);
     };
 
+    this.refreshProgress.next(0);
   }
 
   /**
@@ -174,7 +180,7 @@ export class RecordingsService {
    * Show user the SAF directory selection dialog.
    * After successful selection, the DB is refreshed (clearing the cache).
    */
-  async selectRecordingsDirectory() {
+  async selectRecordingsDirectory(afterSelect?: () => void) {
 
     const alert = await this.alertController.create({
       header: 'Select recordings directory',
@@ -189,17 +195,22 @@ export class RecordingsService {
         'Cancel',
         {
           text: 'OK',
-          handler: () => {
+          handler: async () => {
             // show directory selector
-            AndroidSAF.selectDirectory({})
-              .then(async res => {
-                console.log('Selected directory:', this.settings.recordingsDirectoryUri);
-                this.settings.recordingsDirectoryUri = res.selectedUri;
-                await this.settings.save();
-                // try to load the DB from selected folder
-                // (it will fallback to refreshContent() if database is missing)
-                await this.load();
-              });
+            try {
+              const { selectedUri } = await AndroidSAF.selectDirectory({});
+              console.log('Selected directory:', this.settings.recordingsDirectoryUri);
+              this.settings.recordingsDirectoryUri = selectedUri;
+              this.updateDbFileUri()
+              await this.settings.save();
+              this.initialized = false;
+              afterSelect?.();
+            }
+            catch (error: any) {
+              if (error.code !== ErrorCode.ERR_CANCELED) {
+                console.error('Error selecting directory:', error);
+              }
+            }
           },
         },
       ],
@@ -212,7 +223,7 @@ export class RecordingsService {
   /**
    * Load recordings database from storage
    */
-  private async load() {
+  private async load(): Promise<boolean> {
 
     try {
 
@@ -227,22 +238,31 @@ export class RecordingsService {
           const { content: jsonContent } = await AndroidSAF.readFile(opt);
           const jsonObj = JSON.parse(jsonContent);
           deserializeObject(jsonObj, dbContent);
-        } catch (error) {
-          this.mbs.showError({ error, message: 'Error reading database content' });
-        }
 
-        // check DB version
-        if (dbContent.schemaVersion < DB_SCHEMA_VERSION) {
-          this.upgradeDb(dbContent);
-          this.save();
-        }
+          // check DB version
+          if (dbContent.schemaVersion < DB_SCHEMA_VERSION) {
+            this.upgradeDb(dbContent);
+            await this.save();
+          }
 
-        // return DB
-        this.recordings.next(dbContent.data);
-      }
-      else {
-        // refresh content
-        await this.refreshContent();
+          // return DB
+          this.recordings.next(dbContent.data);
+          return true;
+        }
+        catch (error: any) {
+          if (error.code === ErrorCode.ERR_NOT_FOUND) {
+            // db file is configured but missing, maybe directory was moved
+            // let's search for it again
+            await this.updateDbFileUri();
+            if (this.settings.recordingsDirectoryUri) {
+              // recall
+              return await this.load();
+            }
+          }
+          else {
+            this.mbs.showError({ error, message: 'Error reading database content' });
+          }
+        }
       }
 
     } catch (error) {
@@ -252,6 +272,7 @@ export class RecordingsService {
       });
     }
 
+    return false;
   }
 
   /**
@@ -266,20 +287,16 @@ export class RecordingsService {
 
       // test if file already exists
       if (!this.settings.dbFileUri) {
-        const opt: GetFileUriOptions = {
+        await this.updateDbFileUri();
+      }
+      // file still does not exist, create a new one
+      if (!this.settings.dbFileUri) {
+        const { fileUri: dbUri } = await AndroidSAF.createFile({
           directoryUri: this.settings.recordingsDirectoryUri,
           name: DB_FILENAME,
-        };
-        let dbUri = (await AndroidSAF.getFileUri(opt)).uri;
-
-        // file does not exist, create a new one
-        if (!dbUri) {
-          const { fileUri: dbUri } = await AndroidSAF.createFile({
-            ...opt,
-            encoding: Encoding.UTF8,
-            content: '',
-          })
-        }
+          encoding: Encoding.UTF8,
+          content: '',
+        })
         this.settings.dbFileUri = dbUri;
         await this.settings.save();
       }
@@ -298,6 +315,18 @@ export class RecordingsService {
       });
     }
 
+  }
+
+  /**
+   * Search the DB file in current recordingsDirectoryUri and update settings.
+   */
+  private async updateDbFileUri() {
+    const opt: GetFileUriOptions = {
+      directoryUri: this.settings.recordingsDirectoryUri,
+      name: DB_FILENAME,
+    };
+    this.settings.dbFileUri = (await AndroidSAF.getFileUri(opt)).uri;
+    this.settings.save();
   }
 
   /**

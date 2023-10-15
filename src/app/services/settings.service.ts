@@ -1,8 +1,8 @@
 import { BehaviorSubject } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { Preferences } from '@capacitor/preferences';
-import { SortMode } from '../pipes/recordings-sort.pipe';
 import { deserializeObject, JsonProperty, serializeObject } from '../utils/json-serializer';
+import { SortModeEnum } from '../utils/recordings-sorter';
 import { MessageBoxService } from './message-box.service';
 
 export type Appearance = 'system' | 'light' | 'dark';
@@ -27,9 +27,9 @@ export class SettingsService {
     return this.__rdu;
   };
   public set recordingsDirectoryUri(directoryUri: string) {
-    this.recordingsDirectoryUri = directoryUri;
+    this.__rdu = directoryUri;
     // clear recordings DB Uri
-    this.dbFileUri = '';
+    this.dbFileUri = undefined;
   }
 
   /**
@@ -95,7 +95,7 @@ export class SettingsService {
    * Recordings list sort mode
    */
   @JsonProperty()
-  public recordingsSortMode: SortMode = SortMode.Date_DESC;
+  public recordingsSortMode: SortModeEnum = SortModeEnum.Date_DESC;
 
   constructor(
     private mbs: MessageBoxService,
