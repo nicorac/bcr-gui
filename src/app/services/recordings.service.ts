@@ -1,5 +1,5 @@
 import { BehaviorSubject } from 'rxjs';
-import { AndroidSAF } from 'src/plugins/capacitorandroidsaf';
+import { AndroidSAF, AndroidSAFUtils, GetFileUriOptions, ReadFileOptions } from 'src/plugins/capacitorandroidsaf';
 import { Injectable } from '@angular/core';
 import { Encoding } from '@capacitor/filesystem';
 import { AlertController, IonicSafeString } from '@ionic/angular';
@@ -66,53 +66,60 @@ export class RecordingsService {
     this.refreshProgress.next(0.0001);
     console.log("Reading files in folder:");
 
-    // save current DB and set statuses as 'deleted'
-    // (if a file with the same filename won't be found, then DB record must be removed)
-    let currentDB = this.recordings.value;
-    currentDB.forEach(r => r.status = 'deleted');
+    // save current DB in object structure keyed by display name (to speedup search)
+    let currentDbObj = Object.fromEntries(this.recordings.value.map(i => [ i.audioFileDisplayName, i ]));
 
     try {
       // keep files only (no directories)
-      const allFiles = (await AndroidSAF.listFiles({ directory: this.settings.recordingsDirectoryUri }))
-        ?.items.filter(i => !i.isDirectory);
+      const allFiles = (await AndroidSAFUtils.listFiles({ directoryUri: this.settings.recordingsDirectoryUri }))?.filter(i => !i.isDirectory);
 
-      // extract supported audio file types
-      const audioFiles = allFiles.filter(i => this.settings.supportedTypes.includes(i.type));
+      // extract supported audio file types and metadata files
+      // (use an Object structure to speed up search)
+      const audioFilesObj = Object.fromEntries(allFiles.filter(i => this.settings.supportedTypes.includes(i.type)).map(i => [ i.displayName, i ]));
+      const metadataFilesObj = Object.fromEntries(allFiles.filter(i => i.displayName.endsWith('.json')).map(i => [ i.displayName, i ]));
+
+      // STEP 1: remove deleted files from DB
+      // ------------------------------------
+      Object.keys(currentDbObj)
+        .filter(fn => !(fn in audioFilesObj))
+        .forEach(fn => {
+          delete currentDbObj[fn];
+        }
+      );
 
       // parse each audio file and its corresponding (optional) metadata file
-      const count = audioFiles.length;
+      const count = Object.keys(audioFilesObj).length;
 
       // no files?
       if (count > 0) {
         let i = 0;
-        for (const file of audioFiles) {
+        for (const file of Object.values(audioFilesObj)) {
 
           // send progress update
           this.refreshProgress.next(++i / count);
 
-          // check if current audio file already exists in current DB
-          const dbRecord = currentDB.find(r => r.audioFile === file.name);
+          // compose metadata .json filename
+          const metadataFileName = replaceExtension(file.displayName, '.json');
+          const metadataFile = metadataFilesObj[metadataFileName];
+
+          // check if current audio file already exists in current DB (compare diplay names)
+          const dbRecord = currentDbObj[file.displayName];
           if (dbRecord) {
-            // mark file as "unchanged" and continue
-            dbRecord.status = 'unchanged';
+            // file already exists, update Uris (selected dir could have changed...)
+            dbRecord.audioFileUri = file.uri;
+            dbRecord.metadataFileUri = metadataFile?.uri;
             continue;
           }
-
-          // check if audio file has a corresponding metadata .json file
-          const metadataFileName = replaceExtension(file.name, '.json');
-          const metadataFile = allFiles.find(i => i.name === metadataFileName);
-
-          // add to currentDB
-          currentDB.push(await Recording.createInstance(this.settings.recordingsDirectoryUri, file, metadataFile));
+          else {
+            // add new element to DB
+            currentDbObj[file.displayName] = await Recording.createInstance(this.settings.recordingsDirectoryUri, file, metadataFile);
+          }
 
         }
       }
 
-      // remove deleted files
-      currentDB = currentDB.filter(r => r.status !== 'deleted');
-
       // update collection & cache
-      this.recordings.next(currentDB);
+      this.recordings.next(Object.values(currentDbObj));
       await this.save();
       this.refreshProgress.next(0);
 
@@ -131,14 +138,14 @@ export class RecordingsService {
   async deleteRecording(deleteItems: Recording[]) {
 
     // shared delete function
-    const deleteFileFn = async (filename: string) => {
+    const deleteFileFn = async (fileUri: string) => {
       try {
-        await AndroidSAF.deleteFile({ directory: this.settings.recordingsDirectoryUri, filename: filename });
+        await AndroidSAF.deleteFile({ fileUri });
         return true;
       }
       catch(err) {
         this.mbs.showError({
-          message: 'There was an error while deleting item: ' + filename,
+          message: 'There was an error while deleting item: ' + fileUri,
           error: err,
         });
         return false;
@@ -149,8 +156,8 @@ export class RecordingsService {
     let tmpDb = this.recordings.value;
     for (const item of deleteItems) {
       if (
-        item && await deleteFileFn(item.audioFile)
-        && (!item.metadataFile || (item?.metadataFile && await deleteFileFn(item.metadataFile)))
+        item && await deleteFileFn(item.audioFileUri)
+        && (!item.metadataFileUri || (item?.metadataFileUri && await deleteFileFn(item.metadataFileUri)))
       ) {
         // remove item from DB
         tmpDb = tmpDb.filter(i => i !== item);
@@ -210,16 +217,14 @@ export class RecordingsService {
     try {
 
       // test if DB file exists, then load it
-      const readDbFileOptions = {
-        directory: this.settings.recordingsDirectoryUri,
-        filename: DB_FILENAME,
-        encoding: Encoding.UTF8,
-      };
-
-      if ((await AndroidSAF.fileExists(readDbFileOptions)).exists) {
+      if (this.settings.dbFileUri) {
         const dbContent = new DbContent();
         try {
-          const { content: jsonContent } = await AndroidSAF.readFile(readDbFileOptions);
+          const opt: ReadFileOptions = {
+            fileUri: this.settings.dbFileUri,
+            encoding: Encoding.UTF8,
+          };
+          const { content: jsonContent } = await AndroidSAF.readFile(opt);
           const jsonObj = JSON.parse(jsonContent);
           deserializeObject(jsonObj, dbContent);
         } catch (error) {
@@ -258,10 +263,29 @@ export class RecordingsService {
       const dbContent = new DbContent(this.recordings.value);
       const jsonObj = serializeObject(dbContent);
 
+      // test if file already exists
+      if (!this.settings.dbFileUri) {
+        const opt: GetFileUriOptions = {
+          directoryUri: this.settings.recordingsDirectoryUri,
+          name: DB_FILENAME,
+        };
+        let dbUri = (await AndroidSAF.getFileUri(opt)).uri;
+
+        // file does not exist, create a new one
+        if (!dbUri) {
+          const { fileUri: dbUri } = await AndroidSAF.createFile({
+            ...opt,
+            encoding: Encoding.UTF8,
+            content: '',
+          })
+        }
+        this.settings.dbFileUri = dbUri;
+        await this.settings.save();
+      }
+
       // write content
       await AndroidSAF.writeFile({
-        directory: this.settings.recordingsDirectoryUri,
-        filename: DB_FILENAME,
+        fileUri: this.settings.dbFileUri!,
         content: JSON.stringify(jsonObj),
         encoding: Encoding.UTF8,
       });

@@ -24,6 +24,12 @@ export class SettingsService {
   public recordingsDirectoryUri: string = '';
 
   /**
+   * Uri of the DB file within the selected dir
+   */
+  @JsonProperty()
+  public dbFileUri?: string = '';
+
+  /**
    * Date/time format
    */
   @JsonProperty()

@@ -2,7 +2,6 @@
 import { Subscription } from 'rxjs';
 import { Recording } from 'src/app/models/recording';
 import { SettingsService } from 'src/app/services/settings.service';
-import { AndroidSAF } from 'src/plugins/capacitorandroidsaf';
 import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { NativeAudio } from '@capacitor-community/native-audio';
 import { AlertController, Platform, RangeCustomEvent } from '@ionic/angular';
@@ -39,7 +38,7 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
   @Input({ required: true }) recording!: Recording;
 
   // props
-  get assetId() { return this.recording.audioFile; }
+  get assetId() { return this.recording.audioFileUri; }
 
 
   constructor(
@@ -81,11 +80,10 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
    */
   private async preloadAudio() {
 
-    const { uri: assetPath } = await AndroidSAF.getUri({ directory: this.settings.recordingsDirectoryUri, filename: this.recording.audioFile });
     try {
       await NativeAudio.preload({
         assetId: this.assetId,
-        assetPath,
+        assetPath: this.recording.audioFileUri,
         isUrl: false,
       });
     } catch (error: any) {

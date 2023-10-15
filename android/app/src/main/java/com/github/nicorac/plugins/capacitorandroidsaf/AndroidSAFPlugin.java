@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.DocumentsContract;
 import android.util.Base64;
+import android.util.JsonWriter;
 import android.webkit.MimeTypeMap;
 
 import androidx.activity.result.ActivityResult;
@@ -12,7 +13,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.documentfile.provider.DocumentFile;
 
-import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
@@ -26,6 +26,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
+import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
@@ -36,12 +37,13 @@ public class AndroidSAFPlugin extends Plugin {
   private static final String ERR_CANCELED = "ERR_CANCELED";
   private static final String ERR_INVALID_URI = "ERR_INVALID_URI";
   private static final String ERR_INVALID_CONTENT = "ERR_INVALID_CONTENT";
+  private static final String ERR_INVALID_NAME = "ERR_INVALID_NAME";
   private static final String ERR_NOT_FOUND = "ERR_NOT_FOUND";
   private static final String ERR_IO_EXCEPTION = "ERR_IO_EXCEPTION";
   private static final String ERR_UNKNOWN = "ERR_UNKNOWN";
 
   /**
-   * Allow client to select a directory and get access to contained files and subfolders
+   * Allow client to select a directory and get access to contained files and subdirectorys
    */
   @PluginMethod()
   public void selectDirectory(PluginCall call) {
@@ -49,7 +51,7 @@ public class AndroidSAFPlugin extends Plugin {
     // get input arguments
     String initialUri = call.getString("initialUri", "");
 
-    // open folder selector
+    // open directory selector
     var intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
     if (initialUri != "") {
       intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, initialUri);
@@ -88,20 +90,20 @@ public class AndroidSAFPlugin extends Plugin {
   }
 
   /**
-   * Return an array of filenames contained in the given folder Uri
+   * Return the JSON serialized version of IDocumentFile items contained in the given directory Uri
    */
   @PluginMethod()
   public void listFiles(PluginCall call) {
 
     // get directory param
-    var directoryDF = parseDirectoryParameter(call);
+    var directoryDF = getDirectoryDfFromCall(call);
     if (directoryDF == null) return;
 
     // return files list
     try {
-      var ret = new JSObject();
-      ret.put("items", this.listFileFaster(directoryDF.getUri()));
-      call.resolve(ret);
+      var res = new JSObject();
+      res.put("itemsJson", this.listFileFaster(directoryDF.getUri()));
+      call.resolve(res);
     }
     catch (Exception e) {
       call.reject("Error retrieving files list", ERR_IO_EXCEPTION, e);
@@ -119,11 +121,8 @@ public class AndroidSAFPlugin extends Plugin {
   public void readFile(PluginCall call) {
 
     // Get a DocumentFile from the given "directory" and "filename" params
-    var fileDF = getFileFromDirectoryAndFilenameParameters(call);
-    if (fileDF == null) {
-      call.reject("File not found", ERR_NOT_FOUND);
-      return;
-    }
+    var fileDF = getFileDfFromCall(call);
+    if (fileDF == null) return;
 
     // if an "encoding" has been specified, file content is passed as string
     // otherwise it's passed as BASE64 string
@@ -133,7 +132,7 @@ public class AndroidSAFPlugin extends Plugin {
     // load file content
     String content;
     try (
-      var is = getContext().getContentResolver().openInputStream(fileDF.getUri());
+      var is = getContext().getContentResolver().openInputStream(fileDF.getUri())
     ) {
       if (charset != null) {
         assert is != null;
@@ -159,55 +158,61 @@ public class AndroidSAFPlugin extends Plugin {
   }
 
   /**
-   * Test if file exists
+   * Create a new file and write content
+   *
+   * @param call
+   *  call.directoryUri: URI of the directory that will contain the new file
+   *  call.name: new filename
+   *
    */
   @PluginMethod()
-  public void fileExists(PluginCall call) {
+  public void createFile(PluginCall call) {
 
-    try {
-      // test if file exists
-      final var res = new JSObject();
-      res.put("exists", getFileFromDirectoryAndFilenameParameters(call) != null);
-      call.resolve(res);
+    // get fileUri param
+    var dirDF = getDirectoryDfFromCall(call);
+    if (dirDF == null) return;
+
+    var filename = call.getString("name", null);
+    if (filename == null || filename.isBlank()) {
+      call.reject("Invalid filename", ERR_INVALID_NAME);
+      return;
     }
-    catch (Exception ex) {
-      call.reject("Unknown exception: " + ex.getMessage(), ERR_UNKNOWN);
-    }
+
+    // create a file with proper mimeType
+    var fileDF = dirDF.createFile(getMimeType(filename), filename);
+    if (fileDF == null) {
+      call.reject("Error creating file", ERR_IO_EXCEPTION);
+      return;
+    };
+
+    // call writeFile() passing the created fileDF
+    _writeFile(call, fileDF);
 
   }
 
   /**
-   * Write content to an existing file
+   * Write content to an existing file or create a new file
    *
    * @param call
-   *  call.uri: URI of the file to read
+   *  call.fileUri: URI of the EXISTING file to be overwritten
+   *
    */
   @PluginMethod()
   public void writeFile(PluginCall call) {
 
-    // get directory param
-    var directoryDF = parseDirectoryParameter(call);
-    if (directoryDF == null) return;
+    var fileDF = getFileDfFromCall(call);
+    if (fileDF == null) return;
 
-    // get filename param
-    var filename = parseFilenameParameter(call);
-    if (filename == null) return;
+    _writeFile(call, getFileDfFromCall(call));
+
+  }
+
+  private void _writeFile(PluginCall call, @Nullable DocumentFile fileDF) {
 
     // if an "encoding" has been specified, file content is passed as string
     // otherwise it's passed as BASE64 string
     var encoding = call.getString("encoding", null);
     var charset = getEncoding(encoding);
-
-    // if file does not exist, create it
-    var fileDF = findFileFaster(directoryDF.getUri(), filename);
-    if (fileDF == null) {
-      // create a file with proper mimeType
-      fileDF = directoryDF.createFile(getMimeType(filename), filename);
-    }
-    if (fileDF == null) {
-      call.reject("Error opening/creating file", ERR_IO_EXCEPTION);
-      return;
-    }
 
     // Get content
     var content = call.getString("content", null);
@@ -219,11 +224,11 @@ public class AndroidSAFPlugin extends Plugin {
     // write content (and resolve/reject call)
     try {
       _writeFileContent(fileDF.getUri(), content, charset);
+      call.resolve(new JSObject().put("fileUri", fileDF.getUri()));
     } catch (IOException e) {
       call.reject("Error writing to file", ERR_IO_EXCEPTION);
     }
 
-    call.resolve();
   }
 
   /**
@@ -231,7 +236,7 @@ public class AndroidSAFPlugin extends Plugin {
    */
   private void _writeFileContent(Uri uri, String content, Charset charset) throws IOException {
     try (
-      var os = getContext().getContentResolver().openOutputStream(uri, "wt");
+      var os = getContext().getContentResolver().openOutputStream(uri, "wt")
     ) {
       assert os != null;
       // if charset is not null assume its a plain text file the user wants to save
@@ -255,12 +260,13 @@ public class AndroidSAFPlugin extends Plugin {
 
   /**
    * Delete file
+   * No error is emitted in case file does not exist.
    */
   @PluginMethod()
   public void deleteFile(PluginCall call) {
 
-    // get file from "directory" and "filename" params
-    var fileDF = getFileFromDirectoryAndFilenameParameters(call);
+    // get file from "fileUri" param
+    var fileDF = getFileDfFromCall(call);
 
     // delete file
     if (fileDF != null && !fileDF.delete()) {
@@ -272,34 +278,52 @@ public class AndroidSAFPlugin extends Plugin {
   }
 
   /**
-   * Get file URI
+   * Get the URI of a single file searching it by DisplayName in the given directory.
+   * Returns a null uri in case file is not available.
    */
   @PluginMethod()
-  public void getUri(PluginCall call) {
+  public void getFileUri(PluginCall call) {
 
-    // get file from "directory" and "filename" params
-    var fileDF = getFileFromDirectoryAndFilenameParameters(call);
+    // get directory params
+    var dirDf = getDirectoryDfFromCall(call);
+    if (dirDf == null) return;
+
+    // get filename
+    var filename = call.getString("name", null);
+    if (filename == null || filename.isEmpty()) {
+      call.reject("Invalid filename", ERR_INVALID_NAME);
+      return;
+    }
+
+    // call findFileFaster()
+    var fileUri = findFileFaster(dirDf, filename);
 
     // return URI
-    if (fileDF != null) {
-      var ret = new JSObject();
-      ret.put("uri", fileDF.getUri().toString());
-      call.resolve(ret);
-    } else {
-      call.reject("Error getting file URI", ERR_UNKNOWN);
-    }
+    var ret = new JSObject();
+    ret.put("uri", fileUri != null ? fileUri.toString() : null);
+    call.resolve(ret);
 
   }
 
   /**
-   * More efficient method to find a file in a given directory, avoiding calls to slow DocumentFile methods.
+   * More efficient method to find a file, avoiding calls to
+   * slow DocumentFile methods like .getDisplayName()
    *
-   * @see "https://stackoverflow.com/questions/42186820/why-is-documentfile-so-slow-and-what-should-i-use-instead"
+   * BEWARE: can't filter results of getContentResolver().query(), so it could be slow for crowded directories...
+   *
+   * @return Uri of the searched file or null
    */
   @Nullable
-  private DocumentFile findFileFaster(Uri directoryUri, String filename) {
+  private Uri findFileFaster(DocumentFile directoryDf, String filename) {
 
-    final var childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(directoryUri, DocumentsContract.getDocumentId(directoryUri));
+    Uri childrenUri;
+    var dirUri = directoryDf.getUri();
+    try {
+      childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(dirUri, DocumentsContract.getDocumentId(dirUri));
+    }
+    catch (Exception ex) {
+      return null;
+    }
 
     // load all of the needed data in a single shot
     try (
@@ -309,30 +333,29 @@ public class AndroidSAFPlugin extends Plugin {
       }, null, null, null);
     ) {
       while (c != null && c.moveToNext()) {
-        if (Objects.equals(c.getString(1), filename)) {
+        var displayName = c.getString(1);
+        if (Objects.equals(displayName, filename)) {
           final var documentId = c.getString(0);
-          var fileUri = DocumentsContract.buildDocumentUriUsingTree(directoryUri, documentId);
-          return DocumentFile.fromSingleUri(getContext(), fileUri);
+          return DocumentsContract.buildDocumentUriUsingTree(dirUri, documentId);
         }
       }
     }
     return null;
   }
-
   /**
    * More efficient method to retrieve directory content, avoiding calls to
    * slow DocumentFile methods like .getDisplayName()
    *
    * @see "https://stackoverflow.com/questions/42186820/why-is-documentfile-so-slow-and-what-should-i-use-instead"
    *
-   * @param directoryUri URI of the folder to be searched
+   * @param directoryUri URI of the directory to be searched
    *
    * @return JSArray of JSObject items, ready to be returned to JS
    */
-  private JSArray listFileFaster(Uri directoryUri) {
+  @Nullable
+  private String listFileFaster(Uri directoryUri) {
 
     final var childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(directoryUri, DocumentsContract.getDocumentId(directoryUri));
-    final var result = new JSArray();
 
     // load all of the needed data in a single shot
     try (
@@ -344,26 +367,34 @@ public class AndroidSAFPlugin extends Plugin {
         DocumentsContract.Document.COLUMN_SIZE,           // 4
         DocumentsContract.Document.COLUMN_LAST_MODIFIED,  // 5
       }, null, null, null);
+      var sw = new StringWriter();
+      var jw = new JsonWriter(sw);
     ) {
-      while (c != null && c.moveToNext()) {
-        final var item = new JSObject();
-        final var documentId = c.getString(0);
+      if (c == null) return null;
+      
+      final var recordCount = c.getCount();
+      // to avoid multiple resizes, pre-allocate space assuming 600 bytes x /record
+      sw.getBuffer().ensureCapacity(recordCount * 600);
+
+      jw.beginArray();
+      while (c.moveToNext()) {
         final var mimeType = c.getString(2);
-        final var flags = c.getInt(3);
-
-        item.put("name", c.getString(1));
-        item.put("uri", DocumentsContract.buildDocumentUriUsingTree(directoryUri, documentId).toString());
-        item.put("type", mimeType);
-        item.put("isDirectory", mimeType == DocumentsContract.Document.MIME_TYPE_DIR);
-        item.put("isVirtual", flags & DocumentsContract.Document.FLAG_VIRTUAL_DOCUMENT);
-        item.put("size", c.getLong(4));
-        item.put("lastModified", c.getLong(5));
-
-        // append to result
-        result.put(item);
+        jw.beginObject();
+        jw.name("displayName").value(c.getString(1));  // displayName
+        jw.name("uri").value(DocumentsContract.buildDocumentUriUsingTree(directoryUri, c.getString(0)).toString());  // file URI
+        jw.name("type").value(mimeType);               // mime type
+        jw.name("isDirectory").value(mimeType == DocumentsContract.Document.MIME_TYPE_DIR);  // true if it's a sub-directory
+        jw.name("size").value(c.getLong(4));           // size
+        jw.name("lastModified").value(c.getLong(5));   // last modified timestamp
+        jw.endObject();
       }
+      jw.endArray();
+      jw.close();
+      return sw.toString();
     }
-    return result;
+    catch (Exception ignored) {
+      return null;
+    }
   }
 
   /****************************************************************************
@@ -373,15 +404,12 @@ public class AndroidSAFPlugin extends Plugin {
     if (encoding == null) {
       return null;
     }
-    switch (encoding) {
-      case "utf8":
-        return StandardCharsets.UTF_8;
-      case "utf16":
-        return StandardCharsets.UTF_16;
-      case "ascii":
-        return StandardCharsets.US_ASCII;
-    }
-    return null;
+    return switch (encoding) {
+      case "utf8" -> StandardCharsets.UTF_8;
+      case "utf16" -> StandardCharsets.UTF_16;
+      case "ascii" -> StandardCharsets.US_ASCII;
+      default -> null;
+    };
   }
 
   /**
@@ -418,34 +446,29 @@ public class AndroidSAFPlugin extends Plugin {
    * Get mimeType from a filename
    */
   private String getMimeType(String url) {
-    String type = "unknown";
-    String extension = MimeTypeMap.getFileExtensionFromUrl(url);
-    if (extension != null) {
-      type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
-    }
-    return type;
+    var extension = MimeTypeMap.getFileExtensionFromUrl(url);
+    return extension != null ? MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension) : "unknown";
   }
 
   /**
-   * Parse the given PluginCall "directory" parameter and return a FileDocument that describes it.
+   * Parse the given PluginCall "directoryUri" parameter and return the associated DocumentFile.
    * In case of error, reject the call and return null.
    */
   @Nullable
-  private DocumentFile parseDirectoryParameter(PluginCall call) {
+  private DocumentFile getDirectoryDfFromCall(PluginCall call) {
 
     // get input arguments
-    var directory = call.getString("directory", null);
-    if (directory == null || directory.trim().length() == 0) {
+    var directoryUri = call.getString("directoryUri", null);
+    if (directoryUri == null || directoryUri.isBlank()) {
       call.reject("Invalid or missing directory", ERR_INVALID_URI);
       return null;
     }
+
     // text if it exists
-    Uri directoryUri = null;
     DocumentFile directoryDf = null;
     try {
       // could throw errors if malformed
-      directoryUri = Uri.parse(directory);
-      directoryDf = DocumentFile.fromTreeUri(getContext(), directoryUri);
+      directoryDf = DocumentFile.fromTreeUri(getContext(), Uri.parse(directoryUri));
     }
     catch (Exception ignored) { }
     if (directoryDf == null || !directoryDf.exists()) {
@@ -453,38 +476,25 @@ public class AndroidSAFPlugin extends Plugin {
       return null;
     }
     return directoryDf;
-
   }
 
   /**
-   * Parse the given PluginCall "filename" parameter and return its filename.
+   * Parse the given PluginCall "fileUri" parameter and return the corresponding DocumentFile.
    * In case of error, reject the call and return null.
    */
   @Nullable
-  private String parseFilenameParameter(PluginCall call) {
-    var filename = call.getString("filename", null);
-    if (filename == null || filename.trim().length() == 0) {
-      call.reject("Invalid or missing filename", ERR_INVALID_URI);
+  private DocumentFile getFileDfFromCall(PluginCall call) {
+    var fileUri = call.getString("fileUri", null);
+    if (fileUri == null || fileUri.isBlank()) {
+      call.reject("Invalid or missing fileUri", ERR_INVALID_URI);
       return null;
     }
-    return filename;
-  }
-
-  /**
-   * Return a DocumentFile instance from PluginCall "directory" and "filename" parameters.
-   * In case of error, reject the call and return null.
-   * If file does not exist returns null.
-   */
-  @Nullable
-  private DocumentFile getFileFromDirectoryAndFilenameParameters(PluginCall call) {
-    // get directory param
-    var directoryDF = parseDirectoryParameter(call);
-    if (directoryDF == null) return null;
-    // get filename param
-    var filename = parseFilenameParameter(call);
-    if (filename == null) return null;
-    // find file and return it
-    return findFileFaster(directoryDF.getUri(), filename);
+    var df = DocumentFile.fromTreeUri(getContext(), Uri.parse(fileUri));
+    if (df == null || !df.exists()) {
+      call.reject("File not found", ERR_NOT_FOUND);
+      return null;
+    }
+    return df;
   }
 
 }

@@ -10,12 +10,13 @@ export type CallDirection = 'in' | 'out' | 'conference' | '';
  */
 export class Recording {
 
-  // original reference to underlying Android DocumentFile + optional JSON metadata
-  @JsonProperty() audioFile!: string;
-  @JsonProperty() metadataFile?: string;
+  // references to audio/metadata file
+  @JsonProperty() audioFileUri!: string;
+  @JsonProperty() audioFileDisplayName!: string;
+  @JsonProperty() metadataFileUri?: string; // must keep this in case of Delete() calls...
 
   // test if this recording has an associated metadata file
-  get hasMetadata() { return this.metadataFile !== undefined };
+  get hasMetadata() { return this.metadataFileUri !== undefined };
 
   /**
    * "other party" of the call
@@ -46,7 +47,6 @@ export class Recording {
   @JsonProperty() mimeType: string = '';
 
   // UI only fields
-  status?: 'new' | 'unchanged' | 'deleted' = 'new';
   selected?: boolean = false;
 
   public constructor() {}
@@ -59,25 +59,26 @@ export class Recording {
     const res = new Recording();
 
     // save files references
-    res.audioFile = file.name;
-    res.metadataFile = metadataFile?.name;
+    res.audioFileUri = file.uri;
+    res.audioFileDisplayName = file.displayName;
+    res.metadataFileUri = metadataFile?.uri;
 
     // save Android file props
     res.filesize = file.size;
     res.mimeType = file.type;
     res.date = file.lastModified;
-    res.opName = file.name;
-    res.opNumber = file.name;
+    res.opName = file.displayName;
+    res.opNumber = file.displayName;
 
     // try to extract metadata from companion JSON file
     //props are not available, try to extract them from filename
     let metadata: Partial<BcrRecordingMetadata>|undefined = undefined;
     if (metadataFile) {
-      metadata = await Recording.loadJSONMetadata(directoryUri, metadataFile);
+      metadata = await Recording.loadJSONMetadata(metadataFile);
     }
     // if JSON file is missing or a parse error occurred then fallback to parsing filename
     if (!metadata) {
-      metadata = Recording.extractMetadataFromFilename(file.name);
+      metadata = Recording.extractMetadataFromFilename(file.displayName);
     }
 
     // parse other fields from real (or "filename extracted") metadata
@@ -98,15 +99,13 @@ export class Recording {
     return res;
   }
 
-
   /**
    * Load metadata JSON file and extract its contained data
    */
-  private static async loadJSONMetadata(directoryUri: string, metadataFile: IDocumentFile): Promise<Partial<BcrRecordingMetadata>|undefined> {
+  private static async loadJSONMetadata(metadataFile: IDocumentFile): Promise<Partial<BcrRecordingMetadata>|undefined> {
 
     const { content: metadataFileContent } = await AndroidSAF.readFile({
-      directory: directoryUri,
-      filename: metadataFile.name,
+      fileUri: metadataFile.uri,
       encoding: Encoding.UTF8,
     });
     try {

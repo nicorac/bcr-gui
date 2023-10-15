@@ -1,3 +1,5 @@
+import { AndroidSAF } from './';
+
 export interface AndroidSAFPlugin {
 
   /**
@@ -6,11 +8,14 @@ export interface AndroidSAFPlugin {
   selectDirectory(options?: { initialUri?: string }): Promise<{ selectedUri: string }>;
 
   /**
-   * Return an IDocumentFile[] describing the files contained in the directory with the given URI.
+   * Return a string containing the serialized version of IDocumentFile[].
+   * This is due avoid inefficiency in speed and memory of returning a big array (in case of more then 2000 files).
+   *
+   * NOTE: call AndroidSAFUtils.listFiles() to directly get IDocumentFile[]
    *
    * @param options ListFilesOptions
    */
-  listFiles(options: ListFilesOptions): Promise<{ items: IDocumentFile[] }>;
+  listFiles(options: DirectoryOptions): Promise<{ itemsJson: string }>;
 
   /**
    * Read file and return its content
@@ -20,18 +25,23 @@ export interface AndroidSAFPlugin {
   readFile(options: ReadFileOptions): Promise<{ content: string, encoding?: Encoding }>;
 
   /**
-   * Test if the given file exists
+   * Search the given directory for a file with the given name (display name).
+   * Returns null uri if file cannot be found.
+   *
+   * BEWARE: this method could be really slow because it internally calls listFiles() and filters results.
    */
-  fileExists(options: FileOptions): Promise<{ exists: boolean }>;
+  getFileUri(options: GetFileUriOptions): Promise<{ uri?: string }>;
 
   /**
-   * Get the URI for a file
+   * Create a new file with the given content.
+   *
+   * @param options CreateFileOptions
    */
-  getUri(options: FileOptions): Promise<{ uri: string }>;
+  createFile(options: CreateFileOptions): Promise<{ fileUri: string }>;
 
   /**
    * Write file content.
-   * The file is created if not already exists.
+   * NOTE: the file must exist!
    *
    * @param options WriteFileOptions
    */
@@ -47,12 +57,20 @@ export interface AndroidSAFPlugin {
 
 }
 
+export class AndroidSAFUtils {
+  static async listFiles(options: DirectoryOptions): Promise<IDocumentFile[]> {
+    const { itemsJson } = await AndroidSAF.listFiles(options);
+    return JSON.parse(itemsJson);
+  }
+}
+
 /**
  * Error codes returned on failures
  */
 export enum ErrorCode {
   ERR_CANCELED = "ERR_CANCELED",
   ERR_INVALID_URI = "ERR_INVALID_URI",
+  ERR_INVALID_NAME = "ERR_INVALID_NAME",
   ERR_INVALID_CONTENT = "ERR_INVALID_CONTENT",
   ERR_NOT_FOUND = "ERR_NOT_FOUND",
   ERR_IO_EXCEPTION = "ERR_IO_EXCEPTION",
@@ -68,18 +86,16 @@ export enum Encoding {
   UTF16 = 'utf16',
 }
 
-interface BaseFilesOptions {
+interface FileOptions {
+  // filename
+  fileUri: string;
+}
+
+export interface DirectoryOptions {
   // URI of the base directory
   // (obtained with selectDirectory() & Intent.ACTION_OPEN_DOCUMENT_TREE)
-  directory: string;
+  directoryUri: string;
 }
-
-interface FileOptions extends BaseFilesOptions {
-  // filename
-  filename: string;
-}
-
-export interface ListFilesOptions extends BaseFilesOptions { }
 
 export interface ReadFileOptions extends FileOptions {
   /**
@@ -89,7 +105,7 @@ export interface ReadFileOptions extends FileOptions {
   encoding?: Encoding,
 }
 
-export interface WriteFileOptions extends FileOptions {
+interface CreateWriteFileOptionsBase {
   /**
    * File content, as plain text (encoded with the given encoding) or BASE64 encoded.
    */
@@ -101,12 +117,28 @@ export interface WriteFileOptions extends FileOptions {
   encoding?: Encoding,
 }
 
+export interface GetFileUriOptions extends DirectoryOptions {
+  /**
+   * Name of the file (display name)
+   */
+  name: string;
+}
+
+export interface CreateFileOptions extends DirectoryOptions, CreateWriteFileOptionsBase {
+  /**
+   * Name of the file (display name)
+   */
+  name: string;
+}
+
+export interface WriteFileOptions extends FileOptions, CreateWriteFileOptionsBase { }
+
 export interface DeleteFileOptions extends FileOptions { }
 
-export interface IDocumentFile extends BaseFilesOptions {
-  name: string,     // file/directory name
-  uri: string,      // file URI
-  type: string,     // MIME type
+export interface IDocumentFile {
+  displayName: string,  // file name (SAF display name)
+  uri: string,          // file URI
+  type: string,         // MIME type
   isDirectory: boolean,
   isVirtual: boolean,
   size: number,
