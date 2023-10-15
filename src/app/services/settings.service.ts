@@ -17,11 +17,20 @@ export class SettingsService {
   private isInitialized = false;
   private isLoadingSaving = false;
 
+  @JsonProperty({ mapTo: 'recordingsDirectoryUri' })
+  private __rdu: string = '';
+
   /**
    * Uri of the selected recordingsDirectory
    */
-  @JsonProperty()
-  public recordingsDirectoryUri: string = '';
+  public get recordingsDirectoryUri(): string {
+    return this.__rdu;
+  };
+  public set recordingsDirectoryUri(directoryUri: string) {
+    this.recordingsDirectoryUri = directoryUri;
+    // clear recordings DB Uri
+    this.dbFileUri = '';
+  }
 
   /**
    * Uri of the DB file within the selected dir

@@ -38,7 +38,7 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
   @Input({ required: true }) recording!: Recording;
 
   // props
-  get assetId() { return this.recording.audioFileUri; }
+  get assetId() { return this.recording.audioUri; }
 
 
   constructor(
@@ -83,7 +83,7 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
     try {
       await NativeAudio.preload({
         assetId: this.assetId,
-        assetPath: this.recording.audioFileUri,
+        assetPath: this.recording.audioUri,
         isUrl: false,
       });
     } catch (error: any) {

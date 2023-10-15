@@ -11,12 +11,12 @@ export type CallDirection = 'in' | 'out' | 'conference' | '';
 export class Recording {
 
   // references to audio/metadata file
-  @JsonProperty() audioFileUri!: string;
-  @JsonProperty() audioFileDisplayName!: string;
-  @JsonProperty() metadataFileUri?: string; // must keep this in case of Delete() calls...
+  @JsonProperty() audioUri!: string;
+  @JsonProperty() audioDisplayName!: string;
+  @JsonProperty() metadataUri?: string; // must keep this in case of Delete() calls...
 
   // test if this recording has an associated metadata file
-  get hasMetadata() { return this.metadataFileUri !== undefined };
+  get hasMetadata() { return this.metadataUri !== undefined };
 
   /**
    * "other party" of the call
@@ -59,9 +59,9 @@ export class Recording {
     const res = new Recording();
 
     // save files references
-    res.audioFileUri = file.uri;
-    res.audioFileDisplayName = file.displayName;
-    res.metadataFileUri = metadataFile?.uri;
+    res.audioUri = file.uri;
+    res.audioDisplayName = file.displayName;
+    res.metadataUri = metadataFile?.uri;
 
     // save Android file props
     res.filesize = file.size;

@@ -67,7 +67,7 @@ export class RecordingsService {
     console.log("Reading files in folder:");
 
     // save current DB in object structure keyed by display name (to speedup search)
-    let currentDbObj = Object.fromEntries(this.recordings.value.map(i => [ i.audioFileDisplayName, i ]));
+    let currentDbObj = Object.fromEntries(this.recordings.value.map(i => [ i.audioDisplayName, i ]));
 
     try {
       // keep files only (no directories)
@@ -106,8 +106,8 @@ export class RecordingsService {
           const dbRecord = currentDbObj[file.displayName];
           if (dbRecord) {
             // file already exists, update Uris (selected dir could have changed...)
-            dbRecord.audioFileUri = file.uri;
-            dbRecord.metadataFileUri = metadataFile?.uri;
+            dbRecord.audioUri = file.uri;
+            dbRecord.metadataUri = metadataFile?.uri;
             continue;
           }
           else {
@@ -156,8 +156,8 @@ export class RecordingsService {
     let tmpDb = this.recordings.value;
     for (const item of deleteItems) {
       if (
-        item && await deleteFileFn(item.audioFileUri)
-        && (!item.metadataFileUri || (item?.metadataFileUri && await deleteFileFn(item.metadataFileUri)))
+        item && await deleteFileFn(item.audioUri)
+        && (!item.metadataUri || (item?.metadataUri && await deleteFileFn(item.metadataUri)))
       ) {
         // remove item from DB
         tmpDb = tmpDb.filter(i => i !== item);
@@ -234,6 +234,7 @@ export class RecordingsService {
         // check DB version
         if (dbContent.schemaVersion < DB_SCHEMA_VERSION) {
           this.upgradeDb(dbContent);
+          this.save();
         }
 
         // return DB
@@ -304,23 +305,32 @@ export class RecordingsService {
    */
   private upgradeDb(dbContent: DbContent) {
 
-    // while (dbContent.schemaVersion < DB_SCHEMA_VERSION) {
+    while (dbContent.schemaVersion < DB_SCHEMA_VERSION) {
 
-    //   switch (dbContent.schemaVersion) {
+      switch (dbContent.schemaVersion) {
 
-    //     // upgrade ver. 1 --> 2
-    //     case 1:
-    //       dbContent.schemaVersion = 2;
-    //       break;
+        /**
+         * ====================
+         * Upgrade ver. 1 --> 2
+         * ====================
+         * recording.audioFile --> recording.audioDisplayName
+         * (new audioUri/metadataUri props will be populated at next refresh)
+         */
+        case 1:
+          this.recordings.value.forEach(r => {
+            r.audioDisplayName = (<any>r)['audioFile'];
+          });
+          dbContent.schemaVersion = 2;
+          break;
 
-    //       // upgrade ver. 2 --> 3
-    //       case 1:
-    //       dbContent.schemaVersion = 3;
-    //       break;
+        // // upgrade ver. 2 --> 3
+        // case 1:
+        //   dbContent.schemaVersion = 3;
+        //   break;
 
-    //   }
+      }
 
-    // }
+    }
 
   }
 
