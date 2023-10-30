@@ -1,5 +1,15 @@
 # Version history
 
+## Version 0.0.15 (2023-10-30)
+
+New features:
+
+- Deeply improved native AndroidSAF code, now optimized to manage thousands of recordings (tested with 2000+ records)
+
+- New optimized "virtual" recordings list, it can now easily handle thousands rows with low memory footprint and no stuttering
+
+- Added custom scrollbar to recordings list, to ease list scrolling
+
 ## Version 0.0.14 (2023-10-08)
 
 Bug fixes:
