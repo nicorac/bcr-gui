@@ -1,10 +1,26 @@
-<ion-icon
-  class="buttons"
-  color="primary"
-  [class.disabled]="!ready"
-  [name]="status !== PlayerStatusEnum.Playing ? 'play' : 'pause'"
-  (click)="toggle()"
-/>
+<div class="controls">
+  <ion-icon
+    class="buttons"
+    color="primary"
+    [class.disabled]="!ready"
+    name="play-back"
+    (click)="seek(-1)"
+  />
+  <ion-icon
+    class="buttons"
+    color="primary"
+    [class.disabled]="!ready"
+    [name]="status !== PlayerStatusEnum.Playing ? 'play' : 'pause'"
+    (click)="toggle()"
+  />
+  <ion-icon
+    class="buttons"
+    color="primary"
+    [class.disabled]="!ready"
+    name="play-forward"
+    (click)="seek(+1)"
+  />
+</div>
 
 <div class="progress">
   <ion-range

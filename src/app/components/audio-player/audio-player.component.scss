@@ -1,8 +1,13 @@
 :host {
-  display: flex;
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
   align-items: center;
   gap: 1.2em;
-  // padding: .3em 1em;
+}
+
+.controls {
+  display: flex;
+  gap: .5em;
 }
 
 .buttons {

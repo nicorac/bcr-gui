@@ -62,7 +62,21 @@
       </ion-select>
     </ion-item>
 
-    <!-- <ion-button (click)="settings.save()">SAVE</ion-button> -->
+    <ion-item-divider>
+      <h4>Player</h4>
+    </ion-item-divider>
+
+    <ion-item>
+      <ion-select label="Seek time" [(ngModel)]="settings.seekTime" (ngModelChange)="save()" placeholder="Make a Selection">
+        <ion-select-option [value]="5">5s</ion-select-option>
+        <ion-select-option [value]="10">10s</ion-select-option>
+        <ion-select-option [value]="15">15s</ion-select-option>
+        <ion-select-option [value]="30">30s</ion-select-option>
+        <ion-select-option [value]="60">60s</ion-select-option>
+        <ion-select-option [value]="90">90s</ion-select-option>
+        <ion-select-option [value]="120">120s</ion-select-option>
+      </ion-select>
+    </ion-item>
 
   </ion-list>
 

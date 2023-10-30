@@ -39,6 +39,12 @@ export class SettingsService {
   public dbFileUri?: string = '';
 
   /**
+   * Seek size (in seconds)
+   */
+  @JsonProperty()
+  public seekTime: number = 10;
+
+  /**
    * Date/time format
    */
   @JsonProperty()

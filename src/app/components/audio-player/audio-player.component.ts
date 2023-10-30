@@ -203,6 +203,13 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Fast forward / rewind
+   */
+  protected async seek(delta: number) {
+    this.play(this.progress + delta * this.settings.seekTime);
+  }
+
+  /**
    * Pause the playing media file
    */
   async pause() {
