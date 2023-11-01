@@ -78,7 +78,7 @@ export function deserializeObject<T extends any>(jsonObj: any, typeOrInstance: T
     else if (config.type) {
       (<any>res)[key] = deserializeObject(jsonObj[mappedName], config.type, config.typeArgs);
     }
-    else {
+    else if (jsonObj[mappedName] !== undefined) {
       (<any>res)[key] = jsonObj[mappedName];
     }
   }
