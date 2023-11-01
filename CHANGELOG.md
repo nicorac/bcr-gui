@@ -1,5 +1,11 @@
 # Version history
 
+## Version 0.0.16 (2023-11-01)
+
+New features:
+
+- New player buttons to seek reverse/forward while playing a recording
+
 ## Version 0.0.15 (2023-10-30)
 
 New features:
