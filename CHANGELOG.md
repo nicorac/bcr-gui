@@ -1,5 +1,13 @@
 # Version history
 
+## Version 0.0.17 (2023-11-03)
+
+Bug fixes:
+
+- Default values not correctly deserialized for new settings
+
+- Fixed rendering of items with caller name longer than one line
+
 ## Version 0.0.16 (2023-11-01)
 
 New features:
