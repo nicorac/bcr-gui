@@ -27,8 +27,9 @@
 .title {
   font-size: 14pt;
   line-height: 16pt;
-  display: flex;
-  justify-content: space-between;
+  gap: 1em;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) min-content;
 }
 
 .title,
@@ -39,6 +40,8 @@
 .call-direction-icon {
   height: 16pt;
   width: 16pt;
+  min-height: 16pt;
+  min-width: 16pt;
 }
 
 .items {
@@ -57,10 +60,22 @@
   border-radius: .8em;
   // box-shadow: 0 0 .2em var(--item-shadow-color);
 
+  .op-name {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   &.selected {
-    height: var(--item-height-selected);
+    min-height: var(--item-height-selected);
+    height: unset;
     border-color: var(--item-border-color-selected);
     box-shadow: inset 0 0 .4em var(--item-shadow-color-selected);
+    .op-name {
+      -webkit-line-clamp: 4;
+    }
   }
 
   .checkbox {
