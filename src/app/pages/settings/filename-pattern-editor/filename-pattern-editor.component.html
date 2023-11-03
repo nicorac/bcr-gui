@@ -1,0 +1,52 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Filename pattern editor</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <div class="content">
+
+    <div class="section">
+      <ion-label>Pattern must be a valid JS RegExp, with custom &#123;var&#125; variable placeholders (see BCR help for details).</ion-label>
+      <ion-textarea #patternField class="pattern-field"
+        fill="outline"
+        rows="5"
+        autocapitalize="off"
+        [(ngModel)]="pattern"
+      />
+      <div class="right-container">
+        <ion-button color="primary" fill="clear" (click)="default()">Reset to default</ion-button>
+      </div>
+    </div>
+
+    <div class="section">
+      <ion-label>Test pattern</ion-label>
+      <ion-textarea class="pattern-field"
+        type="text"
+        [ngModel]="testFilename"
+        [readonly]="true"
+        placeholder="Select a filename to test..."
+        (click)="selectTestFile()"
+      ></ion-textarea>
+      <div class="right-container buttons-container">
+        <ion-button fill="clear" (click)="selectTestFile()">Select filename</ion-button>
+        <ion-button fill="clear" (click)="testPattern()" [disabled]="!testFilename">Test pattern</ion-button>
+      </div>
+    </div>
+
+    <div class="section" *ngIf="testResult">
+      <ion-label>Test result</ion-label>
+      <pre class="result">{{ testResult }}</pre>
+    </div>
+
+  </div>
+
+</ion-content>
+
+<!-- footer -->
+<ion-footer class="right-container buttons-container">
+  <ion-button color="primary" fill="clear" (click)="cancel()">Cancel</ion-button>
+  <ion-button color="primary" fill="clear" (click)="confirm()">Ok</ion-button>
+</ion-footer>

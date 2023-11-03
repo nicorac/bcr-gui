@@ -57,7 +57,7 @@ export class RecordingsService {
   /**
    * Refresh recordings list
    */
-  async refreshContent() {
+  async refreshContent(options?: { forceFilenameParse?: boolean }) {
 
     // exit if we're already refreshing
     if (this.refreshProgress.value) {
@@ -72,6 +72,9 @@ export class RecordingsService {
     // immediately send a non-zero progress
     this.refreshProgress.next(0.0001);
     console.log("Reading files in folder:");
+
+    // filename parser instance (NO "g" option here, because we need to reuse this RegExp multiple times!)
+    const filenameRegExp = new RegExp(this.settings.getFilenameRegExPattern());
 
     // save current DB in object structure keyed by display name (to speedup search)
     let currentDbObj = Object.fromEntries(this.recordings.value.map(i => [ i.audioDisplayName, i ]));
@@ -109,17 +112,21 @@ export class RecordingsService {
           const metadataFileName = replaceExtension(file.displayName, '.json');
           const metadataFile = metadataFilesObj[metadataFileName];
 
-          // check if current audio file already exists in current DB (compare diplay names)
+          // check if current audio file already exists in current DB (compare display names)
           const dbRecord = currentDbObj[file.displayName];
           if (dbRecord) {
             // file already exists, update Uris (selected dir could have changed...)
             dbRecord.audioUri = file.uri;
             dbRecord.metadataUri = metadataFile?.uri;
+            // if file doesn't have JSON metadata and forceFilenameParse === true, then reparse filename
+            if (!dbRecord.metadataUri && options?.forceFilenameParse) {
+              dbRecord.reparseFilename(file.displayName, filenameRegExp);
+            }
             continue;
           }
           else {
             // add new element to DB
-            currentDbObj[file.displayName] = await Recording.createInstance(this.settings.recordingsDirectoryUri, file, metadataFile);
+            currentDbObj[file.displayName] = await Recording.createInstance(file, metadataFile, filenameRegExp);
           }
 
         }

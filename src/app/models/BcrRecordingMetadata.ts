@@ -1,3 +1,5 @@
+export type CallDirection = 'in' | 'out' | 'conference' | '';
+
 /**
  * Describes a single call recording, as returned by BCR
 */
@@ -10,7 +12,7 @@ export interface BcrRecordingMetadata {
   timestamp: string,
 
   // Call direction: in, out, or conference. (null if unknown or Android <10)
-  direction: 'in' | 'out' | 'conference',
+  direction: CallDirection,
 
   // SIM slot (null if Android <11 or phone permission is denied)
   // Numbering starts from 1, not 0

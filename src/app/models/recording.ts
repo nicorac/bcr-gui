@@ -1,9 +1,18 @@
 import { AndroidSAF, Encoding, IDocumentFile } from 'src/plugins/capacitorandroidsaf';
 import { replaceExtension, stripExtension } from '../utils/filesystem';
 import { JsonProperty } from '../utils/json-serializer';
-import { BcrRecordingMetadata } from './BcrRecordingMetadata';
+import { BcrRecordingMetadata, CallDirection } from './BcrRecordingMetadata';
 
-export type CallDirection = 'in' | 'out' | 'conference' | '';
+export const FILENAME_PATTERN_SUPPORTED_VARS = [
+  'date',
+  'direction',
+  'sim_slot',
+  'phone_number',
+  'caller_name',
+  'contact_name',
+  'call_log_name',
+];
+export const FILENAME_PATTERN_DEFAULT = '^{date}(_{direction})?(_sim{sim_slot})?_{phone_number}(_{contact_name})?';
 
 /**
  * Class describing a BCR recording
@@ -54,7 +63,11 @@ export class Recording {
   /**
    * Create a new Recording instance from the given audio file and optional metadata file
    */
-  static async createInstance(directoryUri: string, file: IDocumentFile, metadataFile?: IDocumentFile) {
+  static async createInstance(
+    file: IDocumentFile,
+    metadataFile: IDocumentFile|undefined,
+    filenameRegExp: RegExp
+  ) {
 
     const res = new Recording();
 
@@ -78,25 +91,42 @@ export class Recording {
     }
     // if JSON file is missing or a parse error occurred then fallback to parsing filename
     if (!metadata) {
-      metadata = Recording.extractMetadataFromFilename(file.displayName);
+      metadata = Recording.extractMetadataFromFilename(file.displayName, filenameRegExp);
     }
+    res.setMetadata(metadata);
+
+    return res;
+  }
+
+  /**
+   * Set recording metadata (used by both createInstance and reparseFilename)
+   * @param metadata
+   */
+  private setMetadata(metadata: Partial<BcrRecordingMetadata>) {
 
     // parse other fields from real (or "filename extracted") metadata
-    res.direction = metadata.direction ?? '';
-    res.simSlot = metadata.sim_slot ?? 0;
-    res.duration = Math.ceil(metadata.output?.recording?.duration_secs_total ?? 0);
+    this.direction = metadata.direction ?? '';
+    this.simSlot = metadata.sim_slot ?? 0;
+    this.duration = Math.ceil(metadata.output?.recording?.duration_secs_total ?? 0);
     if (metadata.timestamp_unix_ms) {
-      res.date = metadata.timestamp_unix_ms;
+      this.date = metadata.timestamp_unix_ms;
     }
 
     // extract "other party" data
     const calls0 = metadata.calls?.[0];
     if (calls0) {
-      res.opNumber = calls0.phone_number_formatted ?? calls0.phone_number ?? '<unknown>';
-      res.opName = calls0.contact_name ?? res.opNumber;
+      this.opNumber = calls0.phone_number_formatted ?? calls0.phone_number ?? '<unknown>';
+      this.opName = calls0.contact_name ?? this.opNumber;
     }
 
-    return res;
+  }
+
+  /**
+   * Reparse recording filename
+   */
+  public reparseFilename(displayName: string, filenameRegExp: RegExp) {
+    const metadata = Recording.extractMetadataFromFilename(displayName, filenameRegExp);
+    this.setMetadata(metadata);
   }
 
   /**
@@ -123,32 +153,29 @@ export class Recording {
    *
    * @returns Partial instance of BcrRecordingMetadata with the extracted info.
    */
-  private static extractMetadataFromFilename(filename: string): Partial<BcrRecordingMetadata> {
+  public static extractMetadataFromFilename(filename: string, filenameRegExp: RegExp): Partial<BcrRecordingMetadata> {
 
     const res: Partial<BcrRecordingMetadata> = {};
 
-    // split filename into parts
-    //     |   0    |        1      | 2|      3     |      4    |
-    // --> '20230522_164658.997+0200_in_+39012345678_caller name.m4a'
-    const parts = stripExtension(filename).split('_');
+    // keep only the filename
+    filename = stripExtension(filename);
 
-    // ensure we have at least 5 parts
-    while (parts.length < 5) {
-      parts.push('');
-    }
+    // extract parts from filename
+    filenameRegExp.lastIndex = 0;
+    const groups = filenameRegExp.exec(filename)?.groups ?? {};
 
     // extract recording date
     try {
       // format a JS date string "2023-12-31T23:59:59+02:00"
-      //const dateString =
-      const year = parts[0].substring(0, 4);
-      const month = parts[0].substring(4, 6)     // month
-      const day = parts[0].substring(6, 8)     // day
-      const hours = parts[1].substring(0, 2)     // hours
-      const minutes = parts[1].substring(2, 4)     // minutes
-      const secondsAndMs = parts[1].substring(4, 10)    // seconds
-      const tzHours = parts[1].substring(10, 13)    // TZ sign + hours
-      const tzMinutes = parts[1].substring(13, 15)    // TZ minutes
+      const dateString = groups['date'];
+      const year = dateString.substring(0, 4);            // year
+      const month = dateString.substring(4, 6)            // month
+      const day = dateString.substring(6, 8)              // day
+      const hours = dateString.substring(9, 11)          // hours
+      const minutes = dateString.substring(11, 13)        // minutes
+      const secondsAndMs = dateString.substring(13, 19)   // seconds
+      const tzHours = dateString.substring(19, 22)      // TZ sign + hours
+      const tzMinutes = dateString.substring(22, 24)      // TZ minutes
       res.timestamp_unix_ms
         = new Date(`${year}-${month}-${day}T${hours}:${minutes}:${secondsAndMs}${tzHours}:${tzMinutes}`).valueOf();
     } catch (error) {
@@ -157,13 +184,13 @@ export class Recording {
     }
 
     // other fields
-    res.direction = <any>parts[2];
+    res.direction = groups['direction'] as CallDirection;
     res.calls = [
       {
-        phone_number: parts[3],
-        phone_number_formatted: parts[3],
-        caller_name: parts[4] ? parts[4] : parts[3],
-        contact_name: parts[4] ? parts[4] : parts[3],
+        phone_number: groups['phone_number'],
+        phone_number_formatted: groups['phone_number'],
+        caller_name: groups['caller_name'] ? groups['caller_name'] : groups['phone_number'],
+        contact_name: groups['caller_name'] ? groups['caller_name'] : groups['phone_number'],
       }
     ];
 
@@ -175,6 +202,43 @@ export class Recording {
    */
   public static getMetadataFilename(audioFilename: string): string {
     return replaceExtension(audioFilename, '.json');
+  }
+
+  /**
+   * Extract variables from the given filename pattern string
+   */
+  public static getFilenamePatternVars(fnPattern: string): string[] {
+    // extract var names (${varName})
+    const re = /\{(\w+?)\}/g;
+    const res = [];
+    for (const m of fnPattern.matchAll(re)) {
+      res.push(m[1]);
+    };
+    return res;
+  }
+
+  /**
+   * Test the given format and return true if valid, an error message otherwise
+   */
+  public static validateFilenamePattern(fnPattern: string): string|true {
+
+    const vars = this.getFilenamePatternVars(fnPattern);
+
+    // there should be at least one variable
+    if (!vars.length) {
+      return 'No format variables found, please add at least one {var} to your format';
+    }
+
+    // all variables must exist
+    for (const v of vars) {
+      if (!FILENAME_PATTERN_SUPPORTED_VARS.includes(v)) {
+        return `Unsupported variable {${v}}`;
+      }
+    }
+
+    // ok
+    return true;
+
   }
 
 }

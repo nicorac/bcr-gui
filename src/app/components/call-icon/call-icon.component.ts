@@ -1,4 +1,4 @@
-import { CallDirection } from 'src/app/models/recording';
+import { CallDirection } from 'src/app/models/BcrRecordingMetadata';
 import { NgIf } from '@angular/common';
 import { Component, Input } from '@angular/core';
 

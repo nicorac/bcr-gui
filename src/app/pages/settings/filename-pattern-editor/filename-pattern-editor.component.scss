@@ -1,0 +1,39 @@
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+
+.pattern-field {
+  display: table;
+  font-family: monospace;
+  font-size: 1.2em;
+  --background: var(--ion-item-background);
+  --padding-start: .5em;
+  --padding-end: .5em;
+  --padding-top: .5em;
+  --padding-bottom: .5em;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: .1em;
+}
+
+.result {
+  font-family: monospace;
+  font-size: 1.2em;
+  background-color: var(--ion-item-background);
+  padding: .5em;
+}
+
+.var-buttons-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .2em;
+}
+
+.var-button {
+  width: max-content;
+}

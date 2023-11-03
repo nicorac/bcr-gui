@@ -16,6 +16,13 @@
     </ion-item>
 
     <ion-item>
+      <ion-label (click)="editFilenameFormat()">
+        <h2>BCR filename pattern</h2>
+        <p class="ion-text-wrap">{{ settings.filenamePattern }}</p>
+      </ion-label>
+    </ion-item>
+
+    <ion-item>
       <ion-select label="Appearance" [(ngModel)]="settings.appearance">
         <ion-select-option [value]="'system'">System preference</ion-select-option>
         <ion-select-option [value]="'light'">Light</ion-select-option>

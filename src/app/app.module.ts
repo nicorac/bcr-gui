@@ -16,6 +16,7 @@ import { VirtualScrollbarComponent } from './components/virtual-scrollbar/virtua
 import { LongPressDirective } from './directives/long-press.directive';
 import { AboutPage } from './pages/about/about.page';
 import { MainPage } from './pages/main/main.page';
+import { FilenamePatternEditorComponent } from './pages/settings/filename-pattern-editor/filename-pattern-editor.component';
 import { SettingsPage } from './pages/settings/settings.page';
 import { FilesizePipe } from './pipes/filesize.pipe';
 import { ToHmsPipe } from './pipes/to-hms.pipe';
@@ -28,6 +29,7 @@ import version from './version';
     AboutPage,
     AppComponent,
     AudioPlayerComponent,
+    FilenamePatternEditorComponent,
     FilesizePipe,
     HeaderComponent,
     MainPage,

@@ -61,6 +61,11 @@ ion-item-divider {
   justify-content: space-between;
 }
 
+.right-container {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .disabled {
   opacity: .5;
   pointer-events: none;
