@@ -8,6 +8,11 @@ export interface AndroidSAFPlugin {
   selectDirectory(options?: { initialUri?: string }): Promise<{ selectedUri: string }>;
 
   /**
+   * Open Android file picker to select a file
+   */
+  selectFile(options?: { initialUri?: string }): Promise<{ selectedUri: string, displayName: string }>;
+
+  /**
    * Return a string containing the serialized version of IDocumentFile[].
    * This is due avoid inefficiency in speed and memory of returning a big array (in case of more then 2000 files).
    *

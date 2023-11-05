@@ -89,6 +89,56 @@ public class AndroidSAFPlugin extends Plugin {
 
   }
 
+
+  /**
+   * Allow client to select a file and get access to it
+   */
+  @PluginMethod()
+  public void selectFile(PluginCall call) {
+
+    // get input arguments
+    String initialUri = call.getString("initialUri", "");
+
+    // open file
+    var intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+    intent.setType("*/*");
+    intent.addCategory(Intent.CATEGORY_OPENABLE);
+    if (initialUri != "") {
+      intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, initialUri);
+    }
+
+    // start activity
+    startActivityForResult(call, intent, "selectFileResult");
+
+  }
+
+  @ActivityCallback()
+  private void selectFileResult(PluginCall call, ActivityResult result) {
+
+    if (call == null) {
+      return;
+    }
+
+    if (result.getResultCode() != AppCompatActivity.RESULT_OK) {
+      call.reject(result.toString(), ERR_CANCELED);
+      return;
+    }
+
+    // extract intent
+    Intent intent = result.getData();
+    Uri uri = intent.getData();
+
+    // get DocumentFile from selected file
+    var fileDf = DocumentFile.fromSingleUri(getContext(), uri);
+
+    // Do something with the result data
+    var ret = new JSObject();
+    ret.put("selectedUri", intent.getDataString());
+    ret.put("displayName", fileDf.getName());
+    call.resolve(ret);
+
+  }
+
   /**
    * Return the JSON serialized version of IDocumentFile items contained in the given directory Uri
    */
@@ -371,7 +421,7 @@ public class AndroidSAFPlugin extends Plugin {
       var jw = new JsonWriter(sw);
     ) {
       if (c == null) return null;
-      
+
       final var recordCount = c.getCount();
       // to avoid multiple resizes, pre-allocate space assuming 600 bytes x /record
       sw.getBuffer().ensureCapacity(recordCount * 600);
