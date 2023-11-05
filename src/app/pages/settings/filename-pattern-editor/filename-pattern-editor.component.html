@@ -9,7 +9,9 @@
   <div class="content">
 
     <div class="section">
-      <ion-label>Pattern must be a valid JS RegExp, with custom &#123;var&#125; variable placeholders (see BCR help for details).</ion-label>
+      <div class="section-title">Filename pattern</div>
+      <ion-label>This pattern is used to parse filenames of recordings that don't have a corresponding .json metadata file.</ion-label>
+      <ion-label>It must be a valid JS RegExp, with custom <strong>&#123;var&#125;</strong> variable placeholders (see BCR help for details).</ion-label>
       <ion-textarea #patternField class="pattern-field"
         fill="outline"
         rows="5"
@@ -22,7 +24,7 @@
     </div>
 
     <div class="section">
-      <ion-label>Test pattern</ion-label>
+      <div class="section-title">Test filename</div>
       <ion-textarea class="pattern-field"
         type="text"
         [ngModel]="testFilename"

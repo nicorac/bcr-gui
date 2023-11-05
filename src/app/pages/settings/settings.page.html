@@ -9,17 +9,18 @@
     </ion-item-divider>
 
     <ion-item>
-      <ion-label (click)="selectRecordingsDirectory()">
-        <h2>BCR recordings directory</h2>
-        <p class="ion-text-wrap">{{ settings.recordingsDirectoryUri ? settings.recordingsDirectoryUri : 'Click here to select BCR recordings directory...' }}</p>
+      <ion-label>
+        BCR recordings directory
+        <p class="ion-text-wrap">{{ settings.recordingsDirectoryUri ? settings.recordingsDirectoryUri : 'Select BCR recordings directory...' }}</p>
       </ion-label>
+      <ion-button slot="end" (click)="selectRecordingsDirectory()">
+        <ion-icon name="folder-open-outline" />
+      </ion-button>
     </ion-item>
 
     <ion-item>
-      <ion-label (click)="editFilenameFormat()">
-        <h2>BCR filename pattern</h2>
-        <p class="ion-text-wrap">{{ settings.filenamePattern }}</p>
-      </ion-label>
+      <ion-label>BCR filename pattern</ion-label>
+      <ion-button slot="end" icon="folder-open-outline" (click)="editFilenameFormat()">Edit</ion-button>
     </ion-item>
 
     <ion-item>

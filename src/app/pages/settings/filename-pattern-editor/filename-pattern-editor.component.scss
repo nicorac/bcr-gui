@@ -15,10 +15,16 @@
   --padding-bottom: .5em;
 }
 
+.section-title {
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
 .section {
   display: flex;
   flex-direction: column;
-  gap: .1em;
+  gap: .3em;
 }
 
 .result {
