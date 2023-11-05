@@ -73,8 +73,8 @@ export class RecordingsService {
     this.refreshProgress.next(0.0001);
     console.log("Reading files in folder:");
 
-    // filename parser instance (NO "g" option here, because we need to reuse this RegExp multiple times!)
-    const filenameRegExp = new RegExp(this.settings.getFilenameRegExPattern());
+    // filename RegExp parser instance
+    const filenameRegExp = this.settings.getFilenameRegExp();
 
     // save current DB in object structure keyed by display name (to speedup search)
     let currentDbObj = Object.fromEntries(this.recordings.value.map(i => [ i.audioDisplayName, i ]));

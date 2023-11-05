@@ -15,6 +15,7 @@ export class FilenamePatternEditorComponent implements OnInit {
 
   protected testFilename = '';
   protected testResult = '';
+  protected patternError?: string = undefined;
 
   @Input({ required: true }) pattern!: string;
   public onConfirm?: (pattern: string) => Promise<void>;
@@ -35,6 +36,8 @@ export class FilenamePatternEditorComponent implements OnInit {
   ngOnInit() {
     // set own class
     this.ref.nativeElement.parentElement?.classList.add('tag-editor');
+    // first validation
+    this.validatePattern();
   }
 
   async ionViewWillLeave() {
@@ -43,6 +46,7 @@ export class FilenamePatternEditorComponent implements OnInit {
 
   default() {
     this.pattern = FILENAME_PATTERN_DEFAULT;
+    this.validatePattern();
   }
 
   cancel() {
@@ -67,8 +71,28 @@ export class FilenamePatternEditorComponent implements OnInit {
   }
 
   testPattern() {
-    const re = new RegExp(this.settings.getFilenameRegExPattern());
+    const re = this.settings.getFilenameRegExp( this.pattern);
     this.testResult = JSON.stringify(Recording.extractMetadataFromFilename(this.testFilename, re), null, 2);
+  }
+
+  /**
+   * Try to create a RegExp instance with current pattern
+   */
+  validatePattern() {
+    try {
+      this.patternError = undefined;
+
+      // validate RegExp syntax (will throw exception in case of bad pattern)
+      const re = this.settings.getFilenameRegExp( this.pattern);
+
+      // validate BCR vars
+      const varsValidation = Recording.validateFilenamePattern(this.pattern);
+      this.patternError = varsValidation === true ? undefined : varsValidation;
+
+    } catch (error: any) {
+      this.patternError = error.message;
+    }
+
   }
 
 }

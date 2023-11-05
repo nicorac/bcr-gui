@@ -16,8 +16,11 @@
         fill="outline"
         rows="5"
         autocapitalize="off"
+        debounce="1000"
         [(ngModel)]="pattern"
+        (ngModelChange)="validatePattern()"
       />
+      <div class="error" *ngIf="patternError">{{ patternError }}</div>
       <div class="right-container">
         <ion-button color="primary" fill="clear" (click)="default()">Reset to default</ion-button>
       </div>

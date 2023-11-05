@@ -176,11 +176,10 @@ export class SettingsService {
 
   /**
    * Build and return the pattern of a RegEx to be used
-   * to parse recording filename based on current config
+   * to parse recording filename based on given pattern (or current config)
    */
-  public getFilenameRegExPattern(): string {
+  public getFilenameRegExpPattern(pattern: string = this.filenamePattern): string {
 
-    let pattern = this.filenamePattern;
     const vars = Recording.getFilenamePatternVars(pattern);
 
     // transform each format var in a RegEx capture pattern
@@ -220,6 +219,15 @@ export class SettingsService {
 
     return pattern;
 
+  }
+
+  /**
+   * Build and return a RegEx to be used
+   * to parse recording filename based on given pattern (or current config)
+   */
+  public getFilenameRegExp(pattern: string = this.filenamePattern): RegExp {
+    // NOTE: NO "g" option here, because we need to reuse this RegExp multiple times!
+    return new RegExp(this.getFilenameRegExpPattern(pattern));
   }
 
 }
