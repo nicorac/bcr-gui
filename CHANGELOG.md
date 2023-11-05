@@ -1,5 +1,13 @@
 # Version history
 
+## Version 0.0.18 (2023-11-05)
+
+New features:
+
+- Added filename parser support for customized filename patterns
+
+- Hardware back button press now navigates back to home page instead of closing the app
+
 ## Version 0.0.17 (2023-11-03)
 
 Bug fixes:
