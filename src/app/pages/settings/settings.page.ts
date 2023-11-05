@@ -1,8 +1,11 @@
+import { Subscription } from 'rxjs';
+import { AppRoutesEnum } from 'src/app/app-routing.module';
 import { MessageBoxService } from 'src/app/services/message-box.service';
 import { RecordingsService } from 'src/app/services/recordings.service';
 import { SortModeEnum } from 'src/app/utils/recordings-sorter';
 import { Component } from '@angular/core';
-import { ModalController } from '@ionic/angular';
+import { Router } from '@angular/router';
+import { ModalController, Platform } from '@ionic/angular';
 import { AppDateTimeFormat, SettingsService } from '../../services/settings.service';
 import { FilenamePatternEditorComponent } from './filename-pattern-editor/filename-pattern-editor.component';
 
@@ -10,6 +13,7 @@ import { FilenamePatternEditorComponent } from './filename-pattern-editor/filena
   selector: 'app-settings',
   templateUrl: './settings.page.html',
   styleUrls: ['./settings.page.scss'],
+  // hostDirectives
 })
 export class SettingsPage {
 
@@ -20,14 +24,22 @@ export class SettingsPage {
   // sample datetime (last second of current year)
   readonly dateTimeSample = new Date(new Date().getFullYear(), 11, 31, 23, 59, 59);
 
+  private backSub?: Subscription;
+
   constructor(
     protected messageBoxService: MessageBoxService,
     protected modalController: ModalController,
+    protected platform: Platform,
     protected recordingsService: RecordingsService,
+    protected router: Router,
     protected settings: SettingsService,
-  ) { }
+  ) {
+    // subscribe to hardware back button events
+    this.backSub = this.platform.backButton.subscribeWithPriority(10, () => this.router.navigateByUrl(AppRoutesEnum.Main));
+  }
 
   async ionViewWillLeave() {
+    this.backSub?.unsubscribe();
     await this.save();
   }
 
