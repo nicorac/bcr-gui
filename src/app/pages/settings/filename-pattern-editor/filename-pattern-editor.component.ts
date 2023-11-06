@@ -2,7 +2,7 @@ import { Subscription } from 'rxjs';
 import { FILENAME_PATTERN_DEFAULT, Recording } from 'src/app/models/recording';
 import { RecordingsService } from 'src/app/services/recordings.service';
 import { SettingsService } from 'src/app/services/settings.service';
-import { AndroidSAF, ErrorCode } from 'src/plugins/capacitorandroidsaf';
+import { AndroidSAF, ErrorCode } from 'src/plugins/androidsaf';
 import { Component, ElementRef, Input, OnInit } from '@angular/core';
 import { ModalController, Platform } from '@ionic/angular';
 

@@ -1,4 +1,5 @@
 import { BehaviorSubject } from 'rxjs';
+import { AndroidDateTimeSettings } from 'src/plugins/androiddatetimesettings';
 import { Injectable } from '@angular/core';
 import { Preferences } from '@capacitor/preferences';
 import { FILENAME_PATTERN_DEFAULT, Recording } from '../models/recording';
@@ -8,7 +9,7 @@ import { MessageBoxService } from './message-box.service';
 
 export type Appearance = 'system' | 'light' | 'dark';
 export type Theme = 'light' | 'dark';
-export type AppDateTimeFormat = Pick<Intl.DateTimeFormatOptions, 'dateStyle' | 'timeStyle'>;
+export type AppDateTimeFormat = Pick<Intl.DateTimeFormatOptions, 'dateStyle' | 'timeStyle' >;
 
 
 @Injectable({
@@ -18,6 +19,12 @@ export class SettingsService {
 
   private isInitialized = false;
   private isLoadingSaving = false;
+
+  /**
+   * Return true if time is currently set to 12-hours
+   * (both by setting a culture that uses this format and/or by forcing it)
+   */
+  public is12Hours = false;
 
   @JsonProperty({ mapTo: 'recordingsDirectoryUri' })
   private __rdu: string = '';
@@ -119,6 +126,9 @@ export class SettingsService {
    * Load app settings from storage
    */
   async initialize() {
+
+    // load android settings
+    ({ is12Hours: this.is12Hours } = await AndroidDateTimeSettings.is12Hours());
 
     // load settings
     const { value: jsonContent } = await Preferences.get({ key: 'settings' });

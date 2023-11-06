@@ -1,4 +1,4 @@
-package com.github.nicorac.plugins.capacitorandroidsaf;
+package com.github.nicorac.plugins.androidsaf;
 
 import android.content.Intent;
 import android.database.Cursor;

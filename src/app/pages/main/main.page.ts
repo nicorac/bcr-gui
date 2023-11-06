@@ -8,7 +8,7 @@ import { RecordingsService } from 'src/app/services/recordings.service';
 import { SettingsService } from 'src/app/services/settings.service';
 import { sortRecordings } from 'src/app/utils/recordings-sorter';
 import { bringIntoView } from 'src/app/utils/scroll';
-import { AndroidSAF } from 'src/plugins/capacitorandroidsaf';
+import { AndroidSAF } from 'src/plugins/androidsaf';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { DatePipe } from '@angular/common';
 import { AfterViewInit, Component, ViewChild } from '@angular/core';
@@ -57,7 +57,8 @@ export class MainPage implements AfterViewInit {
     protected settings: SettingsService,
   ) { }
 
-  ionViewWillEnter() {
+  async ionViewWillEnter() {
+
     // subscribe
     [
       this.recordingsService.recordings.subscribe((res) => {
@@ -261,5 +262,14 @@ Duration: ${this.toHms.transform(item.duration)}
     this.scrollViewport.scrollToIndex(index);
   }
 
+  test(ts: Date) {
+
+    const region1 = new Intl.DateTimeFormat([]);
+    const options1 = region1.resolvedOptions();
+
+    const d = new Date(ts);
+    const x = Intl.DateTimeFormat('', { timeStyle: 'long' });
+    return x.format(ts);
+  }
 
 }

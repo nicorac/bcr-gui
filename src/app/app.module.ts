@@ -1,4 +1,3 @@
-import { IntlModule } from 'angular-ecmascript-intl';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { CommonModule, DatePipe } from '@angular/common';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
@@ -18,6 +17,7 @@ import { AboutPage } from './pages/about/about.page';
 import { MainPage } from './pages/main/main.page';
 import { FilenamePatternEditorComponent } from './pages/settings/filename-pattern-editor/filename-pattern-editor.component';
 import { SettingsPage } from './pages/settings/settings.page';
+import { DatetimePipe } from './pipes/datetime.pipe';
 import { FilesizePipe } from './pipes/filesize.pipe';
 import { ToHmsPipe } from './pipes/to-hms.pipe';
 import { RecordingsService } from './services/recordings.service';
@@ -36,6 +36,7 @@ import version from './version';
     SettingsPage,
     ToHmsPipe,
     VirtualScrollbarComponent,
+    DatetimePipe,
   ],
   imports: [
     AppRoutingModule,
@@ -43,7 +44,6 @@ import version from './version';
     CallIconComponent,
     CommonModule,
     FormsModule,
-    IntlModule,
     IonicModule.forRoot({ innerHTMLTemplatesEnabled: true }),
     LongPressDirective,
     RouterModule,
@@ -76,9 +76,6 @@ function appInitializer(recordingsService: RecordingsService, settings: Settings
     // initialize version & settings
     await version.initialize();
     await settings.initialize();
-
-    // // initialize recordings service
-    // await recordingsService.initialize();
 
   }
 }

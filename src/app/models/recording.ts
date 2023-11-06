@@ -1,4 +1,4 @@
-import { AndroidSAF, Encoding, IDocumentFile } from 'src/plugins/capacitorandroidsaf';
+import { AndroidSAF, Encoding, IDocumentFile } from 'src/plugins/androidsaf';
 import { replaceExtension, stripExtension } from '../utils/filesystem';
 import { JsonProperty } from '../utils/json-serializer';
 import { BcrRecordingMetadata, CallDirection } from './BcrRecordingMetadata';
