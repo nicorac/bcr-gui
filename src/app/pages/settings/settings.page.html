@@ -32,29 +32,8 @@
     </ion-item>
 
     <ion-item>
-      <ion-select label="Date style"
-        [ngModel]="settings.dateTimeStyle.dateStyle ?? ''"
-        (ngModelChange)="updateDateTimeStyle($event, 'dateStyle')"
-      >
-        <ion-select-option [value]="'full'">{{ dateTimeSample | datetime:{ dateStyle:'full' } }}</ion-select-option>
-        <ion-select-option [value]="'long'">{{ dateTimeSample | datetime:{ dateStyle:'long' } }}</ion-select-option>
-        <ion-select-option [value]="'medium'">{{ dateTimeSample | datetime:{ dateStyle:'medium' } }}</ion-select-option>
-        <ion-select-option [value]="'short'">{{ dateTimeSample | datetime:{ dateStyle:'short' } }}</ion-select-option>
-        <ion-select-option [value]="''">None</ion-select-option>
-      </ion-select>
-    </ion-item>
-
-    <ion-item>
-      <ion-select label="Time style"
-        [ngModel]="settings.dateTimeStyle.timeStyle ?? ''"
-        (ngModelChange)="updateDateTimeStyle($event, 'timeStyle')"
-      >
-        <ion-select-option [value]="'full'">{{ dateTimeSample | datetime:{ timeStyle:'full' } }}</ion-select-option>
-        <ion-select-option [value]="'long'">{{ dateTimeSample | datetime:{ timeStyle:'long' } }}</ion-select-option>
-        <ion-select-option [value]="'medium'">{{ dateTimeSample | datetime:{ timeStyle:'medium' } }}</ion-select-option>
-        <ion-select-option [value]="'short'">{{ dateTimeSample | datetime:{ timeStyle:'short' } }}</ion-select-option>
-        <ion-select-option [value]="''">None</ion-select-option>
-      </ion-select>
+      <ion-label>Date/time style</ion-label>
+      <ion-button slot="end" (click)="editDatetimeFormat()">Edit</ion-button>
     </ion-item>
 
     <ion-item-divider>

@@ -1,6 +1,8 @@
 import { RecordingsService } from 'src/app/services/recordings.service';
+import { AsyncPipe, NgIf } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { IonicModule } from '@ionic/angular';
 
 export type ActionButton = {
   icon: string,
@@ -12,6 +14,8 @@ export type ActionButton = {
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
+  standalone: true,
+  imports: [ AsyncPipe, NgIf, IonicModule ]
 })
 export class HeaderComponent implements OnInit {
 

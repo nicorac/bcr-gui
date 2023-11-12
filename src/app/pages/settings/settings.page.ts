@@ -6,7 +6,8 @@ import { SortModeEnum } from 'src/app/utils/recordings-sorter';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { ModalController, Platform } from '@ionic/angular';
-import { AppDateTimeFormat, SettingsService } from '../../services/settings.service';
+import { SettingsService } from '../../services/settings.service';
+import { DatetimeFormatEditorComponent } from './datetime-format-editor/datetime-format-editor.component';
 import { FilenamePatternEditorComponent } from './filename-pattern-editor/filename-pattern-editor.component';
 
 @Component({
@@ -19,10 +20,7 @@ export class SettingsPage {
 
   SortMode = SortModeEnum;
 
-  protected filenamePatternEditor?: HTMLIonModalElement;
-
-  // sample datetime (last second of current year)
-  readonly dateTimeSample = new Date(new Date().getFullYear(), 11, 31, 23, 59, 59);
+  protected editor?: HTMLIonModalElement;
 
   private backSub?: Subscription;
 
@@ -36,6 +34,12 @@ export class SettingsPage {
   ) {
     // subscribe to hardware back button events
     this.backSub = this.platform.backButton.subscribeWithPriority(10, () => this.router.navigateByUrl(AppRoutesEnum.Main));
+  }
+
+  ngOnInit(): void {
+    //Called after the constructor, initializing input properties, and the first call to ngOnChanges.
+    //Add 'implements OnInit' to the class.
+    this.editDatetimeFormat();
   }
 
   async ionViewWillLeave() {
@@ -52,18 +56,11 @@ export class SettingsPage {
   }
 
   /**
-   * Need to re-create the whole object to let pipes update
-   */
-  updateDateTimeStyle(style: string, key: keyof AppDateTimeFormat) {
-    this.settings.dateTimeStyle = { ...this.settings.dateTimeStyle, [key]: style === '' ? undefined : style }
-  }
-
-  /**
    * Open filename format editor modal
    */
   async editFilenameFormat() {
 
-    this.filenamePatternEditor = await this.modalController.create({
+    this.editor = await this.modalController.create({
       component: FilenamePatternEditorComponent,
       backdropDismiss: false,
       componentProps: <FilenamePatternEditorComponent> {
@@ -82,8 +79,21 @@ export class SettingsPage {
         },
       }
     });
-    this.filenamePatternEditor.onWillDismiss().then(() => this.filenamePatternEditor = undefined);
-    this.filenamePatternEditor.present();
+    this.editor.onWillDismiss().then(() => this.editor = undefined);
+    this.editor.present();
+  }
+
+  /**
+   * Open datetime format editor modal
+   */
+  async editDatetimeFormat() {
+
+    this.editor = await this.modalController.create({
+      component: DatetimeFormatEditorComponent,
+      backdropDismiss: false,
+    });
+    this.editor.onWillDismiss().then(() => this.editor = undefined);
+    this.editor.present();
   }
 
 }

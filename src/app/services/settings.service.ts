@@ -9,8 +9,13 @@ import { MessageBoxService } from './message-box.service';
 
 export type Appearance = 'system' | 'light' | 'dark';
 export type Theme = 'light' | 'dark';
-export type AppDateTimeFormat = Pick<Intl.DateTimeFormatOptions, 'dateStyle' | 'timeStyle' >;
-
+export type AppDateTimeFormat = {
+  dateStyle?: Intl.DateTimeFormatOptions['dateStyle'];
+  timeStyle?: Intl.DateTimeFormatOptions['timeStyle'];
+  customFormat?: string;
+  culture?: string;
+}
+export const DEFAULT_DATE_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
 
 @Injectable({
   providedIn: 'root'
@@ -62,10 +67,11 @@ export class SettingsService {
   /**
    * Date/time format
    */
-  @JsonProperty()
-  public dateTimeStyle: AppDateTimeFormat = {
+  @JsonProperty({ mapTo: 'dateTimeStyle' })
+  public dateTimeFormat: AppDateTimeFormat = {
     dateStyle: 'medium',
     timeStyle: 'medium',
+    customFormat: DEFAULT_DATE_FORMAT,
   };
 
   //#region Dark mode management
