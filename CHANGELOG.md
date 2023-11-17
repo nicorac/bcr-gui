@@ -1,5 +1,15 @@
 # Version history
 
+## Version 0.0.19 (2023-11-18)
+
+New features:
+
+- Added option to set a custom datetime format
+
+Bug fixes:
+
+- Datetime format now respects Android 12/24H setting (overriding selected culture defaults)
+
 ## Version 0.0.18 (2023-11-05)
 
 New features:
