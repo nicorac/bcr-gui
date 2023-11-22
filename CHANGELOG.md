@@ -1,5 +1,11 @@
 # Version history
 
+## Version 0.0.20 (2023-11-22)
+
+Bug fixes:
+
+- Fixed Settings page always opening DateTime format editor
+
 ## Version 0.0.19 (2023-11-18)
 
 New features:

@@ -36,12 +36,6 @@ export class SettingsPage {
     this.backSub = this.platform.backButton.subscribeWithPriority(10, () => this.router.navigateByUrl(AppRoutesEnum.Main));
   }
 
-  ngOnInit(): void {
-    //Called after the constructor, initializing input properties, and the first call to ngOnChanges.
-    //Add 'implements OnInit' to the class.
-    this.editDatetimeFormat();
-  }
-
   async ionViewWillLeave() {
     this.backSub?.unsubscribe();
     await this.save();
