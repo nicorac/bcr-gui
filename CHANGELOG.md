@@ -1,5 +1,11 @@
 # Version history
 
+## Version 0.0.21 (2023-12-03)
+
+New features
+
+- Recordings database autorefresh on application resume (i.e. getting back from a call...)
+
 ## Version 0.0.20 (2023-11-22)
 
 Bug fixes:
