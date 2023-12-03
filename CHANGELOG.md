@@ -1,8 +1,18 @@
 # Version history
 
+## Version 0.0.22 (2023-12-03)
+
+New features:
+
+- Screen is kept awake while playing to avoid play stop (workaround for issue #20)
+
+Bug fixes:
+
+- Recording share button is now disabled while waiting for the "Android share" dialog to appear (it could require some time if recording file is big)
+
 ## Version 0.0.21 (2023-12-03)
 
-New features
+New features:
 
 - Recordings database autorefresh on application resume (i.e. getting back from a call...)
 
