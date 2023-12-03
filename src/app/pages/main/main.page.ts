@@ -130,16 +130,15 @@ export class MainPage implements AfterViewInit {
    */
   async deleteItems(items: Recording[]) {
 
-    // stop player
-    await this.stopPlayer();
-
     // show confirmation alert
     await this.mbs.showConfirm({
       header: 'Delete recording?',
       message: items.length === 1 ? 'Do you really want to delete selected recording?' : `Do you really want to delete ${items.length} recordings?`,
       cancelText: 'Cancel',
       confirmText: 'Delete',
-      onConfirm: () => {
+      onConfirm: async () => {
+        // stop player
+        await this.stopPlayer();
         this.recordingsService.deleteRecording(items);
         this.clearSelection();
       }
@@ -150,7 +149,14 @@ export class MainPage implements AfterViewInit {
   /**
    * Show Android share dialog to share an audio file
    */
-  async shareRecording(item: Recording) {
+  async shareRecording(item: Recording, event: MouseEvent) {
+
+    // disable button (operation could take some time if file is bigger)
+    const iconButtonElem = (event.target as HTMLElement);
+    iconButtonElem.classList.add('icon-button-waiting');
+
+    // stop player
+    await this.stopPlayer();
 
     // we need to create a temp copy of audio file in a "share accessible" location"
     // create parent dir
@@ -226,6 +232,8 @@ export class MainPage implements AfterViewInit {
       // delete temp file
       await Filesystem.deleteFile(tempFile);
       console.log('Deleted temp file:', tempFile.path);
+      // re-enable button
+      iconButtonElem.classList.remove('icon-button-waiting');
     }
 
   }

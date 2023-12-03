@@ -111,13 +111,13 @@
                 <!-- share -->
                 <ion-icon name="share-social"
                   class="action"
-                  (click)="shareRecording(item)"
+                  (click)="shareRecording(item, $event)"
                 />
 
                 <!-- delete -->
                 <ion-icon name="trash"
                   class="action"
-                  (click)="deleteItems([item], audioPlayer)"
+                  (click)="deleteItems([item])"
                 />
 
               </div>
