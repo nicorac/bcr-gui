@@ -162,6 +162,33 @@ public class AndroidSAFPlugin extends Plugin {
   }
 
   /**
+   * Return the last modified time of the given directory URI
+   */
+  @PluginMethod()
+  public void getLastModified(PluginCall call) {
+
+    // get directory param
+    var DF = getDirectoryDfFromCall(call);
+    if (DF == null) return;
+
+    var uri = DF.getUri();
+    try (
+      Cursor c = getContext().getContentResolver().query(uri, new String[] {
+        DocumentsContract.Document.COLUMN_LAST_MODIFIED,   // 0
+      }, null, null, null);
+    ) {
+      if (c != null && c.moveToNext()) {
+        final var timestamp = c.getLong(0);
+        var res = new JSObject();
+        res.put("lastModified", timestamp);
+        call.resolve(res);
+        return;
+      }
+    }
+    call.reject(ERR_INVALID_URI);
+  }
+
+  /**
    * Load and return file content
    *
    * @param call

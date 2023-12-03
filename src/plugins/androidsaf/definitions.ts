@@ -23,6 +23,12 @@ export interface AndroidSAFPlugin {
   listFiles(options: DirectoryOptions): Promise<{ itemsJson: string }>;
 
   /**
+   * Returns the last modified time of the given directory
+   * @param options
+   */
+  getLastModified(options: DirectoryOptions): Promise<{ lastModified: number }>;
+
+  /**
    * Read file and return its content
    *
    * @param options ReadFileOptions
