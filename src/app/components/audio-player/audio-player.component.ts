@@ -1,8 +1,8 @@
-
 import { Subscription } from 'rxjs';
 import { Recording } from 'src/app/models/recording';
 import { SettingsService } from 'src/app/services/settings.service';
 import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { KeepAwake } from '@capacitor-community/keep-awake';
 import { NativeAudio } from '@capacitor-community/native-audio';
 import { AlertController, Platform, RangeCustomEvent } from '@ionic/angular';
 
@@ -96,10 +96,10 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
     // subscribe to playComplete event
     await NativeAudio.addListener(
       'complete',
-      (res) => {
+      async (res) => {
         if (res.assetId === this.assetId) {
           NativeAudio.stop({ assetId: this.assetId });
-          this.stopUpdateInterval();
+          await this.stopUpdateInterval();
           this.status = PlayerStatusEnum.Paused;
           this.progress = 0;
           this.cdr.detectChanges(); // workaround needed to let Angular update values...
@@ -131,7 +131,7 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
    */
   private async unload() {
 
-    this.stopUpdateInterval();
+    await this.stopUpdateInterval();
     this.status = PlayerStatusEnum.Paused;
     this.ready = false;
 
@@ -143,8 +143,11 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
   /**
    * Start a JS interval to update player status
    */
-  private startUpdateInterval() {
-    this.stopUpdateInterval();
+  private async startUpdateInterval() {
+
+    await this.stopUpdateInterval();
+
+    // start update interval
     this.updateInterval = setInterval(() => {
       NativeAudio.getCurrentTime({ assetId: this.assetId }).then(res => {
         if (!this.isMovingKnob) {
@@ -152,15 +155,26 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
         }
       });
     }, 500);
+
+    // keep screen on
+    await KeepAwake.keepAwake();
+
   }
 
   /**
    * Clear update interval
    */
-  private stopUpdateInterval() {
+  private async stopUpdateInterval() {
+
     if (this.updateInterval) {
+
       clearInterval(this.updateInterval);
+
+      // allow screen off
+      await KeepAwake.allowSleep();
+
     }
+
   }
 
   /**
@@ -191,13 +205,16 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
    * Play the given record file (already loaded with load())
    */
   protected async play(position?: number) {
+
     if (position === undefined) {
       position = this.progress;
     }
-    return NativeAudio.play({ assetId: this.assetId, time: position })
-      .then(_ => {
+
+    // start/resume play
+    NativeAudio.play({ assetId: this.assetId, time: position })
+      .then(async _ => {
         this.status = PlayerStatusEnum.Playing;
-        this.startUpdateInterval();
+        await this.startUpdateInterval();
       })
       .catch(error => this.showError(error.message));
   }
@@ -213,10 +230,13 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
    * Pause the playing media file
    */
   async pause() {
+
     if (this.status !== PlayerStatusEnum.Playing) {
       return;
     }
-    this.stopUpdateInterval();
+    await this.stopUpdateInterval();
+
+    // pause audio
     await NativeAudio.pause({ assetId: this.assetId })
       .then(_ => this.status = PlayerStatusEnum.Paused)
       .catch(error => this.showError(error.message));

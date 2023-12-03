@@ -47,6 +47,7 @@ export class MainPage implements AfterViewInit {
 
   private _subs = new Subscription();
 
+  @ViewChild(AudioPlayerComponent) player?: AudioPlayerComponent;
   @ViewChild(CdkVirtualScrollViewport) scrollViewport!: CdkVirtualScrollViewport;
 
   constructor(
@@ -66,6 +67,13 @@ export class MainPage implements AfterViewInit {
         this.updateFilter();
       })
     ].forEach(s => this._subs.add(s));
+  }
+
+  /**
+   * Stop the player before leaving the page
+   */
+  async ionViewWillLeave() {
+    await this.stopPlayer();
   }
 
   async ngAfterViewInit() {
@@ -120,10 +128,10 @@ export class MainPage implements AfterViewInit {
   /**
    * Deletes the given recording file (and its companion JSON metadata)
    */
-  async deleteItems(items: Recording[], player?: AudioPlayerComponent) {
+  async deleteItems(items: Recording[]) {
 
     // stop player
-    player?.pause();
+    await this.stopPlayer();
 
     // show confirmation alert
     await this.mbs.showConfirm({
@@ -262,14 +270,11 @@ Duration: ${this.toHms.transform(item.duration)}
     this.scrollViewport.scrollToIndex(index);
   }
 
-  test(ts: Date) {
-
-    const region1 = new Intl.DateTimeFormat([]);
-    const options1 = region1.resolvedOptions();
-
-    const d = new Date(ts);
-    const x = Intl.DateTimeFormat('', { timeStyle: 'long' });
-    return x.format(ts);
+  /**
+   * Stop player (if it exists)
+   */
+  private async stopPlayer() {
+    await this.player?.pause();
   }
 
 }

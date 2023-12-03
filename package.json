@@ -23,6 +23,7 @@
     "@angular/platform-browser": "^16.2.1",
     "@angular/platform-browser-dynamic": "^16.2.1",
     "@angular/router": "^16.2.1",
+    "@capacitor-community/keep-awake": "^4.0.0",
     "@capacitor-community/native-audio": "file:packages/capacitor-community-native-audio-5.0.1.tgz",
     "@capacitor/android": "^5.2.3",
     "@capacitor/app": "^5.0.6",
