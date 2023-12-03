@@ -2,7 +2,7 @@ import { BehaviorSubject } from 'rxjs';
 import { AndroidSAF, AndroidSAFUtils, ErrorCode, GetFileUriOptions, ReadFileOptions } from 'src/plugins/androidsaf';
 import { Injectable } from '@angular/core';
 import { Encoding } from '@capacitor/filesystem';
-import { AlertController, IonicSafeString } from '@ionic/angular';
+import { AlertController, IonicSafeString, Platform } from '@ionic/angular';
 import { DB_FILENAME, DB_SCHEMA_VERSION, DbContent } from '../models/dbContent';
 import { Recording } from '../models/recording';
 import { replaceExtension } from '../utils/filesystem';
@@ -20,6 +20,9 @@ export class RecordingsService {
   // recordings database
   public recordings = new BehaviorSubject<Recording[]>([]);
 
+  // timestamp of last update, used to automatically refresh recording on app resume
+  private lastUpdate: number = 0;
+
   /**
    * Refresh status:
    * value === 0    ==> no refresh running
@@ -30,6 +33,7 @@ export class RecordingsService {
   constructor(
     private alertController: AlertController,
     private mbs: MessageBoxService,
+    private platform: Platform,
     protected settings: SettingsService,
   ) {}
 
@@ -51,6 +55,13 @@ export class RecordingsService {
       }
       this.initialized = true;
     }
+
+    // refresh database when the app is restored
+    this.platform.resume.subscribe(async () => {
+      if (await this.shallRefresh()) {
+        this.refreshContent();
+      }
+    });
 
   }
 
@@ -133,6 +144,7 @@ export class RecordingsService {
       }
 
       // update collection & cache
+      this.lastUpdate = new Date().getTime();
       this.recordings.next(Object.values(currentDbObj));
       await this.save();
 
@@ -143,6 +155,19 @@ export class RecordingsService {
     };
 
     this.refreshProgress.next(0);
+  }
+
+  /**
+   * Test if directory was last modified after last update
+   * @returns
+   */
+  private async shallRefresh() {
+    // get directory last update
+    var lastModified = -1;
+    if (this.settings.recordingsDirectoryUri) {
+      ({ lastModified } = await AndroidSAF.getLastModified({ directoryUri: this.settings.recordingsDirectoryUri }));
+    }
+    return this.lastUpdate < lastModified;
   }
 
   /**
