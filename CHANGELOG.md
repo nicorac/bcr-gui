@@ -1,5 +1,17 @@
 # Version history
 
+## Version 0.0.23 (2023-12-09)
+
+New features:
+
+- Recordings list can now be searched & filtered
+
+Bug fixes:
+
+- Wrapped multiselect actions in a toolbar context menu, shown in multiselect mode
+
+- Date format changes are now applied immediately (no need to restart the app)
+
 ## Version 0.0.22 (2023-12-03)
 
 New features:
