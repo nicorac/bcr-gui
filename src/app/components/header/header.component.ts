@@ -1,11 +1,11 @@
 import { RecordingsService } from 'src/app/services/recordings.service';
-import { AsyncPipe, NgIf } from '@angular/common';
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 
 export type ActionButton = {
-  icon: string,
+  icon: () => string,
   visible?: () => boolean,
   onClick: () => void,
 };
@@ -15,7 +15,7 @@ export type ActionButton = {
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
   standalone: true,
-  imports: [ AsyncPipe, NgIf, IonicModule ]
+  imports: [ AsyncPipe, NgFor, NgIf, IonicModule ]
 })
 export class HeaderComponent implements OnInit {
 
@@ -35,10 +35,6 @@ export class HeaderComponent implements OnInit {
     if (this.title === undefined) {
       this.title = this.route.snapshot.routeConfig?.title as string;
     }
-  }
-
-  protected actionButtonClick(btn: ActionButton) {
-    btn.onClick();
   }
 
 }

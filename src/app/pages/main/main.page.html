@@ -1,7 +1,7 @@
 <app-header
   [title]="version.appName"
   [actionButtons]="actionButtons"
-  [showCustomContent]="multiselect"
+  [showCustomContent]="isMultiselect"
 >
   <!-- custom toolbar content -->
 
@@ -36,6 +36,18 @@
 
 </app-header>
 
+<!-- search panel -->
+<ion-toolbar *ngIf="isSearch">
+  <ion-searchbar #searchBar
+    show-clear-button="focus"
+    [debounce]="750"
+    [(ngModel)]="searchValue"
+    (ngModelChange)="updateFilter()"
+    (ionClear)="clearFilter()"
+  />
+</ion-toolbar>
+
+<!-- main content (list) -->
 <ion-content #content
   id="main-content"
   class="ion-padding main-content"
@@ -77,14 +89,14 @@
 
         <ion-card *cdkVirtualFor="let item of items; let index = index"
           class="item"
-          [class.selected]="item.selected && !multiselect"
+          [class.selected]="item.selected && !isMultiselect"
           (click)="onItemClick(item)"
           longPress
           (longPress)="startMultiselection(item)"
         >
-          <!-- multiselect checkbox -->
+          <!-- isMultiselect checkbox -->
           <div>
-            <ion-checkbox *ngIf="multiselect" class="checkbox" [(ngModel)]="item.selected" />
+            <ion-checkbox *ngIf="isMultiselect" class="checkbox" [(ngModel)]="item.selected" />
           </div>
 
           <div>
@@ -100,7 +112,7 @@
               </ion-card-subtitle>
             </ion-card-header>
 
-            <ion-card-content *ngIf="!multiselect && item.selected" class="content">
+            <ion-card-content *ngIf="!isMultiselect && item.selected" class="content">
 
               <!-- details -->
               <div class="details">

@@ -12,6 +12,15 @@
       <!-- page title -->
       <ion-title>{{ title }}</ion-title>
 
+      <!-- action buttons -->
+      <ion-buttons slot="secondary">
+        <ng-container *ngFor="let ab of actionButtons">
+          <ion-button *ngIf="!ab.visible || ab.visible()" (click)="ab.onClick()" >
+            <ion-icon [name]="ab.icon()" slot="icon-only" />
+          </ion-button>
+        </ng-container>
+      </ion-buttons>
+
     </ng-container>
 
     <!-- custom content -->

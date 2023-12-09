@@ -6,6 +6,7 @@ import { ToHmsPipe } from 'src/app/pipes/to-hms.pipe';
 import { MessageBoxService } from 'src/app/services/message-box.service';
 import { RecordingsService } from 'src/app/services/recordings.service';
 import { SettingsService } from 'src/app/services/settings.service';
+import { filterList } from 'src/app/utils/filterList';
 import { sortRecordings } from 'src/app/utils/recordings-sorter';
 import { bringIntoView } from 'src/app/utils/scroll';
 import { AndroidSAF } from 'src/plugins/androidsaf';
@@ -14,7 +15,7 @@ import { DatePipe } from '@angular/common';
 import { AfterViewInit, Component, ViewChild } from '@angular/core';
 import { Directory, Filesystem } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
-import { RefresherCustomEvent } from '@ionic/angular';
+import { IonSearchbar, RefresherCustomEvent } from '@ionic/angular';
 import version from '../../version';
 
 @Component({
@@ -25,17 +26,14 @@ import version from '../../version';
 export class MainPage implements AfterViewInit {
 
   version = version;
-  multiselect = false;
+  isMultiselect = false;
+  isSearch = false;
+  searchValue = '';
   actionButtons: ActionButton[] = [
     {
-      icon: 'trash',
-      visible: () => this.multiselect,
-      onClick: () => { }
-    },
-    {
-      icon: 'close',
-      visible: () => this.multiselect,
-      onClick: () => { this.clearSelection(); this.multiselect = false; }
+      icon: () => this.searchValue ? 'search-circle' : 'search-circle-outline',
+      visible: () => !this.isMultiselect,
+      onClick: () => this.toggleSearchBar(),
     },
   ];
   protected itemsAll: Recording[] = [];
@@ -49,6 +47,7 @@ export class MainPage implements AfterViewInit {
 
   @ViewChild(AudioPlayerComponent) player?: AudioPlayerComponent;
   @ViewChild(CdkVirtualScrollViewport) scrollViewport!: CdkVirtualScrollViewport;
+  @ViewChild('searchBar') searchBar!: IonSearchbar;
 
   constructor(
     private datePipe: DatePipe,
@@ -88,16 +87,44 @@ export class MainPage implements AfterViewInit {
   }
 
   clearSelection() {
-    this.recordingsService.recordings.value.forEach(r => r.selected = false);
-    this.multiselect = false;
+    this.itemsAll.forEach(r => r.selected = false); // remove flag from itemsAll, just to stay safe...😉
+    this.isMultiselect = false;
   }
 
   getSelectedItems(): Recording[] {
-    return this.recordingsService.recordings.value.filter(r => r.selected);
+    return this.items.filter(r => r.selected);
   }
 
+  /**
+   * Show/hide the searchbar and set focus to search field
+   */
+  toggleSearchBar() {
+    this.isSearch = !this.isSearch;
+    if (this.isSearch) {
+      setTimeout(() => this.searchBar.setFocus(), 50);
+    }
+  }
+
+  clearFilter() {
+    this.searchValue = '';
+    this.isSearch = false;
+    this.updateFilter();
+  }
+
+  /**
+   * Sort & filter recordings
+   */
   updateFilter() {
-    this.items = sortRecordings(this.itemsAll, this.settings.recordingsSortMode);
+
+    let res = this.itemsAll;
+
+    // filter
+    if (this.searchValue) {
+      res = filterList(res, this.searchValue, r => `${r.opName} ${r.opNumber}`);
+    }
+
+    // sort
+    this.items = sortRecordings(res, this.settings.recordingsSortMode);
   }
 
   /**
@@ -106,20 +133,20 @@ export class MainPage implements AfterViewInit {
   async onItemClick(item: Recording) {
 
     if (item.selected) {
-      if (this.multiselect) {
+      if (this.isMultiselect) {
         item.selected = false;
       }
       // disable multiselection if no element is still selected
       if (!this.getSelectedItems().length) {
-        this.multiselect = false;
+        this.isMultiselect = false;
       }
     }
     else {
-      if (!this.multiselect) {
+      if (!this.isMultiselect) {
         this.clearSelection();
       }
       item.selected = true;
-      if (!this.multiselect) {
+      if (!this.isMultiselect) {
         bringIntoView('.items .selected');
       }
     }
@@ -153,8 +180,8 @@ export class MainPage implements AfterViewInit {
    * Select all items
    */
   async selectAll() {
-    this.multiselect = true;
-    this.itemsAll.forEach(i => i.selected = true);
+    this.isMultiselect = true;
+    this.items.forEach(i => i.selected = true); // select all VISIBLE items
   }
 
   /**
@@ -266,9 +293,9 @@ Duration: ${this.toHms.transform(item.duration)}
    * Start multiselection and select the given item
    */
   protected startMultiselection(item?: Recording) {
-    if (!this.multiselect) {
-      this.clearSelection()
-      this.multiselect = true;
+    if (!this.isMultiselect) {
+      this.clearSelection();
+      this.isMultiselect = true;
       if (item) {
         item.selected = true;
       }
