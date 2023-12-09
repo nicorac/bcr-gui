@@ -44,6 +44,7 @@ export class DatetimeFormatEditorComponent {
     // Need to re-create the whole object to force pipes update
     this.settings.dateTimeFormat = { ...this.format };
     await this.settings.save();
+    location.reload();  // force page reload to clear pipes cache (if date format has changed)
     this.cancel();
   }
 
