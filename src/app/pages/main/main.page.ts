@@ -74,6 +74,7 @@ export class MainPage implements AfterViewInit {
    */
   async ionViewWillLeave() {
     await this.stopPlayer();
+    this._subs.unsubscribe();
   }
 
   async ngAfterViewInit() {
