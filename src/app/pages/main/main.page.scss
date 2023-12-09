@@ -48,59 +48,59 @@
   padding: 0;
   margin: 0;
   background: var(--ion-background-color);
-}
 
-.item {
-  margin: 0;
-  height: var(--item-height);
-  display: grid;
-  grid-template-columns: min-content minmax(0, 1fr);
-  align-items: center;
-  border: 1px solid var(--item-border-color);
-  border-radius: .8em;
-  // box-shadow: 0 0 .2em var(--item-shadow-color);
+  .item {
+    margin: 0;
+    height: var(--item-height);
+    display: grid;
+    grid-template-columns: min-content minmax(0, 1fr);
+    align-items: center;
+    border: 1px solid var(--item-border-color);
+    border-radius: .8em;
+    // box-shadow: 0 0 .2em var(--item-shadow-color);
 
-  .op-name {
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 1;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  &.selected {
-    min-height: var(--item-height-selected);
-    height: unset;
-    border-color: var(--item-border-color-selected);
-    box-shadow: inset 0 0 .4em var(--item-shadow-color-selected);
     .op-name {
-      -webkit-line-clamp: 4;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-  }
 
-  .checkbox {
-    margin-left: 1em;
-  }
+    &.selected {
+      min-height: var(--item-height-selected);
+      height: unset;
+      border-color: var(--item-border-color-selected);
+      box-shadow: inset 0 0 .4em var(--item-shadow-color-selected);
+      .op-name {
+        -webkit-line-clamp: 4;
+      }
+    }
 
-  .content {
-    display: flex;
-    flex-direction: column;
-    gap: 1em;
-  }
+    .checkbox {
+      margin-left: 1em;
+    }
 
-  .player {
-    border-radius: .6em;
-  }
+    .content {
+      display: flex;
+      flex-direction: column;
+      gap: 1em;
+    }
 
-  .actions {
-    display: flex;
-    gap: 1.25em;
-    justify-content: flex-end;
-  }
+    .player {
+      border-radius: .6em;
+    }
 
-  .action {
-    font-size: 2em;
-    line-height: 2em;
+    .actions {
+      display: flex;
+      gap: 1.25em;
+      justify-content: flex-end;
+    }
+
+    .action {
+      font-size: 2em;
+      line-height: 2em;
+    }
   }
 }
 

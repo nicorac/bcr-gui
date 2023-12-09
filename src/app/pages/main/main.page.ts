@@ -134,7 +134,9 @@ export class MainPage implements AfterViewInit {
     // show confirmation alert
     await this.mbs.showConfirm({
       header: 'Delete recording?',
-      message: items.length === 1 ? 'Do you really want to delete selected recording?' : `Do you really want to delete ${items.length} recordings?`,
+      message: items.length === 1
+        ? 'Do you really want to delete selected recording?'
+        : `Do you really want to delete ${items.length} selected recordings?`,
       cancelText: 'Cancel',
       confirmText: 'Delete',
       onConfirm: async () => {
@@ -145,6 +147,14 @@ export class MainPage implements AfterViewInit {
       }
     });
 
+  }
+
+  /**
+   * Select all items
+   */
+  async selectAll() {
+    this.multiselect = true;
+    this.itemsAll.forEach(i => i.selected = true);
   }
 
   /**

@@ -14,9 +14,24 @@
 
   <!-- action buttons -->
   <ion-buttons slot="end">
-      <ion-button (click)="deleteItems(getSelectedItems())" >
-        <ion-icon icon="trash" slot="icon-only" />
-      </ion-button>
+    <ion-button id="context-menu-button" >
+      <ion-icon icon="ellipsis-vertical" slot="icon-only" />
+    </ion-button>
+
+    <!-- actions context menu -->
+    <ion-popover trigger="context-menu-button" [dismissOnSelect]="true">
+      <ng-template>
+        <ion-content>
+          <ion-list lines="none">
+            <ion-item (click)="selectAll()">Select all</ion-item>
+            <ion-item (click)="deleteItems(getSelectedItems())">
+              Delete
+            </ion-item>
+          </ion-list>
+        </ion-content>
+      </ng-template>
+    </ion-popover>
+
   </ion-buttons>
 
 </app-header>
