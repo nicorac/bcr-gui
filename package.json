@@ -11,7 +11,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint",
-    "generate-assets": "npx capacitor-assets generate --assets-path app/src/assets/icons --android",
+    "generate-assets": "npx capacitor-assets generate --assetPath src/assets/icons --android",
     "open-android-studio": "npx cap open android"
   },
   "private": true,
