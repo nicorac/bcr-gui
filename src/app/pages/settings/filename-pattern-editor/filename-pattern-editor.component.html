@@ -11,7 +11,11 @@
     <div class="section">
       <div class="section-title">Filename pattern</div>
       <ion-label>This pattern is used to parse filenames of recordings that don't have a corresponding .json metadata file.</ion-label>
-      <ion-label>It must be a valid JS RegExp, with custom <strong>&#123;var&#125;</strong> variable placeholders (see BCR help for details).</ion-label>
+      <ion-label>
+        It must be a valid JS RegExp, with custom <strong>&#123;var&#125;</strong> variable placeholders
+        (see <a href="https://github.com/chenxiaolong/BCR#template-variables" target="_blank">BCR help</a>
+        for details).
+      </ion-label>
       <ion-textarea #patternField class="pattern-field"
         fill="outline"
         rows="5"
@@ -31,9 +35,8 @@
       <ion-textarea class="pattern-field"
         type="text"
         [ngModel]="testFilename"
-        [readonly]="true"
         placeholder="Select a filename to test..."
-        (click)="selectTestFile()"
+        (click)="!testFilename && selectTestFile()"
       ></ion-textarea>
       <div class="right-container buttons-container">
         <ion-button fill="clear" (click)="selectTestFile()">Select filename</ion-button>

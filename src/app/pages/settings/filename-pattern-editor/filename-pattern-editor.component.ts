@@ -1,6 +1,6 @@
 import { Subscription } from 'rxjs';
 import { FILENAME_PATTERN_DEFAULT, Recording } from 'src/app/models/recording';
-import { RecordingsService } from 'src/app/services/recordings.service';
+import { MessageBoxService } from 'src/app/services/message-box.service';
 import { SettingsService } from 'src/app/services/settings.service';
 import { AndroidSAF, ErrorCode } from 'src/plugins/androidsaf';
 import { Component, ElementRef, Input, OnInit } from '@angular/core';
@@ -23,11 +23,11 @@ export class FilenamePatternEditorComponent implements OnInit {
   private backSub?: Subscription;
 
   constructor(
-    protected mc: ModalController,
-    protected platform: Platform,
-    protected ref: ElementRef<HTMLIonModalElement>,
-    protected settings: SettingsService,
-    protected recordingsSvc: RecordingsService,
+    private mbs: MessageBoxService,
+    private mc: ModalController,
+    private platform: Platform,
+    private ref: ElementRef<HTMLIonModalElement>,
+    private settings: SettingsService,
   ) {
     // subscribe to hardware back button events
     this.backSub = this.platform.backButton.subscribeWithPriority(10, () => this.cancel());
@@ -45,8 +45,15 @@ export class FilenamePatternEditorComponent implements OnInit {
   }
 
   default() {
-    this.pattern = FILENAME_PATTERN_DEFAULT;
-    this.validatePattern();
+    this.mbs.showConfirm({
+      confirmText: 'Yes',
+      cancelText: 'No',
+      message: 'Do you want to reset pattern back to default value?',
+      onConfirm: () => {
+        this.pattern = FILENAME_PATTERN_DEFAULT;
+        this.validatePattern();
+      }
+    });
   }
 
   cancel() {
