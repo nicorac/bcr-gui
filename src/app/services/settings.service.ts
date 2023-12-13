@@ -2,7 +2,7 @@ import { BehaviorSubject } from 'rxjs';
 import { AndroidDateTimeSettings } from 'src/plugins/androiddatetimesettings';
 import { Injectable } from '@angular/core';
 import { Preferences } from '@capacitor/preferences';
-import { FILENAME_PATTERN_DEFAULT, Recording } from '../models/recording';
+import { FILENAME_PATTERN_DEFAULT } from '../models/recording';
 import { deserializeObject, JsonProperty, serializeObject } from '../utils/json-serializer';
 import { SortModeEnum } from '../utils/recordings-sorter';
 import { MessageBoxService } from './message-box.service';
@@ -188,62 +188,6 @@ export class SettingsService {
       const isDarkMode = this.appearance === 'system' ? this.systemThemeMode : this.appearance;
       this.themeMode.next(isDarkMode);
     }
-  }
-
-  /**
-   * Build and return the pattern of a RegEx to be used
-   * to parse recording filename based on given pattern (or current config)
-   */
-  public getFilenameRegExpPattern(pattern: string = this.filenamePattern): string {
-
-    const vars = Recording.getFilenamePatternVars(pattern);
-
-    // transform each format var in a RegEx capture pattern
-    for (const v of vars) {
-
-      let replacement = '';
-
-      // get var pattern
-      switch (v) {
-        case 'date':
-          // --> 20230523_164658.998+0200
-          replacement = String.raw`(?<date>\d{8}_\d{6}\.\d{3}[+-]\d{4})`;
-          break;
-        case 'direction':
-          // --> in|out|
-          replacement = String.raw`(?<direction>in|out|conference)`;
-          break;
-        case 'phone_number':
-          // --> +39123456789
-          replacement = String.raw`(?<phone_number>[\d\+\- ]+)`;
-          break;
-        case 'sim_slot':
-          // --> 0|1
-          replacement = String.raw`(?<sim_slot>\d+)`;
-          break;
-          case 'caller_name':
-          case 'contact_name':
-          case 'call_log_name':
-            replacement = String.raw`(?<caller_name>.*)`;
-            break;
-        default:
-          console.warn('Unsupported var:', v);
-      }
-
-      pattern = pattern.replace(`{${v}}`, replacement);
-    }
-
-    return pattern;
-
-  }
-
-  /**
-   * Build and return a RegEx to be used
-   * to parse recording filename based on given pattern (or current config)
-   */
-  public getFilenameRegExp(pattern: string = this.filenamePattern): RegExp {
-    // NOTE: NO "g" option here, because we need to reuse this RegExp multiple times!
-    return new RegExp(this.getFilenameRegExpPattern(pattern));
   }
 
 }

@@ -78,8 +78,11 @@ export class FilenamePatternEditorComponent implements OnInit {
   }
 
   testPattern() {
-    const re = this.settings.getFilenameRegExp( this.pattern);
-    this.testResult = JSON.stringify(Recording.extractMetadataFromFilename(this.testFilename, re), null, 2);
+    const re = Recording.getFilenameRegExp(this.pattern);
+    const obj = Recording.extractMetadataFromFilename(this.testFilename, re);
+    // add a string date value
+    (obj as any).call_date = new Date(+(obj.timestamp_unix_ms ?? 0)).toISOString();
+    this.testResult = JSON.stringify(obj, null, 2);
   }
 
   /**
@@ -90,7 +93,7 @@ export class FilenamePatternEditorComponent implements OnInit {
       this.patternError = undefined;
 
       // validate RegExp syntax (will throw exception in case of bad pattern)
-      const re = this.settings.getFilenameRegExp( this.pattern);
+      const re = Recording.getFilenameRegExp(this.pattern);
 
       // validate BCR vars
       const varsValidation = Recording.validateFilenamePattern(this.pattern);

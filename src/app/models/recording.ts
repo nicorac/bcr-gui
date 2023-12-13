@@ -4,7 +4,7 @@ import { JsonProperty } from '../utils/json-serializer';
 import { BcrRecordingMetadata, CallDirection } from './BcrRecordingMetadata';
 
 export const FILENAME_PATTERN_SUPPORTED_VARS = [
-  'date',
+  'date','date:year', 'date:month', 'date:day', 'date:hours', 'date:minutes', 'date:seconds', 'date:tzHours', 'date:tzSeconds',
   'direction',
   'sim_slot',
   'phone_number',
@@ -166,18 +166,33 @@ export class Recording {
 
     // extract recording date
     try {
-      // format a JS date string "2023-12-31T23:59:59+02:00"
-      const dateString = groups['date'];
-      const year = dateString.substring(0, 4);            // year
-      const month = dateString.substring(4, 6)            // month
-      const day = dateString.substring(6, 8)              // day
-      const hours = dateString.substring(9, 11)          // hours
-      const minutes = dateString.substring(11, 13)        // minutes
-      const secondsAndMs = dateString.substring(13, 19)   // seconds
-      const tzHours = dateString.substring(19, 22)      // TZ sign + hours
-      const tzMinutes = dateString.substring(22, 24)      // TZ minutes
-      res.timestamp_unix_ms
-        = new Date(`${year}-${month}-${day}T${hours}:${minutes}:${secondsAndMs}${tzHours}:${tzMinutes}`).valueOf();
+      let year = groups['date_year'];
+      let month = groups['date_month'];
+      let day = groups['date_day'];
+      let hours = groups['date_hours'];
+      let minutes = groups['date_minutes'];
+      let secondsAndMs = groups['date_seconds'];
+
+      // if any of the required date parts is missing, fall back to "0" date
+      if (year && month && day && hours && minutes && secondsAndMs) {
+        // is timezone missing? then use current...
+        let tz = '';
+        if (groups['date_tzHours'] !== undefined && groups['date_tzMinutes'] !== undefined) {
+          tz = (groups['date_tzHours'] ?? '+00') + ':' + groups['date_tzMinutes'] ?? '00';
+          // ensure TZ has a sign
+          if (!(tz.startsWith('+') || tz.startsWith('-'))) {
+            tz = '+' + tz;
+          }
+        }
+        // format a JS date string with the extracted parts,
+        // like "2023-12-31T23:59:59+02:00" (tz is optional...)
+        res.timestamp_unix_ms
+          = new Date(`${year}-${month}-${day}T${hours}:${minutes}:${secondsAndMs}${tz}`).valueOf();
+      }
+      else {
+        res.timestamp_unix_ms = 0;
+      }
+
     } catch (error) {
       res.timestamp_unix_ms = 0;
       console.error(error);
@@ -209,7 +224,7 @@ export class Recording {
    */
   public static getFilenamePatternVars(fnPattern: string): string[] {
     // extract var names (${varName})
-    const re = /\{(\w+?)\}/g;
+    const re = /\{([\w\:]+?)\}/g;
     const res = [];
     for (const m of fnPattern.matchAll(re)) {
       res.push(m[1]);
@@ -239,6 +254,71 @@ export class Recording {
     // ok
     return true;
 
+  }
+
+  /**
+   * Build and return the pattern of a RegEx to be used
+   * to parse recording filename based on given pattern (or current config)
+   */
+  public static getFilenameRegExpPattern(pattern: string): string {
+
+    const vars = Recording.getFilenamePatternVars(pattern);
+
+    // transform each format var in a RegEx capture pattern
+    for (const v of vars) {
+
+      let replacement = '';
+
+      // get var pattern
+      switch (v) {
+        case 'date':
+          // sample BCR default date_ "20230518_171143.015+0100"
+          replacement = Recording.getFilenameRegExpPattern('{date:year}{date:month}{date:day}_{date:hours}{date:minutes}{date:seconds}{date:tzHours}{date:tzMinutes}');
+          break;
+        case 'date:year':     replacement = String.raw`(?<date_year>\d{4})`; break;
+        case 'date:month':    replacement = String.raw`(?<date_month>\d{2})`; break;
+        case 'date:day':      replacement = String.raw`(?<date_day>\d{2})`; break;
+        case 'date:hours':    replacement = String.raw`(?<date_hours>\d{2})`; break;
+        case 'date:minutes':  replacement = String.raw`(?<date_minutes>\d{2})`; break;
+        case 'date:seconds':  replacement = String.raw`(?<date_seconds>\d{2}(\.\d{1,3})?)`; break;
+        case 'date:tzHours':  replacement = String.raw`(?<date_tzHours>[\+\-]?\d{2})`; break;
+        case 'date:tzMinutes':  replacement = String.raw`(?<date_tzMinutes>\d{2})`; break;
+
+        case 'direction':
+          // --> in|out|
+          replacement = String.raw`(?<direction>in|out|conference)`;
+          break;
+        case 'phone_number':
+          // --> +39123456789
+          replacement = String.raw`(?<phone_number>[\d\+\- ]+|unknown)`;
+          break;
+        case 'sim_slot':
+          // --> 0|1
+          replacement = String.raw`(?<sim_slot>\d+)`;
+          break;
+        case 'caller_name':
+        case 'contact_name':
+        case 'call_log_name':
+          replacement = String.raw`(?<caller_name>.*)`;
+          break;
+        default:
+          console.warn('Unsupported var:', v);
+      }
+
+      pattern = pattern.replace(`{${v}}`, replacement);
+    }
+
+    return pattern;
+
+  }
+
+  /**
+   * Build and return a RegEx to be used
+   * to parse recording filename based on given pattern (or current config)
+   */
+  public static getFilenameRegExp(pattern: string): RegExp {
+    // NOTE: NO "g" option here, because we need to reuse this RegExp multiple times!
+    return new RegExp(Recording.getFilenameRegExpPattern(pattern));
   }
 
 }
