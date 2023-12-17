@@ -2,7 +2,7 @@ import { BehaviorSubject } from 'rxjs';
 import { AndroidDateTimeSettings } from 'src/plugins/androiddatetimesettings';
 import { Injectable } from '@angular/core';
 import { Preferences } from '@capacitor/preferences';
-import { FILENAME_PATTERN_DEFAULT } from '../models/recording';
+import { FILENAME_PATTERN_TEMPLATES } from '../models/recording';
 import { deserializeObject, JsonProperty, serializeObject } from '../utils/json-serializer';
 import { SortModeEnum } from '../utils/recordings-sorter';
 import { MessageBoxService } from './message-box.service';
@@ -62,7 +62,7 @@ export class SettingsService {
    * Custom filename format
    */
   @JsonProperty()
-  public filenamePattern: string = FILENAME_PATTERN_DEFAULT;
+  public filenamePattern: string = FILENAME_PATTERN_TEMPLATES[0].pattern;
 
   /**
    * Date/time format

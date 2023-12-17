@@ -3,16 +3,29 @@ import { replaceExtension, stripExtension } from '../utils/filesystem';
 import { JsonProperty } from '../utils/json-serializer';
 import { BcrRecordingMetadata, CallDirection } from './BcrRecordingMetadata';
 
-export const FILENAME_PATTERN_SUPPORTED_VARS = [
-  'date','date:year', 'date:month', 'date:day', 'date:hours', 'date:minutes', 'date:seconds', 'date:tzHours', 'date:tzSeconds',
-  'direction',
-  'sim_slot',
-  'phone_number',
-  'caller_name',
-  'contact_name',
-  'call_log_name',
-];
-export const FILENAME_PATTERN_DEFAULT = '^{date}(_{direction})?(_sim{sim_slot})?_{phone_number}(_{contact_name})?';
+export const FILENAME_PATTERN_SUPPORTED_VARS = {
+  'date': 'Full date in YYYYMMDD-HHmmss.ddd+ format',
+  'date:year': 'Year (4 digits)',
+  'date:month': 'Month (2 digits)',
+  'date:day': 'Day of month (2 digits)',
+  'date:hours': 'Hours (2 digits, 24H)',
+  'date:minutes': 'Minutes (2 digits)',
+  'date:seconds': 'Seconds (2 digits)',
+  'date:tzHours': 'Timezone hours (2 digits): +02, -06, +00',
+  'date:tzMinutes': 'Timezone minutes (2 digits)',
+  'direction': 'Call direction: "in" | "out" | "conference"',
+  'sim_slot': 'SIM slot number: 0, 1, 2, undefined',
+  'phone_number': 'Caller phone number: 0-9, +, -, <space>',
+  'caller_name': 'Caller name: any character',
+  'contact_name': 'Caller name: any character',
+  'call_log_name': 'Caller name: any character',
+};
+
+// default (well-known) filename patterns
+export const FILENAME_PATTERN_TEMPLATES: { name:string, pattern:string }[] = [
+  { name: 'BCR (Basic Call Recorder)', pattern: '^{date}(_{direction})?(_sim{sim_slot})?_{phone_number}(_{contact_name})?' },
+  { name: 'GrapheneOS call recorder', pattern: '^CallRecord_{date:year}{date:month}{date:day}-{date:hours}{date:minutes}{date:seconds}_{phone_number}' },
+]
 
 /**
  * Class describing a BCR recording
@@ -246,7 +259,7 @@ export class Recording {
 
     // all variables must exist
     for (const v of vars) {
-      if (!FILENAME_PATTERN_SUPPORTED_VARS.includes(v)) {
+      if (!Object.keys(FILENAME_PATTERN_SUPPORTED_VARS).includes(v)) {
         return `Unsupported variable {${v}}`;
       }
     }

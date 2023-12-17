@@ -10,8 +10,8 @@
 
     <ion-item>
       <ion-label>
-        BCR recordings directory
-        <p class="ion-text-wrap">{{ settings.recordingsDirectoryUri ? settings.recordingsDirectoryUri : 'Select BCR recordings directory...' }}</p>
+        Recordings directory
+        <p class="ion-text-wrap">{{ settings.recordingsDirectoryUri ? settings.recordingsDirectoryUri : 'Select directory containing recording files...' }}</p>
       </ion-label>
       <ion-button slot="end" (click)="selectRecordingsDirectory()">
         <ion-icon name="folder-open-outline" />
@@ -19,7 +19,7 @@
     </ion-item>
 
     <ion-item>
-      <ion-label>BCR filename pattern</ion-label>
+      <ion-label>Filename pattern</ion-label>
       <ion-button slot="end" icon="folder-open-outline" (click)="editFilenameFormat()">Edit</ion-button>
     </ion-item>
 

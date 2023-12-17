@@ -8,14 +8,17 @@
 
   <div class="content">
 
+    <!-- pattern -->
     <div class="section">
       <div class="section-title">Filename pattern</div>
       <ion-label>This pattern is used to parse filenames of recordings that don't have a corresponding .json metadata file.</ion-label>
+
+      <!-- label + variable help -->
       <ion-label>
-        It must be a valid JS RegExp, with custom <strong>&#123;var&#125;</strong> variable placeholders
-        (see <a href="https://github.com/chenxiaolong/BCR#template-variables" target="_blank">BCR help</a>
-        for details).
+        It must be a valid JS RegExp, with custom <strong>&#123;*&#125;</strong> placeholders.
       </ion-label>
+
+      <!-- pattern -->
       <ion-textarea #patternField class="pattern-field"
         fill="outline"
         rows="5"
@@ -26,24 +29,81 @@
       />
       <div class="error" *ngIf="patternError">{{ patternError }}</div>
       <div class="right-container">
-        <ion-button color="primary" fill="clear" (click)="default()">Reset to default</ion-button>
+
+        <!-- placeholders button -->
+        <ion-button id="placeholders-button" color="primary" fill="clear">Placeholders</ion-button>
+
+        <!-- placeholders sheet -->
+        <ion-modal
+          #placeholdersModal
+          class="sheet-list"
+          trigger="placeholders-button"
+          initialBreakpoint="0.50"
+        >
+          <ng-template>
+            <ion-toolbar slot="fixed">
+              <ion-title>Placeholders</ion-title>
+              <ion-title size="small">(click to insert)</ion-title>
+            </ion-toolbar>
+            <ion-content>
+              <ion-list>
+                <ion-item *ngFor="let item of placeholders" (click)="insertPlaceholder(item.text);">
+                  <ion-label>
+                    <h2>{{ item.text }}</h2>
+                    <p class="description">{{ item.description }}</p>
+                  </ion-label>
+                </ion-item>
+              </ion-list>
+            </ion-content>
+          </ng-template>
+        </ion-modal>
+
+        <!-- load template pattern button -->
+        <ion-button id="templates-button" color="primary" fill="clear">Templates</ion-button>
+
+        <!-- pattern templates sheet -->
+        <ion-modal
+          #templateLoadModal
+          class="sheet-list"
+          trigger="templates-button"
+          initialBreakpoint="0.25"
+        >
+          <ng-template>
+            <ion-toolbar slot="fixed">
+              <ion-title>Pattern templates</ion-title>
+            </ion-toolbar>
+            <ion-content>
+              <ion-list>
+                <ion-item *ngFor="let item of FILENAME_PATTERN_TEMPLATES" (click)="loadTemplate(item.pattern);">
+                  <ion-label>
+                    <h2>{{ item.name }}</h2>
+                    <p class="description">{{ item.pattern }}</p>
+                  </ion-label>
+                </ion-item>
+              </ion-list>
+            </ion-content>
+          </ng-template>
+        </ion-modal>
+
+
       </div>
     </div>
 
+    <!-- test filename -->
     <div class="section">
       <div class="section-title">Test filename</div>
       <ion-textarea class="pattern-field"
         type="text"
         [(ngModel)]="testFilename"
-        placeholder="Select a filename to test..."
-        (click)="!testFilename && selectTestFile()"
-      ></ion-textarea>
+        placeholder="Select (or insert) a filename to test..."
+      />
       <div class="right-container buttons-container">
         <ion-button fill="clear" (click)="selectTestFile()">Select filename</ion-button>
         <ion-button fill="clear" (click)="testPattern()" [disabled]="!testFilename">Test pattern</ion-button>
       </div>
     </div>
 
+    <!-- test result -->
     <div class="section" *ngIf="testResult">
       <ion-label>Test result</ion-label>
       <pre class="result">{{ testResult }}</pre>

@@ -1,10 +1,9 @@
 import { Subscription } from 'rxjs';
-import { FILENAME_PATTERN_DEFAULT, Recording } from 'src/app/models/recording';
+import { FILENAME_PATTERN_SUPPORTED_VARS, FILENAME_PATTERN_TEMPLATES, Recording } from 'src/app/models/recording';
 import { MessageBoxService } from 'src/app/services/message-box.service';
-import { SettingsService } from 'src/app/services/settings.service';
 import { AndroidSAF, ErrorCode } from 'src/plugins/androidsaf';
-import { Component, ElementRef, Input, OnInit } from '@angular/core';
-import { ModalController, Platform } from '@ionic/angular';
+import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { IonModal, IonTextarea, ModalController, Platform } from '@ionic/angular';
 
 @Component({
   selector: 'app-filename-pattern-editor',
@@ -13,6 +12,7 @@ import { ModalController, Platform } from '@ionic/angular';
 })
 export class FilenamePatternEditorComponent implements OnInit {
 
+  protected FILENAME_PATTERN_TEMPLATES = FILENAME_PATTERN_TEMPLATES;
   protected testFilename = '';
   protected testResult = '';
   protected patternError?: string = undefined;
@@ -22,12 +22,22 @@ export class FilenamePatternEditorComponent implements OnInit {
 
   private backSub?: Subscription;
 
+  @ViewChild('patternField') private patternField!: IonTextarea;
+  @ViewChild('placeholdersModal') private placeholdersModal!: IonModal;
+  @ViewChild('templateLoadModal') private templateLoadModal!: IonModal;
+
+  protected placeholders = Object.entries(FILENAME_PATTERN_SUPPORTED_VARS).map(([key, value]) => {
+    return {
+      text: `{${key}}`,
+      description: value,
+    }
+  });
+
   constructor(
     private mbs: MessageBoxService,
     private mc: ModalController,
     private platform: Platform,
     private ref: ElementRef<HTMLIonModalElement>,
-    private settings: SettingsService,
   ) {
     // subscribe to hardware back button events
     this.backSub = this.platform.backButton.subscribeWithPriority(10, () => this.cancel());
@@ -42,18 +52,6 @@ export class FilenamePatternEditorComponent implements OnInit {
 
   async ionViewWillLeave() {
     this.backSub?.unsubscribe();
-  }
-
-  default() {
-    this.mbs.showConfirm({
-      confirmText: 'Yes',
-      cancelText: 'No',
-      message: 'Do you want to reset pattern back to default value?',
-      onConfirm: () => {
-        this.pattern = FILENAME_PATTERN_DEFAULT;
-        this.validatePattern();
-      }
-    });
   }
 
   cancel() {
@@ -75,6 +73,19 @@ export class FilenamePatternEditorComponent implements OnInit {
         console.error('Error selecting file:', error);
       }
     }
+  }
+
+  async insertPlaceholder(ph: string) {
+    const txt = await this.patternField.getInputElement();
+    let startPos = txt.selectionStart ?? 0;
+    let endPos = txt.selectionStart ?? this.pattern.length;
+    this.pattern = this.pattern.substring(0, startPos) + ph + this.pattern.substring(startPos + endPos);
+    this.placeholdersModal.dismiss();
+  }
+
+  async loadTemplate(pattern: string) {
+    this.pattern = pattern;
+    this.templateLoadModal.dismiss();
   }
 
   testPattern() {
