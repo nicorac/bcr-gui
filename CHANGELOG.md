@@ -1,5 +1,17 @@
 # Version history
 
+## Version 0.0.24 (2023-12-21)
+
+New features:
+
+- Added new filename pattern placeholders, to customize datetime format parsing
+
+- Improved filename pattern editor
+
+- Added support for pattern templates (to support additional call recorders)
+
+- Added support for GrapheneOS embedded call recorder filename pattern
+
 ## Version 0.0.23 (2023-12-09)
 
 New features:
