@@ -67,6 +67,10 @@ export class AppModule {}
 function appInitializer(recordingsService: RecordingsService, settings: SettingsService, platform: Platform) {
   return async () => {
 
+    // if (!environment.production) {
+    //   waitForDebugger();
+    // }
+
     // enable mixing on audio (to allow other running audio players)
     await NativeAudio.configure({ focus: false });
 
@@ -80,3 +84,20 @@ function appInitializer(recordingsService: RecordingsService, settings: Settings
   }
 }
 
+// /**
+//  * Wait for a debugger to attach.
+//  * If already attached, it will break at "debugger" line...
+//  */
+// async function waitForDebugger() {
+//   while (true) {
+//     const t = Date.now();
+//     debugger; // if debugger is attached, then it will break here (and at least 10ms elapsed...)
+//     if (Date.now() - t > 10) {
+//       break;
+//     }
+//     else {
+//       console.log('Waiting for debugger to attach...');
+//       await new Promise(r => setTimeout(r, 1000));  // wait for 1 second
+//     }
+//   }
+// }
