@@ -1,5 +1,11 @@
 # Version history
 
+## Version 0.0.25 (2023-12-31)
+
+Bug fixes:
+
+- Improved directory change detection to update list at application start/resume
+
 ## Version 0.0.24 (2023-12-21)
 
 New features:
