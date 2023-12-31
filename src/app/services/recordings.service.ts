@@ -50,13 +50,13 @@ export class RecordingsService {
 
     // load existing database from storage
     if (!this.initialized) {
-      if (!await this.load()) {
+      if (!await this.load() || await this.shallRefresh()) {
         await this.refreshContent();
       }
       this.initialized = true;
     }
 
-    // refresh database when the app is restored
+    // refresh database when the app is resumed
     this.platform.resume.subscribe(async () => {
       if (await this.shallRefresh()) {
         this.refreshContent();
@@ -167,6 +167,7 @@ export class RecordingsService {
     if (this.settings.recordingsDirectoryUri) {
       ({ lastModified } = await AndroidSAF.getLastModified({ directoryUri: this.settings.recordingsDirectoryUri }));
     }
+    //console.warn(`this.lastUpdate < lastModified = ${this.lastUpdate < lastModified} (${this.lastUpdate}, ${lastModified})`);
     return this.lastUpdate < lastModified;
   }
 
@@ -278,6 +279,7 @@ export class RecordingsService {
           }
 
           // return DB
+          this.lastUpdate = dbContent.lastUpdate;
           this.recordings.next(dbContent.data);
           return true;
         }
@@ -314,7 +316,7 @@ export class RecordingsService {
 
     try {
       // serialize data
-      const dbContent = new DbContent(this.recordings.value);
+      const dbContent = new DbContent(this.recordings.value, this.lastUpdate);
       const jsonObj = serializeObject(dbContent);
 
       // test if file already exists

@@ -14,8 +14,12 @@ export class DbContent {
   @JsonProperty({ isArray: true, type: Recording })
   data: Recording[] = [];
 
-  constructor(data: Recording[] = []) {
+  @JsonProperty()
+  lastUpdate: number = 0;
+
+  constructor(data: Recording[] = [], lastUpdate = 0) {
     this.data = data;
+    this.lastUpdate = lastUpdate;
   }
 
 }
