@@ -352,6 +352,23 @@ export class RecordingsService {
   }
 
   /**
+   * Set the given opName to all recordings with the given phone number
+   */
+  public async setNameByNumber(phoneNumber: string, name: string) {
+
+    this.recordings.value
+      .filter(i => i.opNumber === phoneNumber)
+      .forEach(i => i.opName = name);
+
+    // notify update
+    this.recordings.next(this.recordings.value);
+
+    // save DB
+    await this.save();
+
+  }
+
+  /**
    * Search the DB file in current recordingsDirectoryUri and update settings.
    */
   private async updateDbFileUri() {

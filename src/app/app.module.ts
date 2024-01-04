@@ -20,6 +20,7 @@ import { SettingsPage } from './pages/settings/settings.page';
 import { DatetimePipe } from './pipes/datetime.pipe';
 import { FilesizePipe } from './pipes/filesize.pipe';
 import { ToHmsPipe } from './pipes/to-hms.pipe';
+import { ContactsService } from './services/contacts.service';
 import { RecordingsService } from './services/recordings.service';
 import { SettingsService } from './services/settings.service';
 import version from './version';
@@ -50,6 +51,7 @@ import version from './version';
     ScrollingModule,
   ],
   providers: [
+    ContactsService,
     DatePipe,
     ToHmsPipe,
     { provide: APP_INITIALIZER, useFactory: appInitializer, deps: [ RecordingsService, SettingsService, Platform ], multi: true },

@@ -86,3 +86,24 @@ ion-alert.msgbox-error {
   opacity: .5;
   pointer-events: none;
 }
+
+ion-action-sheet.actions {
+  --background: var(--ion-toolbar-background);
+  --color: var(--ion-toolbar-color);
+  --button-background: var(--ion-background-color);
+  --button-color: var(--ion-text-color);
+  --max-width: 95%;
+  .action-sheet-group {
+    border-top-left-radius: 1em;
+    border-top-right-radius: 1em;
+    border: 1px solid var(--item-border-color);
+    border-bottom: none;
+    box-shadow: 0 0 1em .5em rgba(0, 0, 0, 0.6);
+  }
+  .action-sheet-title {
+    font-size: 120%;
+  }
+  .action-sheet-icon {
+    color: var(--ion-text-color);
+  }
+}

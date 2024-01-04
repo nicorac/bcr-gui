@@ -87,6 +87,7 @@
         (scrolledIndexChange)="onScroll($event)"
       >
 
+        <!-- recording item -->
         <ion-card *cdkVirtualFor="let item of items; let index = index"
           class="item"
           [class.selected]="item.selected && !isMultiselect"
@@ -129,11 +130,10 @@
               <div class="actions">
 
                 <!-- edit -->
-                <!-- <ion-icon name="pencil"
+                <ion-icon name="pencil"
                   class="action"
-                  [class.disabled]="true"
-                  (click)="onActionNotImplemented(item)"
-                /> -->
+                  (click)="editItem(item)"
+                />
 
                 <!-- share -->
                 <ion-icon name="share-social"

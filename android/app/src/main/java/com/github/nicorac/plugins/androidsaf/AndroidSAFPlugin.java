@@ -3,6 +3,7 @@ package com.github.nicorac.plugins.androidsaf;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.provider.ContactsContract;
 import android.provider.DocumentsContract;
 import android.util.Base64;
 import android.util.JsonWriter;

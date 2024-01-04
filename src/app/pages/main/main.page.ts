@@ -3,6 +3,7 @@ import { AudioPlayerComponent } from 'src/app/components/audio-player/audio-play
 import { ActionButton } from 'src/app/components/header/header.component';
 import { Recording } from 'src/app/models/recording';
 import { ToHmsPipe } from 'src/app/pipes/to-hms.pipe';
+import { ContactsService } from 'src/app/services/contacts.service';
 import { MessageBoxService } from 'src/app/services/message-box.service';
 import { RecordingsService } from 'src/app/services/recordings.service';
 import { SettingsService } from 'src/app/services/settings.service';
@@ -15,7 +16,7 @@ import { DatePipe } from '@angular/common';
 import { AfterViewInit, Component, ViewChild } from '@angular/core';
 import { Directory, Filesystem } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
-import { IonSearchbar, RefresherCustomEvent } from '@ionic/angular';
+import { ActionSheetController, IonSearchbar, RefresherCustomEvent } from '@ionic/angular';
 import version from '../../version';
 
 @Component({
@@ -50,6 +51,8 @@ export class MainPage implements AfterViewInit {
   @ViewChild('searchBar') searchBar!: IonSearchbar;
 
   constructor(
+    private asc: ActionSheetController,
+    private contactsService: ContactsService,
     private datePipe: DatePipe,
     private mbs: MessageBoxService,
     private toHms: ToHmsPipe,
@@ -66,6 +69,7 @@ export class MainPage implements AfterViewInit {
         this.updateFilter();
       })
     ].forEach(s => this._subs.add(s));
+
   }
 
   /**
@@ -173,6 +177,147 @@ export class MainPage implements AfterViewInit {
         this.clearSelection();
       }
     });
+
+  }
+
+  /**
+   * Edit the given item
+   */
+  async editItem(rec: Recording) {
+
+    // show sheet modal
+    const sheet = await this.asc.create({
+      header: 'Edit recording',
+      cssClass: 'actions edit-actions',
+      buttons: [
+        {
+          text: `Edit recording name`,
+          icon: 'pencil',
+          handler: async () => await this.editItem_Edit(rec),
+        },
+        {
+          text: 'Create new contact with this number',
+          icon: '/assets/icons/contacts-add.svg',
+          handler: async () => await this.editItem_AddContact(rec),
+        },
+        {
+          text: 'Search existing contact with this number',
+          icon: '/assets/icons/contacts-search.svg',
+          handler: async () => await this.editItem_SearchContacts(rec),
+        },
+      ]
+    });
+    await sheet.present();
+
+  }
+
+  /**
+   * Allow user to insert a custom name for this recording
+   */
+  private async editItem_Edit(rec: Recording) {
+
+    await this.mbs.showInputBox({
+      header: 'Edit recording',
+      message: 'Insert the contact name associated with this recording',
+      inputs: [
+        { name: 'contactName', placeholder: 'Contact name', value: rec.opName },
+        { name: 'phoneNumber', placeholder: 'Phone number', value: rec.opNumber, disabled: true },
+      ],
+      onConfirm: async (data) => {
+        rec.opName = data?.contactName?.length ? data.contactName : rec.opNumber;
+        await this.recordingsService.save();
+      }
+    });
+
+  }
+
+  /**
+   * Search contacts for an item with the same phone number as the given recording
+   */
+  private async editItem_SearchContacts(rec: Recording) {
+
+    // check Contacts permission
+    if (await this.contactsService.checkPermission() !== 'granted') return;
+
+    // find contact
+    const contact = await this.contactsService.getContactFromPhoneNumber(rec.opNumber);
+
+    // contact found?
+    if (contact) {
+      const displayName = this.contactsService.getContactDisplayName(contact);
+      // show confirm
+      await this.mbs.showConfirm({
+        header: 'Contact found',
+        message: [
+          `Found a contact with this phone number: "<strong>${displayName}</strong>"`,
+          '',
+          'Do you want to use this name for all recordings with this number?',
+        ],
+        cancelText: 'Cancel',
+        confirmText: 'OK',
+        onConfirm: async () => {
+          await this.recordingsService.setNameByNumber(rec.opNumber, displayName);
+        }
+      });
+    }
+    else {
+      // show failure message
+      await this.mbs.showConfirm({
+        header: 'Contact not found',
+        message: [
+          'No contact has been found with this phone number.',
+          '',
+          'Do you want to create a new one?',
+        ],
+        cancelText: 'Cancel',
+        confirmText: 'Create contact',
+        onConfirm: async () => {
+          await this.editItem_AddContact(rec);
+        }
+      });
+
+    }
+
+  }
+
+  private async editItem_AddContact(rec: Recording) {
+
+    // check if a contact with this phone number already exists
+    const existingContact = await this.contactsService.getContactFromPhoneNumber(rec.opNumber);
+
+    // error if a contact already exists
+    if (existingContact) {
+      await this.mbs.showError({
+        header: 'Contact already exists',
+        message: [
+          'A contact with this phone number already exists:',
+          '',
+          `"<strong>${existingContact.name?.display}</strong>"`,
+        ],
+        confirmText: 'Cancel',
+      });
+    }
+    else {
+
+      // if opName does not contain a number, use it as default contact name
+      const defaultName = this.contactsService.isPhoneNumber(rec.opName) ? '' : rec.opName;
+
+      await this.mbs.showInputBox({
+        header: 'Create contact',
+        message: 'Create a new contact with this phone number',
+        inputs: [
+          { name: 'contactName', placeholder: 'Contact name', value: defaultName },
+          { name: 'phoneNumber', placeholder: 'Phone number', value: rec.opNumber, disabled: true },
+        ],
+        onConfirm: async (data) => {
+          if (data?.contactName?.length) {
+            await this.contactsService.createContactWithPhoneNumber(data.contactName, rec.opNumber);
+            await this.recordingsService.setNameByNumber(rec.opNumber, data.contactName);
+          }
+        }
+      });
+
+    }
 
   }
 

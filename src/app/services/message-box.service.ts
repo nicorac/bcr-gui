@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AlertButton, AlertController, IonicSafeString } from '@ionic/angular';
+import { AlertButton, AlertController, AlertInput, IonicSafeString } from '@ionic/angular';
 
 export type MessageType = string|string[]|IonicSafeString;
 
@@ -26,6 +26,7 @@ export class MessageBoxService {
     header?: string,
     message?: string|IonicSafeString,
     buttons?: (AlertButton | string)[],
+    inputs?: AlertInput[],
     cssClass?: string,
   }) {
     return await this.alertController.create({
@@ -54,7 +55,6 @@ export class MessageBoxService {
 
   }
 
-
   /**
    * Show a confirmation messagebox with customizable buttons
    */
@@ -72,6 +72,28 @@ export class MessageBoxService {
       ],
     });
     await mb.present();
+
+  }
+
+  /**
+   * Show an input box
+   */
+  async showInputBox(options: InputBoxOptions): Promise<AlertInput[]> {
+
+    // merge defaults
+    options = { ...new InputBoxOptions(), ...options };
+
+    const mb = await this.getAlert({
+      header: options.header,
+      message: this.formatMessage(options.message),
+      inputs: options.inputs,
+      buttons: [
+        { text: options.cancelText!, handler: () => options.onCancel?.() },
+        { text: options.confirmText!, handler: (data: {}) => options.onConfirm?.(data) },
+      ],
+    });
+    await mb.present();
+    return mb.inputs;
 
   }
 
@@ -149,4 +171,15 @@ export class MessageBoxOptionsConfirm extends mbOptionsBase {
 export class MessageBoxOptionsError extends mbOptionsBase {
   override header?: string = 'Error';
   error?: any;
+}
+
+/**
+ * Options for an inputbox
+ */
+export class InputBoxOptions extends MessageBoxOptions {
+  inputs: AlertInput[] = [];
+  confirmText?: string = 'Ok';
+  onConfirm?: (inputs: any) => void;
+  cancelText?: string = 'Cancel';
+  onCancel?: () => void;
 }
