@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { AlertButton, AlertController, IonicSafeString } from '@ionic/angular';
 
+export type MessageType = string|string[]|IonicSafeString;
+
 @Injectable({
   providedIn: 'root'
 })
@@ -10,14 +12,21 @@ export class MessageBoxService {
     private alertController: AlertController,
   ) { }
 
+  private formatMessage(message?: MessageType): string|IonicSafeString {
+    if (Array.isArray(message)) {
+      return new IonicSafeString(message.join('<br>'));
+    }
+    return message ?? '';
+  }
+
   /**
    * Common alert constructor
    */
   private async getAlert(options: {
-    header?: string;
-    message?: string | IonicSafeString;
-    buttons?: (AlertButton | string)[];
-    cssClass?: string;
+    header?: string,
+    message?: string|IonicSafeString,
+    buttons?: (AlertButton | string)[],
+    cssClass?: string,
   }) {
     return await this.alertController.create({
       // default options
@@ -38,7 +47,7 @@ export class MessageBoxService {
 
     const mb = await this.getAlert({
       header: options.header,
-      message: options.message,
+      message: this.formatMessage(options.message),
       buttons: options.buttons,
     });
     await mb.present();
@@ -56,7 +65,7 @@ export class MessageBoxService {
 
     const mb = await this.getAlert({
       header: options.header,
-      message: options.message,
+      message: this.formatMessage(options.message),
       buttons: [
         { text: options.cancelText!, handler: () => options.onCancel?.() },
         { text: options.confirmText!, handler: () => options.onConfirm?.() },
@@ -76,7 +85,8 @@ export class MessageBoxService {
     options = { ...new MessageBoxOptionsError(), ...options };
 
     // build error message details
-    const msgLines = [ options.message ?? '', '' ];
+    const msgLines = Array.isArray(options.message) ? options.message : [ options.message ];
+    msgLines.push('');
     if (options.error?.code) {
       msgLines.push(`Code: ${options.error.code}`);
     }
@@ -111,7 +121,7 @@ export class MessageBoxService {
  */
 export class mbOptionsBase {
   header?: string = '';
-  message?: string = '';
+  message?: MessageType = '';
   confirmText?: string = 'Ok';
   onConfirm?: () => void;
 }
@@ -121,7 +131,7 @@ export class mbOptionsBase {
  */
 export class MessageBoxOptions {
   header: string = '';
-  message?: string = '';
+  message?: MessageType = '';
   buttons?: AlertButton[] = [ { text: 'Ok' } ];
 }
 
