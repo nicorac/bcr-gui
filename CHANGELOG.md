@@ -1,5 +1,20 @@
 # Version history
 
+## Version 1.0.0 (2024-01-05)
+
+App is now stable and (almost) feature-complete, so it's time to switch to a **full** version number 😉.
+
+New features:
+
+- New features to synchronize recordings with phone Contacts, accessible with the **pencil icon** within each recording:
+
+  - **create a new contact** with recording phone number \
+    (to be used after recording a call from an unknown contact)
+  - **search existing contact** with recording phone number \
+    (to be used if you've already created the contact after recording the call)
+  - **manual edit** \
+    (if you changed your mind in both cases 🙄)
+
 ## Version 0.0.25 (2023-12-31)
 
 Bug fixes:

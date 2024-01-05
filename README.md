@@ -6,7 +6,6 @@ BCR-GUI is a _companion app_ for the great [BCR](https://github.com/chenxiaolong
 
 <img src="docs/images/screenshot-main.jpg?nocache=1" height="600px">
 
-
 To manage BCR call recordings, you actually need to use a file manager... and thats not so user-friendly 😉.
 It's hard to "extract" call informations from audio filename, and its even harder to search them when the list grows.
 
@@ -24,6 +23,9 @@ BCR-GUI needs **BCR v.1.49** (or newer) to work at its best, because it needs th
 - It **does not need Internet access** at all. \
   _NOTE:_ this may change in the future if an auto-update feature will be added, but actually the app can't send/receive anything to/from internet.
 
+- It needs **Contacts** permission only if you need to synchronize recordings
+  names with contacts **after** recording a call from an unknown caller.
+
 ## What's working/missing?
 
 BCR-GUI is still in early development stage, but its already usable!
@@ -34,6 +36,10 @@ Working:
 - **play**: play each call recording straight from the list (no external player needed)
 - **share**: share recording file with other apps, like messaging, email, ...
 - **delete**: delete recordings
+- **create a new contact** with recording phone number \
+  (to be used after recording a call from an unknown contact)
+- **search contact with recording phone number** \
+  (to be used if you've already created the contact after recording the call)
 
 Still missing (not ready yet...):
 
