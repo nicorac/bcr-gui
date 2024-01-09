@@ -14,6 +14,7 @@ import { AndroidSAF } from 'src/plugins/androidsaf';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { DatePipe } from '@angular/common';
 import { AfterViewInit, Component, ViewChild } from '@angular/core';
+import { Clipboard } from '@capacitor/clipboard';
 import { Directory, Filesystem } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
 import { ActionSheetController, IonSearchbar, RefresherCustomEvent } from '@ionic/angular';
@@ -194,6 +195,11 @@ export class MainPage implements AfterViewInit {
           text: `Edit recording name`,
           icon: 'pencil',
           handler: async () => await this.editItem_Edit(rec),
+        },
+        {
+          text: `Copy number to clipboard`,
+          icon: 'copy-outline',
+          handler: async () => await Clipboard.write({ string: rec.opNumber }),
         },
         {
           text: 'Create new contact with this number',
