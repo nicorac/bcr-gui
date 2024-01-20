@@ -1,5 +1,13 @@
 # Version history
 
+## Version 1.1.0 (2024-01-20)
+
+New features:
+
+- New setting to configure the default phone country prefix (i.e. `+39` for Italy and `+1` for the US). This will be used to improve contacts search and let it find the ones missing it.
+
+- New feature to copy recording number to clipboard
+
 ## Version 1.0.0 (2024-01-05)
 
 App is now stable and (almost) feature-complete, so it's time to switch to a **full** version number 😉.
