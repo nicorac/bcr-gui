@@ -59,6 +59,12 @@ export class SettingsService {
   public seekTime: number = 10;
 
   /**
+   * Default country phone prefix
+   */
+  @JsonProperty()
+  public defaultCountryPrefix: string = '';
+
+  /**
    * Custom filename format
    */
   @JsonProperty()

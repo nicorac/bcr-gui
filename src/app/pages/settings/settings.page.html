@@ -36,6 +36,20 @@
       <ion-button slot="end" (click)="editDatetimeFormat()">Edit</ion-button>
     </ion-item>
 
+    <ion-item>
+      <ion-label class="phone-prefix-label">
+        <h2>Default country prefix</h2>
+        <p class="ion-text-wrap">The country prefix (i.e. +1 for USA) to be used with numbers missing it</p>
+      </ion-label>
+      <ion-input
+        [ngModel]="settings.defaultCountryPrefix"
+        (ngModelChange)="setDefaultCountryPrefix($event)"
+        class="phone-prefix ion-text-right"
+        type="tel"
+        maxlength="7"
+      />
+    </ion-item>
+
     <ion-item-divider>
       <h4>Recordings</h4>
     </ion-item-divider>

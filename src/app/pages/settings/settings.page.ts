@@ -90,4 +90,19 @@ export class SettingsPage {
     this.editor.present();
   }
 
+  /**
+   * Set the default country prefix to settings
+   */
+  setDefaultCountryPrefix(prefix: string) {
+    prefix = prefix.trim();
+    if (prefix) {
+      if (!prefix.startsWith('+')) {
+        prefix = '+' + prefix;
+      }
+      if (/^\+\d*$/g.test(prefix)) {
+        this.settings.defaultCountryPrefix = prefix;
+      }
+    }
+  }
+
 }

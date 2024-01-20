@@ -3,12 +3,14 @@ import { Injectable } from '@angular/core';
 import { ContactPayload, Contacts, PhoneType } from '@capacitor-community/contacts';
 import { PermissionState } from '@capacitor/core';
 import { MessageBoxService } from './message-box.service';
+import { SettingsService } from './settings.service';
 
 @Injectable()
 export class ContactsService {
 
   constructor(
-    private mbs: MessageBoxService
+    private mbs: MessageBoxService,
+    private settings: SettingsService,
   ) {}
 
   /**
@@ -20,7 +22,7 @@ export class ContactsService {
   }
 
   /**
-   * Cleanup the given phone number by keeping only "+" and digits
+   * Cleanup the given phone number by keeping only "+" and digits.
    */
   cleanupPhoneNumber(phoneNumber: string): string {
     return phoneNumber.replace(/[^\d\+]/g, '');
@@ -42,13 +44,29 @@ export class ContactsService {
       }
     });
 
-    // find and return the first match
-    return res.contacts.find(item =>
-      item.phones?.filter(i => i.number)
-        .map(i => this.cleanupPhoneNumber(i.number!))
-        .includes(phoneNumber)
-    );
+    // find and return the first contact match
+    for (const contact of res.contacts) {
 
+      // get defined and cleaned contact numbers
+      const numbers = contact.phones?.filter(n => n).map(p => this.cleanupPhoneNumber(p!.number!));
+      if (numbers?.length) {
+
+        // search first the plain number...
+        for (const n of numbers) {
+          if (n === phoneNumber) return contact;
+        }
+
+        // ...then tries adding the default country prefix
+        // (special numbers could not have intl prefix)
+        if (this.settings.defaultCountryPrefix) {
+          for (const n of numbers) {
+            if (n[0] !== '+' && (this.settings.defaultCountryPrefix + n === phoneNumber)) return contact;
+          }
+        }
+      }
+    }
+
+    return undefined;
   }
 
   /**
