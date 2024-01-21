@@ -1,7 +1,28 @@
-.phone-prefix-label {
-  max-width: none;
+.wrapper {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) max-content;
+  gap: 1em;
+  align-items: center;
+  min-width: 100%;
+}
+
+.item-input .sc-ion-label-md-h,
+.in-item.legacy-select,
+.ion-label.label {
+  max-width: initial;
+}
+
+ion-button {
+  height: 1em;
+  min-height: 2.5em;
+  min-width: 4em;
+}
+
+.label {
 }
 
 .phone-prefix {
-  min-width: 4em;
+  width: initial;
+  min-width: 2em;
+  max-width: 5em;
 }

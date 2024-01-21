@@ -9,45 +9,56 @@
     </ion-item-divider>
 
     <ion-item>
-      <ion-label>
-        Recordings directory
-        <p class="ion-text-wrap">{{ settings.recordingsDirectoryUri ? settings.recordingsDirectoryUri : 'Select directory containing recording files...' }}</p>
-      </ion-label>
-      <ion-button slot="end" (click)="selectRecordingsDirectory()">
-        <ion-icon name="folder-open-outline" />
-      </ion-button>
+      <div class="wrapper">
+        <ion-label class="label">
+          <h2>Recordings directory</h2>
+          <p class="ion-text-wrap">{{ settings.recordingsDirectoryUri ? settings.recordingsDirectoryUri : 'Select directory containing recording files...' }}</p>
+        </ion-label>
+        <ion-button (click)="selectRecordingsDirectory()">
+          <ion-icon name="folder-open-outline" />
+        </ion-button>
+      </div>
     </ion-item>
 
     <ion-item>
-      <ion-label>Filename pattern</ion-label>
-      <ion-button slot="end" icon="folder-open-outline" (click)="editFilenameFormat()">Edit</ion-button>
+      <div class="wrapper">
+        <ion-label>Filename pattern</ion-label>
+        <ion-button icon="folder-open-outline" (click)="editFilenameFormat()">Edit</ion-button>
+      </div>
     </ion-item>
 
     <ion-item>
-      <ion-select label="Appearance" [(ngModel)]="settings.appearance">
-        <ion-select-option [value]="'system'">System preference</ion-select-option>
-        <ion-select-option [value]="'light'">Light</ion-select-option>
-        <ion-select-option [value]="'dark'">Dark</ion-select-option>
-      </ion-select>
+      <div class="wrapper">
+        <ion-label>Appearance</ion-label>
+        <ion-select [(ngModel)]="settings.appearance">
+          <ion-select-option [value]="'system'">System preference</ion-select-option>
+          <ion-select-option [value]="'light'">Light</ion-select-option>
+          <ion-select-option [value]="'dark'">Dark</ion-select-option>
+        </ion-select>
+      </div>
     </ion-item>
 
     <ion-item>
-      <ion-label>Date/time style</ion-label>
-      <ion-button slot="end" (click)="editDatetimeFormat()">Edit</ion-button>
+      <div class="wrapper">
+        <ion-label>Date/time style</ion-label>
+        <ion-button (click)="editDatetimeFormat()">Edit</ion-button>
+      </div>
     </ion-item>
 
     <ion-item>
-      <ion-label class="phone-prefix-label">
-        <h2>Default country prefix</h2>
-        <p class="ion-text-wrap">The country prefix (i.e. +1 for USA) to be used with numbers missing it</p>
-      </ion-label>
-      <ion-input
-        [ngModel]="settings.defaultCountryPrefix"
-        (ngModelChange)="setDefaultCountryPrefix($event)"
-        class="phone-prefix ion-text-right"
-        type="tel"
-        maxlength="7"
-      />
+      <div class="wrapper">
+        <ion-label class="label">
+          <h2>Default country prefix</h2>
+          <p>The country prefix (i.e. +1 for USA) to be used with numbers missing it</p>
+        </ion-label>
+        <ion-input
+          [ngModel]="settings.defaultCountryPrefix"
+          (ngModelChange)="setDefaultCountryPrefix($event)"
+          class="phone-prefix ion-text-right"
+          type="tel"
+          maxlength="7"
+        />
+      </div>
     </ion-item>
 
     <ion-item-divider>
@@ -55,12 +66,15 @@
     </ion-item-divider>
 
     <ion-item>
-      <ion-select label="List sort mode" [(ngModel)]="settings.recordingsSortMode" (ngModelChange)="save()" placeholder="Make a Selection">
-        <ion-select-option [value]="SortMode.Date_ASC">Date (ascending)</ion-select-option>
-        <ion-select-option [value]="SortMode.Date_DESC">Date (descending)</ion-select-option>
-        <ion-select-option [value]="SortMode.Duration_ASC">Duration (ascending)</ion-select-option>
-        <ion-select-option [value]="SortMode.Duration_DESC">Duration (descending)</ion-select-option>
-      </ion-select>
+      <div class="wrapper">
+        <ion-label>List sort mode</ion-label>
+        <ion-select [(ngModel)]="settings.recordingsSortMode" (ngModelChange)="save()" placeholder="Make a Selection">
+          <ion-select-option [value]="SortMode.Date_ASC">Date (ascending)</ion-select-option>
+          <ion-select-option [value]="SortMode.Date_DESC">Date (descending)</ion-select-option>
+          <ion-select-option [value]="SortMode.Duration_ASC">Duration (ascending)</ion-select-option>
+          <ion-select-option [value]="SortMode.Duration_DESC">Duration (descending)</ion-select-option>
+        </ion-select>
+      </div>
     </ion-item>
 
     <ion-item-divider>
@@ -68,15 +82,18 @@
     </ion-item-divider>
 
     <ion-item>
-      <ion-select label="Seek time" [(ngModel)]="settings.seekTime" (ngModelChange)="save()" placeholder="Make a Selection">
-        <ion-select-option [value]="5">5s</ion-select-option>
-        <ion-select-option [value]="10">10s</ion-select-option>
-        <ion-select-option [value]="15">15s</ion-select-option>
-        <ion-select-option [value]="30">30s</ion-select-option>
-        <ion-select-option [value]="60">60s</ion-select-option>
-        <ion-select-option [value]="90">90s</ion-select-option>
-        <ion-select-option [value]="120">120s</ion-select-option>
-      </ion-select>
+      <div class="wrapper">
+        <ion-label>Seek time</ion-label>
+        <ion-select [(ngModel)]="settings.seekTime" (ngModelChange)="save()" placeholder="Make a Selection">
+          <ion-select-option [value]="5">5s</ion-select-option>
+          <ion-select-option [value]="10">10s</ion-select-option>
+          <ion-select-option [value]="15">15s</ion-select-option>
+          <ion-select-option [value]="30">30s</ion-select-option>
+          <ion-select-option [value]="60">60s</ion-select-option>
+          <ion-select-option [value]="90">90s</ion-select-option>
+          <ion-select-option [value]="120">120s</ion-select-option>
+        </ion-select>
+      </div>
     </ion-item>
 
   </ion-list>
