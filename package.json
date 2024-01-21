@@ -7,6 +7,7 @@
     "ng": "ng",
     "start": "ionic serve",
     "build": "ng build",
+    "prebuild:android": "node scripts\\check-android-version.js",
     "build:android": "ionic capacitor build android --no-open --prod && cd android && gradlew assembleRelease && cd ..",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
