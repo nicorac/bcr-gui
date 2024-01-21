@@ -288,6 +288,9 @@ export class MainPage implements AfterViewInit {
 
   private async editItem_AddContact(rec: Recording) {
 
+    // check Contacts permission
+    if (await this.contactsService.checkPermission() !== 'granted') return;
+
     // check if a contact with this phone number already exists
     const existingContact = await this.contactsService.getContactFromPhoneNumber(rec.opNumber);
 
