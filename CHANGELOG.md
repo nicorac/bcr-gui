@@ -1,5 +1,21 @@
 # Version history
 
+## Version 1.2.0 (2024-01-21)
+
+New features:
+
+- Application now uses Angular 17
+
+- Uniformed style of "modal action sheets" and "action sheets"
+
+- Improved dark mode readability (list, messageboxes, background, ...)
+
+- Removed unused (and never used) READ_EXTERNAL_STORAGE permission
+
+Bug fixes:
+
+- Added missing Contacts permission check to "Create contact..." action
+
 ## Version 1.1.0 (2024-01-20)
 
 New features:
