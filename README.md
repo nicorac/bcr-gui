@@ -4,6 +4,8 @@
 
 BCR-GUI is a _companion app_ for the great [BCR](https://github.com/chenxiaolong/BCR) (Basic Call Recorder) Android application.
 
+It also [can manage](https://github.com/nicorac/bcr-gui/issues/30) recordings of [GrapheneOS](https://grapheneos.org/) embedded call recorder.
+
 <img src="docs/images/screenshot-main.jpg?nocache=1" height="600px">
 
 To manage BCR call recordings, you actually need to use a file manager... and thats not so user-friendly 😉.
@@ -23,12 +25,11 @@ BCR-GUI needs **BCR v.1.49** (or newer) to work at its best, because it needs th
 - It **does not need Internet access** at all. \
   _NOTE:_ this may change in the future if an auto-update feature will be added, but actually the app can't send/receive anything to/from internet.
 
-- It needs **Contacts** permission only if you need to synchronize recordings
-  names with contacts **after** recording a call from an unknown caller.
+- _(optional)_ It needs **Contacts** permission to update recordings names with contacts or create new contacts for recordings from unknown callers. Feel free to **deny** this permission: app will remember you how to enable it whthe next time you use a feature that requires it.
 
 ## What's working/missing?
 
-BCR-GUI is still in early development stage, but its already usable!
+BCR-GUI is stable and ready for usage!
 
 Working:
 
@@ -61,7 +62,7 @@ Latest version is [available here](https://github.com/nicorac/bcr-gui/releases/)
 
 - Ionic 7
 - Capacitor 5 (with custom AndroidSAF plugin)
-- Angular 16
+- Angular 17
 - Icons from [Ionicons](https://ionic.io/ionicons/v4) and [FreeSVG (public domain icons)](https://freesvg.org/1547046949)
 
 ## License
