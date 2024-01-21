@@ -29,9 +29,15 @@ export class MessageBoxService {
     inputs?: AlertInput[],
     cssClass?: string,
   }) {
+
+    // prepend custom class (if not already there)
+    const classes = options.cssClass?.split(' ') ?? [];
+    if (!classes.includes('msgbox')) {
+      classes.unshift('msgbox');
+    }
+    options.cssClass = classes.join(' ');
+
     return await this.alertController.create({
-      // default options
-      backdropDismiss: false,
       // given options
       ...options,
     });
@@ -70,6 +76,7 @@ export class MessageBoxService {
         { text: options.cancelText!, handler: () => options.onCancel?.() },
         { text: options.confirmText!, handler: () => options.onConfirm?.() },
       ],
+      cssClass: 'msgbox-confirm',
     });
     await mb.present();
 
