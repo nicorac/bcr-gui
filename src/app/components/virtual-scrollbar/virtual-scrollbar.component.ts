@@ -1,6 +1,9 @@
-import { sampleTime, Subject, Subscription } from 'rxjs';
-import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
-import { IonList } from '@ionic/angular';
+/* eslint-disable @angular-eslint/no-input-rename */
+import { BehaviorSubject, sampleTime, Subject, Subscription } from 'rxjs';
+import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
+import { Component, ElementRef, HostListener, Input, OnDestroy, OnInit, Output } from '@angular/core';
+
+const MIN_CURSOR_HEIGHT = 40; // min cursor height in px
 
 /**
  * This componnt "attaches" itself to a list and shows a virtual scrollbar beside it
@@ -10,103 +13,154 @@ import { IonList } from '@ionic/angular';
   templateUrl: './virtual-scrollbar.component.html',
   styleUrls: ['./virtual-scrollbar.component.scss'],
 })
-export class VirtualScrollbarComponent implements OnInit, AfterViewInit, OnDestroy {
+export class VirtualScrollbarComponent implements OnInit, OnDestroy {
 
-  protected isDragging = false;
-  protected lastSetIndex = 0;
-  protected topOffset = 0;    // pointer events coordinates are absolute, so we need to offset them
-  protected scrollRange = 0;  // scroll range of the cursor (relative in Y coordinate, starting from 0)
-  protected cursorYPos = 0;   // cursor current Y position
-  protected cursorHeight = 48;
-  protected cursorDragging = false;
+  // protected isDragging = false;
+  protected readonly cursorHeight = 48;
+  protected cursorYPos = 0;     // cursor current Y position
+  private cursorYRange = 0;   // Y cursor scroll range (starting from 0)
+  private topOffset = 0;      // pointer events coordinates are absolute, so we need to offset them
+  private height = 0;
 
-  // reference list
-  @Input({ required: true }) list!: IonList;
-  listBounds = new DOMRect();
+  // CDK list
+  private listHeight = 0;       // height of CDK list component
+  private listTotalHeight = 0;  // total height of all items in virtual list
+  private listYRange = 0;       // Y scroll range of the list
 
-  // cursor element
-  @ViewChild('cursor') cursor!: ElementRef<HTMLDivElement>;
+  // self native element
+  private ne: HTMLDivElement;
 
-  // cursor position
-  @Input() min = 0;
-  @Input() max = 100;
-  @Input() set value(val: number) {
-    // console.warn(`[setValue] newIndex: ${val}`);
-    if (!this.isDragging) {
-      const ratio = val / (this.max - this.min);
-      this.setCursorYPos(this.scrollRange * ratio);
-    }
-  };
-  private limitedSubj = new Subject<number>();
-  private limiterSubjSub?: Subscription;
-  @Output() valueChange = new EventEmitter<number>();
+  // throttled subject to manage cursor drag events
+  private throttledScrollSubj = new Subject<number>();
+  private _subs!: Subscription;
 
+  // reference to CdkVirtualScrollViewport
+  @Input({ required: true, alias: 'virtualScrollViewport' })
+  cvsViewport!: CdkVirtualScrollViewport;
+  cvsSpacer!: HTMLDivElement;
 
-  constructor() { }
+  // event to notify dragging status
+  @Output() public isDragging = new BehaviorSubject<boolean>(false);
 
-  ngOnInit() {
-    // limit emission rate of pointerMove DOM event
-    this.limiterSubjSub = this.limitedSubj
-      .pipe(sampleTime(300))
-      .subscribe((index: number) => {
-        // console.warn(`[emit] newIndex: ${index}`);
-        this.valueChange.emit(index)
-      });
+  // resize observer to children catch events
+  private resizeObserver!: ResizeObserver;
+  private cvsViewportScrollSubscription!: Subscription;
+
+  constructor(el: ElementRef<HTMLDivElement>) {
+    this.ne = el.nativeElement;
   }
 
-  ngAfterViewInit() {
-    setTimeout(() => {
-      this.listBounds = (this.list as any).el.getBoundingClientRect();
-      this.topOffset = this.listBounds.top;
-      this.scrollRange = this.listBounds.height - this.cursorHeight;  // cursor can't go outside bottom bound
-    }, 1000);
+  ngOnInit() {
+
+    // limit emission rate of pointerMove DOM event
+    this._subs = this.throttledScrollSubj
+      .pipe(sampleTime(250))
+      .subscribe((yPos: number) => {
+        // scroll the CDK virtual list to the given Y coordinate
+        this.cvsViewport.scrollToOffset(yPos, 'instant');
+      });
+
+    // extract vsv child elements
+    const viewportNe = this.cvsViewport.elementRef.nativeElement;
+    this.cvsSpacer = viewportNe.getElementsByClassName('cdk-virtual-scroll-spacer')?.[0] as HTMLDivElement;
+
+    // start an observer to catch size changes, both in this component and in CDK component
+    this.resizeObserver = new ResizeObserver((e, o) => this.resizeHandler(e, o));
+    this.resizeObserver.observe(this.ne, { box: 'border-box' });
+    this.resizeObserver.observe(this.cvsSpacer, { box: 'border-box' });
+
+    // attach to vsv scroll event
+    this.cvsViewportScrollSubscription = this.cvsViewport.elementScrolled().subscribe(e => {
+      if (e.target) {
+        this.scrollHandler(e.target as HTMLDivElement);
+      }
+    });
+
   }
 
   ngOnDestroy() {
-    this.limiterSubjSub?.unsubscribe();
+    this._subs?.unsubscribe();
+    this.cvsViewportScrollSubscription?.unsubscribe();
+    this.resizeObserver.disconnect();
   }
 
+  /**
+   * Handles CVS element resizes
+   */
+  private resizeHandler(entries: ResizeObserverEntry[], observer: ResizeObserver) {
+
+    for (const entry of entries) {
+
+      // handle resize of this component
+      if (entry.target === this.ne) {
+        const r = this.ne.getBoundingClientRect();
+        this.height = r.height;
+        this.topOffset = r.top;
+        this.cursorYRange = this.height - this.cursorHeight;  // cursor can't go outside bottom bound
+      }
+
+      // handle resize of CDK spacer DIV
+      if (entry.target === this.cvsSpacer) {
+        this.listHeight = this.cvsViewport.elementRef.nativeElement.offsetHeight;
+        this.listTotalHeight = this.cvsSpacer.offsetHeight;
+        this.listYRange = this.listTotalHeight - this.listHeight;
+      }
+
+    }
+
+  }
+
+  /**
+   * This is needed to let pointerMove event be continuously raised when moving
+   * console.warn(`[touchStart] isDragging: ${this.isDragging}`);
+   */
   touchStart(e: TouchEvent) {
-    // needed to let pointerMove event be continuously raised when moving
-    // console.warn(`[touchStart] isDragging: ${this.isDragging}`);
     e.preventDefault();
   }
 
-  pointerDown(e: PointerEvent) {
-    this.isDragging = true;
-    // console.warn(`[pointerDown] isDragging: ${this.isDragging}`);
+  @HostListener('pointerdown', ['$event'])
+  protected pointerDown(e: PointerEvent) {
+    this.isDragging.next(true);
+    // console.log(`[pointerDown] isDragging: ${this.isDragging}`);
   }
 
+  @HostListener('pointerup', ['$event'])
   protected pointerUp(e: PointerEvent) {
-    this.isDragging = false;
-    // console.warn(`[pointerUp] isDragging: ${this.isDragging}`);
+    this.isDragging.next(false);
+    // console.log(`[pointerUp] isDragging: ${this.isDragging}`);
   }
 
+  @HostListener('pointermove', ['$event'])
   protected pointerMove(e: PointerEvent) {
-    // e.preventDefault();
-    if (this.isDragging) {
-      const newY = e.clientY - this.topOffset - this.cursorHeight / 2;
-      this.setCursorYPos(e.clientY - this.topOffset - this.cursorHeight / 2);
-      // emit event to limitedSubject
-      this.lastSetIndex = Math.floor((this.max - this.min) * this.cursorYPos / this.scrollRange);
-      this.limitedSubj.next(this.lastSetIndex);
-      // console.warn(`[pointerMove] newIndex: ${this.lastSetIndex}`);
-      // this.valueChange.next(this.lastSetIndex);
+    if (this.isDragging.value) {
+      this.setCursorYPos(e.clientY - this.topOffset - this.cursorHeight/2);
+      // emit event to throttled Subject
+      const newY = this.listTotalHeight * this.cursorYPos / this.cursorYRange;
+      // console.log(`[pointerMove] newY: ${newY}`);
+      this.throttledScrollSubj.next(newY);
     }
   }
 
   /**
-   *
-   * @param y set new cursor Y coordinate (relative), clamping value between limits
+   * Handles virtual list scroll events and set cursor Y position
+   */
+  private scrollHandler(elem: HTMLDivElement) {
+    if (!this.isDragging.value) {
+      this.cursorYPos = this.cursorYRange * elem.scrollTop / this.listYRange;
+    }
+  }
+
+  /**
+   * Set new cursor Y coordinate (relative), clamping value between limits
    */
   setCursorYPos(y: number) {
-    // console.log("MOVE", e.clientY, newY, this.cursorBottom);
     if (y < 0) {
       y = 0;
     }
-    else if (y > this.scrollRange) {
-      y = this.scrollRange;
+    else if (y > this.cursorYRange) {
+      y = this.cursorYRange;
     }
+    // console.log("setCursorYPos", y);
     this.cursorYPos = y;
   }
 

@@ -44,6 +44,7 @@ export class MainPage implements AfterViewInit {
   protected itemHeight = 78;
   protected itemHeightSelected = this.itemHeight + 180;
   protected itemGap = 12;
+  protected isDraggingCursor = false;
 
   private _subs = new Subscription();
 
@@ -463,12 +464,6 @@ Duration: ${this.toHms.transform(item.duration)}
     this.topIndex = index;
   }
 
-  /**
-   * Scroll invoked by virtual scrollbar
-   */
-  onScrollbarDrag(index: number) {
-    this.scrollViewport.scrollToIndex(index);
-  }
 
   /**
    * Stop player (if it exists)

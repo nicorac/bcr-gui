@@ -56,7 +56,7 @@
 >
   <div class="content-wrapper">
 
-    <ion-list #list class="items"
+    <ion-list class="items"
       lines="full"
       style="height: 100%; min-height: 100%;"
       [style.--item-height]="itemHeight + 'px'"
@@ -64,11 +64,11 @@
       [style.--item-gap]="itemGap + 'px'"
     >
 
-      <ion-refresher slot="fixed"
+      <ion-refresher *ngIf="topIndex === 0 && !isDraggingCursor"
+        slot="fixed"
         pullFactor=".5"
         pullMin="60"
         pullMax="120"
-        [disabled]="topIndex !== 0"
         (ionRefresh)="refreshList($any($event))"
       >
         <ion-refresher-content
@@ -79,7 +79,7 @@
         />
       </ion-refresher>
 
-      <cdk-virtual-scroll-viewport
+      <cdk-virtual-scroll-viewport #vsv
         class="virtual-scroll-viewport ion-content-scroll-host"
         [maxBufferPx]="1500"
         [minBufferPx]="1000"
@@ -159,13 +159,7 @@
 
     </ion-list>
 
-    <app-virtual-scrollbar class="virtual-scrollbar"
-      [list]="list"
-      [min]="0"
-      [max]="items.length"
-      [value]="topIndex"
-      (valueChange)="onScrollbarDrag($event)"
-    />
+    <app-virtual-scrollbar class="virtual-scrollbar" [virtualScrollViewport]="vsv" (isDragging)="isDraggingCursor = $event" />
 
   </div>
 
