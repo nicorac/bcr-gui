@@ -4,9 +4,15 @@
 
 BCR-GUI is a _companion app_ for the great [BCR](https://github.com/chenxiaolong/BCR) (Basic Call Recorder) Android application.
 
-It also [can manage](https://github.com/nicorac/bcr-gui/issues/30) recordings of [GrapheneOS](https://grapheneos.org/) embedded call recorder.
+It also supports other recording applications:
 
-<img src="docs/images/screenshot-main.jpg?nocache=1" height="600px">
+- [BCR - Basic Call Recorder](https://github.com/chenxiaolong/BCR)
+
+- [GrapheneOS](https://grapheneos.org/) Call Recorder (see [here](https://github.com/nicorac/bcr-gui/issues/30))
+
+- Huawei Call Recorder (see [here](https://github.com/nicorac/bcr-gui/issues/44))
+
+<img src="docs/images/screenshot-main.jpg?nocache=1">
 
 To manage BCR call recordings, you actually need to use a file manager... and thats not so user-friendly 😉.
 It's hard to "extract" call informations from audio filename, and its even harder to search them when the list grows.
@@ -15,7 +21,7 @@ Such a feature was [already requested](https://github.com/chenxiaolong/BCR/issue
 
 ## Requirements
 
-BCR-GUI needs **BCR v.1.49** (or newer) to work at its best, because it needs the new [JSON call metadata](https://github.com/chenxiaolong/BCR/issues/380) feature to extract and show detailed call info in its call list. In case of missing JSON file (eg. recordings done before 1.49), BCR-GUI tries to extract call data from its filename.
+BCR-GUI needs **BCR v.1.49** (or newer) to work at its best, because it needs the new [JSON call metadata](https://github.com/chenxiaolong/BCR/issues/380) feature to extract and show detailed call info in its call list. In case of missing JSON file (eg. recordings done before 1.49 or using another recording app), BCR-GUI will parse filename to extract call data. You can customize the format of the filename being parsed.
 
 ## Permissions
 
@@ -37,14 +43,15 @@ Working:
 - **play**: play each call recording straight from the list (no external player needed)
 - **share**: share recording file with other apps, like messaging, email, ...
 - **delete**: delete recordings
-- **create a new contact** with recording phone number \
+- **manual edit**: edit caller name
+- **create contact**: create a new contact with recording phone number \
   (to be used after recording a call from an unknown contact)
-- **search contact with recording phone number** \
+- **search number**: search an existing contact with recording phone number** \
   (to be used if you've already created the contact after recording the call)
 
 Still missing (not ready yet...):
 
-- **edit**: allow user to add **own** data to call recording, like notes, tags, change _numeric_ caller name with a name, ...
+- **edit**: allow user to add **own** data to call recording, like notes, tags, ...
 - **filter**: be able to filter list by tags, content, date range, length, ...
 
 Other things could be improved and added. \
