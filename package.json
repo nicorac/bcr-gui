@@ -52,7 +52,7 @@
     "@angular-eslint/template-parser": "^17.2.1",
     "@angular/cli": "^17.1.0",
     "@angular/compiler": "^17.1.0",
-    "@angular/compiler-cli": "^17.1.0",
+    "@angular/compiler-cli": "^17.1.1",
     "@angular/language-service": "^17.1.0",
     "@capacitor/assets": "^3.0.4",
     "@capacitor/cli": "^5.2.3",
