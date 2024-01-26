@@ -1,5 +1,15 @@
 # Version history
 
+## Version 1.3.0 (2024-01-26)
+
+New features:
+
+- Added filename template for Huawei call recorder
+
+Bug fixes:
+
+- Fixed and improved performance of recordings list scrollbar
+
 ## Version 1.2.0 (2024-01-21)
 
 New features:
