@@ -63,7 +63,7 @@
     "@typescript-eslint/parser": "^6.19.0",
     "eslint": "^8.56.0",
     "eslint-plugin-import": "^2.29.1",
-    "eslint-plugin-jsdoc": "^48.0.2",
+    "eslint-plugin-jsdoc": "^48.0.4",
     "typescript": "^5.3.3"
   },
   "description": "BCR-GUI is a companion app for BCR (Basic Call Recorder)"
