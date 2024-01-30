@@ -12,6 +12,7 @@
 
 .cursor {
   position: relative;
+  transition: .25s ease-out;
 }
 .cursor-knob {
   min-width: var(--cursor-width);
