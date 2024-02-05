@@ -146,7 +146,7 @@ export class VirtualScrollbarComponent implements OnInit, OnDestroy {
    */
   private scrollHandler(elem: HTMLDivElement) {
     if (!this.isDragging.value) {
-      this.cursorYPos = this.cursorYRange * elem.scrollTop / this.listYRange;
+      this.cursorYPos = this.clampYPos(this.cursorYRange * elem.scrollTop / this.listYRange);
     }
   }
 
@@ -154,14 +154,18 @@ export class VirtualScrollbarComponent implements OnInit, OnDestroy {
    * Set new cursor Y coordinate (relative), clamping value between limits
    */
   setCursorYPos(y: number) {
+    // console.log("setCursorYPos", y);
+    this.cursorYPos = this.clampYPos(y);
+  }
+
+  clampYPos(y: number): number {
     if (y < 0) {
-      y = 0;
+      return 0;
     }
     else if (y > this.cursorYRange) {
-      y = this.cursorYRange;
+      return this.cursorYRange;
     }
-    // console.log("setCursorYPos", y);
-    this.cursorYPos = y;
+    return y;
   }
 
 }
