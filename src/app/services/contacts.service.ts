@@ -1,6 +1,7 @@
 import { AndroidSettings, NativeSettings } from 'capacitor-native-settings';
+import { BcrGui } from 'src/plugins/bcrgui';
 import { Injectable } from '@angular/core';
-import { ContactPayload, Contacts, PhoneType } from '@capacitor-community/contacts';
+import { ContactPayload, Contacts } from '@capacitor-community/contacts';
 import { PermissionState } from '@capacitor/core';
 import { MessageBoxService } from './message-box.service';
 import { SettingsService } from './settings.service';
@@ -16,7 +17,7 @@ export class ContactsService {
   /**
    * test if the given string contains a phone number
    */
-  isPhoneNumber(phoneNumber: string): boolean {
+  isPhoneNumber(phoneNumber?: string): boolean {
     phoneNumber = phoneNumber?.trim() ?? '';
     return phoneNumber.length !== 0 && !/[^\d\.\-\+ ]/g.test(phoneNumber);
   }
@@ -70,31 +71,14 @@ export class ContactsService {
   }
 
   /**
-   * Create a new contact with the given phone number
+   * Show default Android create/edit contact dialog
    */
-  async createContactWithPhoneNumber(contactName: string, phoneNumber: string): Promise<void> {
+  public createOrEditContact(data: { displayName?: string, phoneNumber: string }) {
 
-    // cleanup phonenumber
-    phoneNumber = this.cleanupPhoneNumber(phoneNumber);
-
-    // create new contact
-    const contactNameParts = contactName.split(/[\s]+/g);
-    const res = await Contacts.createContact({
-      contact: {
-        name: {
-          given: contactNameParts[0],
-          family: contactNameParts.slice(1).join(' '),
-        },
-        phones: [
-          { type: PhoneType.Home , number: phoneNumber }
-        ],
-      }
+    return BcrGui.createOrEditContact({
+      displayName: (data.displayName && !this.isPhoneNumber(data.displayName)) ? data.displayName : undefined,
+      phoneNumber: data.phoneNumber
     });
-
-    // open the created contact
-    if (res?.contactId) {
-      Contacts.openContact({ contactId: res.contactId });
-    }
 
   }
 

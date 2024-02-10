@@ -203,7 +203,7 @@ export class MainPage implements AfterViewInit {
           handler: async () => await Clipboard.write({ string: rec.opNumber }),
         },
         {
-          text: 'Create new contact with this number',
+          text: 'Create/edit contact with this name/number',
           icon: '/assets/icons/contacts-add.svg',
           handler: async () => await this.editItem_AddContact(rec),
         },
@@ -292,42 +292,24 @@ export class MainPage implements AfterViewInit {
     // check Contacts permission
     if (await this.contactsService.checkPermission() !== 'granted') return;
 
-    // check if a contact with this phone number already exists
-    const existingContact = await this.contactsService.getContactFromPhoneNumber(rec.opNumber);
+    // open the default "add or edit" contact selector
+    this.contactsService.createOrEditContact({
+      displayName: rec.opName,
+      phoneNumber: rec.opNumber
+    }).then(async res => {
 
-    // error if a contact already exists
-    if (existingContact) {
-      await this.mbs.showError({
-        header: 'Contact already exists',
-        message: [
-          'A contact with this phone number already exists:',
-          '',
-          `"<strong>${existingContact.name?.display}</strong>"`,
-        ],
-        confirmText: 'Cancel',
-      });
-    }
-    else {
+      // a new contact has been created (or an existing one was modified)
+      console.log(`Created/edited contact: '${res.displayName}`);
 
-      // if opName does not contain a number, use it as default contact name
-      const defaultName = this.contactsService.isPhoneNumber(rec.opName) ? '' : rec.opName;
-
-      await this.mbs.showInputBox({
-        header: 'Create contact',
-        message: 'Create a new contact with this phone number',
-        inputs: [
-          { name: 'contactName', placeholder: 'Contact name', value: defaultName },
-          { name: 'phoneNumber', placeholder: 'Phone number', value: rec.opNumber, disabled: true },
-        ],
-        onConfirm: async (data) => {
-          if (data?.contactName?.length) {
-            await this.contactsService.createContactWithPhoneNumber(data.contactName, rec.opNumber);
-            await this.recordingsService.setNameByNumber(rec.opNumber, data.contactName);
-          }
+      await this.mbs.showConfirm({
+        header: 'Update recordings contact',
+        message: `Do you want to set '${res.displayName}' to all recordings with this number?`,
+        onConfirm: async () => {
+          await this.recordingsService.setNameByNumber(rec.opNumber, res.displayName);
         }
       });
 
-    }
+    });
 
   }
 
