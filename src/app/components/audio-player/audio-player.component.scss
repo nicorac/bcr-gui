@@ -2,12 +2,12 @@
   display: grid;
   grid-template-columns: max-content minmax(0, 1fr);
   align-items: center;
-  gap: 1.2em;
+  gap: 2em;
 }
 
 .controls {
   display: flex;
-  gap: .5em;
+  gap: 1em;
 }
 
 .buttons {
@@ -16,5 +16,7 @@
 }
 
 .progress {
+  display: flex;
+  gap: .5em;
   width: 100%;
 }
