@@ -1,5 +1,22 @@
 # Version history
 
+## Version 1.4.0 (2024-02-10)
+
+New features:
+
+- Improved create/edit contact action by using default Android intent. \
+  Now it is possible to:
+  - create a new contact with the given phone number
+  - append phone number to already existing contact
+  - select contact storage (local, cloud, ...)
+  - change all other contact fields
+
+Bug fixes:
+
+- Improved recording list scrollbar smoothness
+
+- Increased spacing between recording play buttons
+
 ## Version 1.3.0 (2024-01-26)
 
 New features:
