@@ -53,8 +53,6 @@ export class DatetimePipe implements PipeTransform {
    * mm	  00-59	Minutes, 2-digits
    * s	  0-59	Seconds
    * ss	  00-59	Seconds, 2-digits
-   * Z	  -05:00	Offset from UTC
-   * ZZ	  -0500	Compact offset from UTC, 2-digits
    * A	  AM PM	Post or ante meridiem, upper-case
    * a	  am pm	Post or ante meridiem, lower-case
    */
@@ -62,7 +60,7 @@ export class DatetimePipe implements PipeTransform {
 
     const date = typeof timestamp === 'number' ? new Date(timestamp) : timestamp;
 
-    return format.replaceAll(/(?<!\\)([YMDHhms])\1{0,3}/gm, (match: string) => {
+    return format.replaceAll(/(YYYY|YY|MMMM|MMM|MM|M|DDDD|DDD|DD|D|HH|H|hh|h|mm|m|ss|s|A|a)/gm, (match: string) => {
 
       switch (match) {
         // year
