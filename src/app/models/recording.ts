@@ -8,9 +8,10 @@ export const FILENAME_PATTERN_SUPPORTED_VARS = {
   'date:year': 'Year (4 digits)',
   'date:month': 'Month (2 digits)',
   'date:day': 'Day of month (2 digits)',
-  'date:hours': 'Hours (2 digits, 24H)',
+  'date:hours': 'Hours (2 digits, 12H or 24H)',
   'date:minutes': 'Minutes (2 digits)',
   'date:seconds': 'Seconds (2 digits)',
+  'date:ampm': 'AM/PM indicator (can be AM or PM, case insensitive)',
   'date:tzHours': 'Timezone hours (2 digits): +02, -06, +00',
   'date:tzMinutes': 'Timezone minutes (2 digits)',
   'direction': 'Call direction: "in" | "out" | "conference"',
@@ -185,7 +186,7 @@ export class Recording {
       let day = groups['date_day'];
       let hours = groups['date_hours'];
       let minutes = groups['date_minutes'];
-      let secondsAndMs = groups['date_seconds'];
+      let secondsAndMs = groups['date_seconds'] ?? '00';
 
       // if any of the required date parts is missing, fall back to "0" date
       if (year && month && day && hours && minutes && secondsAndMs) {
@@ -198,6 +199,14 @@ export class Recording {
             tz = '+' + tz;
           }
         }
+
+        // test if time is expressed in 12h format
+        let ampm = groups['date_ampm']?.toUpperCase();
+        if (ampm) {
+          // fix hours to 24h format
+          hours = ((+hours % 12) + (ampm === "AM" ? 0 : 12)).toString().padStart(2, '0');
+        }
+
         // format a JS date string with the extracted parts,
         // like "2023-12-31T23:59:59+02:00" (tz is optional...)
         res.timestamp_unix_ms
@@ -289,14 +298,15 @@ export class Recording {
           // sample BCR default date_ "20230518_171143.015+0100"
           replacement = Recording.getFilenameRegExpPattern('{date:year}{date:month}{date:day}_{date:hours}{date:minutes}{date:seconds}{date:tzHours}{date:tzMinutes}');
           break;
-        case 'date:year':     replacement = String.raw`(?<date_year>\d{4})`; break;
-        case 'date:month':    replacement = String.raw`(?<date_month>\d{2})`; break;
-        case 'date:day':      replacement = String.raw`(?<date_day>\d{2})`; break;
-        case 'date:hours':    replacement = String.raw`(?<date_hours>\d{2})`; break;
-        case 'date:minutes':  replacement = String.raw`(?<date_minutes>\d{2})`; break;
-        case 'date:seconds':  replacement = String.raw`(?<date_seconds>\d{2}(\.\d{1,3})?)`; break;
-        case 'date:tzHours':  replacement = String.raw`(?<date_tzHours>[\+\-]?\d{2})`; break;
+        case 'date:year':       replacement = String.raw`(?<date_year>\d{4})`; break;
+        case 'date:month':      replacement = String.raw`(?<date_month>\d{2})`; break;
+        case 'date:day':        replacement = String.raw`(?<date_day>\d{2})`; break;
+        case 'date:hours':      replacement = String.raw`(?<date_hours>\d{2})`; break;
+        case 'date:minutes':    replacement = String.raw`(?<date_minutes>\d{2})`; break;
+        case 'date:seconds':    replacement = String.raw`(?<date_seconds>\d{2}(\.\d{1,3})?)`; break;
+        case 'date:tzHours':    replacement = String.raw`(?<date_tzHours>[\+\-]?\d{2})`; break;
         case 'date:tzMinutes':  replacement = String.raw`(?<date_tzMinutes>\d{2})`; break;
+        case 'date:ampm':       replacement = String.raw`(?<date_ampm>AM|PM)`; break;
 
         case 'direction':
           // --> in|out|
@@ -332,7 +342,7 @@ export class Recording {
    */
   public static getFilenameRegExp(pattern: string): RegExp {
     // NOTE: NO "g" option here, because we need to reuse this RegExp multiple times!
-    return new RegExp(Recording.getFilenameRegExpPattern(pattern));
+    return new RegExp(Recording.getFilenameRegExpPattern(pattern), 'i');
   }
 
 }
