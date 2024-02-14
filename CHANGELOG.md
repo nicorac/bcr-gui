@@ -1,5 +1,13 @@
 # Version history
 
+## Version 1.4.1 (2024-02-14)
+
+Bug fixes:
+
+- Fixed support for AM/PM datetime parsing in filenames (#63)
+
+- Fixed missing support for AM/PM in custom date format (#75)
+
 ## Version 1.4.0 (2024-02-10)
 
 New features:
