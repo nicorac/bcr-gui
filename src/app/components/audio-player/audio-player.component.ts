@@ -1,9 +1,8 @@
 import { Subscription } from 'rxjs';
 import { Recording } from 'src/app/models/recording';
 import { SettingsService } from 'src/app/services/settings.service';
+import { AudioPlayer, IBaseParams } from 'src/plugins/audioplayer';
 import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { KeepAwake } from '@capacitor-community/keep-awake';
-import { NativeAudio } from '@capacitor-community/native-audio';
 import { AlertController, Platform, RangeCustomEvent } from '@ionic/angular';
 
 export enum PlayerStatusEnum {
@@ -26,6 +25,7 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
   protected progress = 0;   // current play position (in integer seconds)
   protected duration = 0;   // audio duration in seconds
   protected isMovingKnob = false;
+  protected playerRef?: IBaseParams;
 
   // subscriptions
   private _androidEventsSubs = new Subscription();
@@ -51,18 +51,8 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
   async ngOnInit() {
 
     try {
-      // when Android put app on the background we MUST unload audio
-      // to avoid it automatically back to play once app restored (pause/stop doesn't work!)
-      this._androidEventsSubs.add(this.platform.pause.subscribe(async () => {
-        await this.unload();
-      }));
-      this._androidEventsSubs.add(this.platform.resume.subscribe(async () => {
-        this.preloadAudio();
-      }));
-
       // preload audio file
       await this.preloadAudio();
-
     } catch (error: any) {
       this.showError(error.message);
     }
@@ -71,7 +61,7 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
 
   async ngOnDestroy() {
     // release asset
-    await this.unload();
+    await this.unloadAudio();
     this._androidEventsSubs.unsubscribe();
   }
 
@@ -80,46 +70,40 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
    */
   private async preloadAudio() {
 
-    try {
-      await NativeAudio.preload({
-        assetId: this.assetId,
-        assetPath: this.recording.audioUri,
-        isUrl: false,
-      });
-    } catch (error: any) {
-      // the error "Audio Asset already exists" is thrown at page reload (in development) and can be ignored
-      if (error.message !== 'Audio Asset already exists') {
-        throw error;
-      }
-    }
+    await AudioPlayer.init({ fileUri: this.recording.audioUri })
+      .then(res => {
+        this.playerRef = res;
 
-    // subscribe to playComplete event
-    await NativeAudio.addListener(
-      'complete',
-      async (res) => {
-        if (res.assetId === this.assetId) {
-          NativeAudio.stop({ assetId: this.assetId });
-          await this.stopUpdateInterval();
-          this.status = PlayerStatusEnum.Paused;
-          this.progress = 0;
-          this.cdr.detectChanges(); // workaround needed to let Angular update values...
-        }
-      }
-    ).then(res => {
-      // save reference to listener remove function
-      this.removeListener = res.remove;
-    });
+        // subscribe to playComplete event
+        AudioPlayer.addListener(
+          'playCompleted',
+          async (res) => {
+            if (res.id === this.playerRef?.id) {
+              await this.stopUpdateInterval();
+              this.status = PlayerStatusEnum.Paused;
+              this.progress = 0;
+              this.cdr.detectChanges(); // workaround needed to let Angular update values...
+            }
+          }
+        ).then(res => {
+          // save reference to listener remove function
+          this.removeListener = res.remove;
+        });
 
-    // get audio duration
-    const res = await NativeAudio.getDuration({ assetId: this.assetId });
-    this.duration = Math.ceil(res.duration);
-    this.ready = true;
+        // get audio duration
+        AudioPlayer.getDuration(this.playerRef!).then(res2 => {
+          this.duration = res2.duration / 1000;
 
-    // set duration to recording item
-    // (if not already set with JSON metadata file)
-    if (!this.recording.duration) {
-      this.recording.duration = this.duration;
-    }
+          // set duration to recording item
+          // (if not already set with JSON metadata file)
+          if (!this.recording.duration) {
+            this.recording.duration = this.duration;
+          }
+          // init complete
+          this.ready = true;
+        })
+      })
+      .catch(error => this.showError(error.message));
 
     // workaround needed to let Angular update values...
     this.cdr.detectChanges();
@@ -129,50 +113,44 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
   /**
    * Release loaded audio file
    */
-  private async unload() {
+  public async unloadAudio() {
 
     await this.stopUpdateInterval();
     this.status = PlayerStatusEnum.Paused;
     this.ready = false;
 
-    await NativeAudio.unload({ assetId: this.assetId });
+    await AudioPlayer.release(this.playerRef!);
+    this.playerRef = undefined;
     await this.removeListener?.();
     this.cdr.detectChanges(); // workaround needed to let Angular update values...
+
   }
 
   /**
    * Start a JS interval to update player status
    */
-  private async startUpdateInterval() {
+  private startUpdateInterval() {
 
-    await this.stopUpdateInterval();
+    this.stopUpdateInterval();
 
     // start update interval
     this.updateInterval = setInterval(() => {
-      NativeAudio.getCurrentTime({ assetId: this.assetId }).then(res => {
+      AudioPlayer.getCurrentTime(this.playerRef!).then(res => {
         if (!this.isMovingKnob) {
-          this.progress = Math.ceil(res.currentTime);
+          this.progress = Math.ceil(res.currentTime / 1000);
         }
       });
     }, 500);
-
-    // keep screen on
-    await KeepAwake.keepAwake();
 
   }
 
   /**
    * Clear update interval
    */
-  private async stopUpdateInterval() {
+  private stopUpdateInterval() {
 
     if (this.updateInterval) {
-
       clearInterval(this.updateInterval);
-
-      // allow screen off
-      await KeepAwake.allowSleep();
-
     }
 
   }
@@ -204,17 +182,16 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
   /**
    * Play the given record file (already loaded with load())
    */
-  protected async play(position?: number) {
+  protected play(position?: number) {
 
     if (position === undefined) {
       position = this.progress;
     }
 
-    // start/resume play
-    NativeAudio.play({ assetId: this.assetId, time: position })
+    AudioPlayer.play({ id: this.playerRef!.id, position: position * 1000 })
       .then(async _ => {
         this.status = PlayerStatusEnum.Playing;
-        await this.startUpdateInterval();
+        this.startUpdateInterval();
       })
       .catch(error => this.showError(error.message));
   }
@@ -234,11 +211,13 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
     if (this.status !== PlayerStatusEnum.Playing) {
       return;
     }
-    await this.stopUpdateInterval();
 
     // pause audio
-    await NativeAudio.pause({ assetId: this.assetId })
-      .then(_ => this.status = PlayerStatusEnum.Paused)
+    await AudioPlayer.pause(this.playerRef!)
+      .then(_ => {
+        this.status = PlayerStatusEnum.Paused;
+        this.stopUpdateInterval();
+      })
       .catch(error => this.showError(error.message));
   }
 

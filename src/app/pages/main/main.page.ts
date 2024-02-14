@@ -173,8 +173,8 @@ export class MainPage implements AfterViewInit {
       cancelText: 'Cancel',
       confirmText: 'Delete',
       onConfirm: async () => {
-        // stop player
-        await this.stopPlayer();
+        // forcibly unload audio
+        await this.player?.unloadAudio();
         this.recordingsService.deleteRecording(items);
         this.clearSelection();
       }

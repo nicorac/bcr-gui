@@ -4,7 +4,6 @@ import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouteReuseStrategy, RouterModule } from '@angular/router';
-import { NativeAudio } from '@capacitor-community/native-audio';
 import { IonicModule, IonicRouteStrategy, Platform } from '@ionic/angular';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -72,9 +71,6 @@ function appInitializer(recordingsService: RecordingsService, settings: Settings
     // if (!environment.production) {
     //   waitForDebugger();
     // }
-
-    // enable mixing on audio (to allow other running audio players)
-    await NativeAudio.configure({ focus: false });
 
     // wait for Ionic initialization
     await platform.ready();

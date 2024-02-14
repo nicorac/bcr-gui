@@ -3,7 +3,6 @@ package com.github.nicorac.plugins.bcrgui;
 import android.content.Intent;
 import android.net.Uri;
 import android.provider.ContactsContract;
-import android.provider.DocumentsContract;
 
 import androidx.activity.result.ActivityResult;
 import androidx.annotation.Nullable;
@@ -15,9 +14,6 @@ import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.ActivityCallback;
 import com.getcapacitor.annotation.CapacitorPlugin;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 @CapacitorPlugin(name = "BcrGui")
 public class BcrGuiPlugin extends Plugin {
@@ -102,4 +98,5 @@ public class BcrGuiPlugin extends Plugin {
 
     return null;
   }
+
 }
