@@ -1,5 +1,16 @@
 # Version history
 
+## Version 1.5.0 (2024-02-18)
+
+New features:
+
+- Added background audio play support: now the application continue playing when the app is minimized and/or the screen is switched off
+- New system notification now shown when playing to let user bring the app back on foreground
+
+Bug fixes:
+
+- Removed warning message `Missing .json metadata file!` (almost useless to user)
+
 ## Version 1.4.1 (2024-02-14)
 
 Bug fixes:
