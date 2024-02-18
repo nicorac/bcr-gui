@@ -1,9 +1,11 @@
 import { Subscription } from 'rxjs';
 import { Recording } from 'src/app/models/recording';
+import { DatetimePipe } from 'src/app/pipes/datetime.pipe';
+import { ToHmsPipe } from 'src/app/pipes/to-hms.pipe';
 import { SettingsService } from 'src/app/services/settings.service';
 import { AudioPlayer, IBaseParams } from 'src/plugins/audioplayer';
 import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { AlertController, Platform, RangeCustomEvent } from '@ionic/angular';
+import { AlertController, IonicModule, RangeCustomEvent } from '@ionic/angular';
 
 export enum PlayerStatusEnum {
   Paused = 0,
@@ -14,6 +16,9 @@ export enum PlayerStatusEnum {
   selector: 'app-audio-player',
   templateUrl: './audio-player.component.html',
   styleUrls: ['./audio-player.component.scss'],
+  standalone: true,
+  imports: [ DatetimePipe, ToHmsPipe, IonicModule ],
+  providers: [ DatetimePipe ],
 })
 export class AudioPlayerComponent implements OnInit, OnDestroy {
 
@@ -44,7 +49,7 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
   constructor(
     private alertController: AlertController,
     private cdr: ChangeDetectorRef,
-    private platform: Platform,
+    private dateTimePipe: DatetimePipe,
     private settings: SettingsService,
   ) { }
 
@@ -70,7 +75,11 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
    */
   private async preloadAudio() {
 
-    await AudioPlayer.init({ fileUri: this.recording.audioUri })
+    await AudioPlayer.init({
+      fileUri: this.recording.audioUri,
+      notificationTitle: this.recording.opName,
+      notificationText: this.dateTimePipe.transform(this.recording.date, this.settings.dateTimeFormat),
+    })
       .then(res => {
         this.playerRef = res;
 

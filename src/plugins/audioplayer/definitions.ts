@@ -4,7 +4,7 @@ import { PluginListenerHandle } from '@capacitor/core';
 export interface AudioPlayer extends EventManagerPlugin {
 
   // Initialize a new MediaPlayer instance on the given file URI
-  init(options: { fileUri: string }): Promise<IBaseParams>;
+  init(options: { fileUri: string, notificationTitle?: string, notificationText?: string }): Promise<IBaseParams>;
 
   // Release MediaPlayer instance
   release(options: IBaseParams): Promise<void>;

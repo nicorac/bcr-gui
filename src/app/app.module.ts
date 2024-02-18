@@ -28,15 +28,14 @@ import version from './version';
   declarations: [
     AboutPage,
     AppComponent,
-    AudioPlayerComponent,
     FilenamePatternEditorComponent,
     FilesizePipe,
     MainPage,
     SettingsPage,
-    ToHmsPipe,
     VirtualScrollbarComponent,
   ],
   imports: [
+    AudioPlayerComponent,
     AppRoutingModule,
     BrowserModule,
     CallIconComponent,
@@ -48,6 +47,7 @@ import version from './version';
     LongPressDirective,
     RouterModule,
     ScrollingModule,
+    ToHmsPipe,
   ],
   providers: [
     ContactsService,
