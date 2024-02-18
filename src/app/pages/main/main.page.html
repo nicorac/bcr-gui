@@ -120,7 +120,6 @@
                 <p *ngIf="item.opName !== item.opNumber">Number: {{ item.opNumber }}</p>
                 <p>Type: {{ item.mimeType }}</p>
                 <p>Size: {{ item.filesize | filesize }}</p>
-                <p *ngIf="!item.hasMetadata"><i>Missing .json metadata file!</i></p>
               </div>
 
               <!-- audio player -->
