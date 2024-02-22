@@ -122,6 +122,7 @@ export class SettingsService {
     'audio/mpeg',
     'audio/ogg',
     'audio/x-wav',
+    'audio/amr',
   ];
 
   /**
