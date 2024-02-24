@@ -34,7 +34,8 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
 
   // subscriptions
   private _androidEventsSubs = new Subscription();
-  private removeListener?: () => Promise<void>;
+  private removePlayCompletedListener?: () => Promise<void>;
+  private removeUpdateListener?: () => Promise<void>;
 
   // play update interval
   private updateInterval?: ReturnType<typeof setInterval>;
@@ -84,19 +85,25 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
         this.playerRef = res;
 
         // subscribe to playComplete event
-        AudioPlayer.addListener(
-          'playCompleted',
-          async (res) => {
-            if (res.id === this.playerRef?.id) {
-              await this.stopUpdateInterval();
-              this.status = PlayerStatusEnum.Paused;
-              this.progress = 0;
-              this.cdr.detectChanges(); // workaround needed to let Angular update values...
-            }
+        AudioPlayer.addListener('playCompleted', (res) => {
+          if (res.id === this.playerRef?.id) {
+            this.status = PlayerStatusEnum.Paused;
+            this.progress = 0;
+            this.cdr.detectChanges(); // workaround needed to let Angular update values...
           }
-        ).then(res => {
+        }).then(res => {
           // save reference to listener remove function
-          this.removeListener = res.remove;
+          this.removePlayCompletedListener = res.remove;
+        });
+
+        // subscribe to update event
+        AudioPlayer.addListener('update', (res) => {
+          if (res.id === this.playerRef?.id) {
+            this.progress = Math.floor(res.position / 1000);
+          }
+        }).then(res => {
+          // save reference to listener remove function
+          this.removeUpdateListener = res.remove;
         });
 
         // get audio duration
@@ -130,7 +137,7 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
 
     await AudioPlayer.release(this.playerRef!);
     this.playerRef = undefined;
-    await this.removeListener?.();
+    await this.removePlayCompletedListener?.();
     this.cdr.detectChanges(); // workaround needed to let Angular update values...
 
   }
@@ -140,16 +147,16 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
    */
   private startUpdateInterval() {
 
-    this.stopUpdateInterval();
+    // this.stopUpdateInterval();
 
-    // start update interval
-    this.updateInterval = setInterval(() => {
-      AudioPlayer.getCurrentTime(this.playerRef!).then(res => {
-        if (!this.isMovingKnob) {
-          this.progress = Math.ceil(res.currentTime / 1000);
-        }
-      });
-    }, 500);
+    // // start update interval
+    // this.updateInterval = setInterval(() => {
+    //   AudioPlayer.getCurrentTime(this.playerRef!).then(res => {
+    //     if (!this.isMovingKnob) {
+    //       this.progress = Math.ceil(res.currentTime / 1000);
+    //     }
+    //   });
+    // }, 500);
 
   }
 
@@ -158,9 +165,9 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
    */
   private stopUpdateInterval() {
 
-    if (this.updateInterval) {
-      clearInterval(this.updateInterval);
-    }
+    // if (this.updateInterval) {
+    //   clearInterval(this.updateInterval);
+    // }
 
   }
 

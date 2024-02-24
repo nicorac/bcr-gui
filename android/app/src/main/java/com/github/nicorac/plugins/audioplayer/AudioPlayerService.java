@@ -5,8 +5,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
-import android.graphics.BitmapFactory;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
@@ -14,27 +12,27 @@ import android.os.IBinder;
 import android.os.PowerManager;
 
 import androidx.annotation.Nullable;
-import androidx.core.app.NotificationCompat;
 
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
 import com.github.nicorac.bcrgui.MainActivity;
-import com.github.nicorac.bcrgui.R;
 
 import java.util.HashMap;
 
 public class AudioPlayerService extends Service {
 
-  private static final String ERR_BAD_ID = "Unexisting player with this 'id'";
+  private static final String ERR_BAD_ID = "Can't find a player instance with this 'id'";
 
   private static final String NOTIFICATION_CHANNEL_ID = "BCR-GUI";
   private static final String NOTIFICATION_CHANNEL_NAME = "BCR-GUI - Play status";
+  private static PendingIntent bringAppToForegroundIntent;
+  private static NotificationManager notificationManager;
 
   // wakelock to keep the service alive when playing
   private PowerManager.WakeLock wakeLock = null;
 
   // players collection
-  private final HashMap<Integer, MediaPlayerInstance> players = new HashMap<>();
+  private final HashMap<Integer, MediaPlayerEx> players = new HashMap<>();
 
   // reference to plugin
   private IJSEventSender plugin;
@@ -50,19 +48,50 @@ public class AudioPlayerService extends Service {
 
   @Override
   public void onCreate() {
+
     super.onCreate();
     var powerManager = (PowerManager) getSystemService(POWER_SERVICE);
     wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "AudioPlayerService::WakelockTag");
+
+    // Create an Intent for the "bring-to-front" action to be linked in notifications
+    Intent customIntent = new Intent(getApplicationContext(), MainActivity.class);
+    customIntent.setAction(Intent.ACTION_MAIN);
+    customIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+
+    // get instance of NotificationManager and create notifications channel
+    if (notificationManager == null) {
+      notificationManager = (NotificationManager) getApplicationContext().getSystemService(NOTIFICATION_SERVICE);
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        var channel = new NotificationChannel(
+          NOTIFICATION_CHANNEL_ID,
+          NOTIFICATION_CHANNEL_NAME,
+          NotificationManager.IMPORTANCE_DEFAULT
+        );
+        notificationManager.createNotificationChannel(channel);
+      }
+    }
+
+    // Create a PendingIntent
+    bringAppToForegroundIntent = PendingIntent.getActivity(
+      getApplicationContext(), 0, customIntent,
+      PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+    );
+
   }
 
   @Override
   public void onDestroy() {
     super.onDestroy();
-    for (MediaPlayerInstance i : players.values()) {
-      destroyPlayer(i);
+    for (MediaPlayerEx i : players.values()) {
+      release(i);
     }
     players.clear();
     wakeLockUpdate();
+  }
+
+  @Override
+  public void onTaskRemoved(Intent rootIntent) {
+    // cancel all notifications
   }
 
   @Override
@@ -92,23 +121,34 @@ public class AudioPlayerService extends Service {
       try {
 
         var fileUri = Uri.parse(fileUriStr);
-        var mediaPlayer = MediaPlayer.create(this, fileUri);
-        mediaPlayer.setLooping(false);
-        var mpi = new MediaPlayerInstance(
-          id,
-          mediaPlayer,
+        var mpe = new MediaPlayerEx(
+          getApplicationContext(),
+          fileUri,
           notificationTitle,
-          notificationText
-        );
-        players.put(id, mpi);
+          notificationText,
+          new OnEventListener() {
 
-        // Set completion listener
-        mediaPlayer.setOnCompletionListener(mp -> {
-          cancelMediaNotification(mpi);
-          var res = new JSObject();
-          res.put("id", id);
-          plugin.sendJSEvent("playCompleted", res);
-        });
+            @Override
+            public PendingIntent getNotificationClickIntent() { return bringAppToForegroundIntent; }
+
+            @Override
+            public void onUpdate(MediaPlayerEx player) {
+              var res = new JSObject();
+              res.put("id", id);
+              res.put("position", player.getCurrentPosition());
+              plugin.sendJSEvent("update", res);
+            }
+
+            @Override
+            public void onCompletion(MediaPlayerEx mp) {
+              var res = new JSObject();
+              res.put("id", id);
+              plugin.sendJSEvent("playCompleted", res);
+            }
+
+          }
+        );
+        players.put(id, mpe);
 
       } catch (Exception e) {
         call.reject("Error loading audio file: " + fileUriStr);
@@ -124,22 +164,24 @@ public class AudioPlayerService extends Service {
   }
 
   /**
-   * Release current audio file and free linked mediaplayer
+   * Release current audio file and free the linked mediaplayer
    */
   public void release(PluginCall call) {
 
     var id = getPlayerId(call);
-    if (id == null) return;
+    if (id == null) {
+      call.reject(ERR_BAD_ID);
+      return;
+    };
 
     // remove item
-    var i = players.get(id);
-    if (i == null) {
+    var p = players.get(id);
+    if (p == null) {
       call.reject(ERR_BAD_ID);
       return;
     }
     else {
-      destroyPlayer(i);
-      players.remove(id);
+      release(p);
     }
 
     call.resolve();
@@ -149,10 +191,11 @@ public class AudioPlayerService extends Service {
   /**
    * Destroy a MediaPlayer instance
    */
-  private void destroyPlayer(MediaPlayerInstance i) {
+  private void release(MediaPlayerEx p) {
     try {
-      stop(i);
-      i.player.release();
+      stop(p);
+      p.release();
+      players.remove(p.id);
     }
     catch (Exception ignored) {}
   }
@@ -163,18 +206,17 @@ public class AudioPlayerService extends Service {
   public void play(PluginCall call) {
 
     // get target player
-    var i = getPlayerInstance(call);
-    if (i == null) return;
+    var p = getPlayerInstance(call);
+    if (p == null) return;
 
     // test if a position has been passed
     var position = call.getInt("position");
     if (position != null) {
-      i.player.seekTo(position);
+      p.seekTo(position);
     }
-    if (!i.player.isPlaying()) {
-      i.player.start();
+    if (!p.isPlaying()) {
+      p.start();
       wakeLockUpdate();
-      showMediaNotification(i);
     }
     call.resolve();
 
@@ -189,9 +231,8 @@ public class AudioPlayerService extends Service {
     var i = getPlayerInstance(call);
     if (i == null) return;
 
-    if (i.player.isPlaying()) {
-      i.player.pause();
-      cancelMediaNotification(i);
+    if (i.isPlaying()) {
+      i.pause();
       wakeLockUpdate();
     }
     call.resolve();
@@ -208,11 +249,10 @@ public class AudioPlayerService extends Service {
     stop(i);
     call.resolve();
   }
-  public void stop(MediaPlayerInstance i) {
+  public void stop(MediaPlayerEx p) {
 
-    if (i.player.isPlaying()) {
-      i.player.stop();
-      cancelMediaNotification(i);
+    if (p.isPlaying()) {
+      p.stop();
       wakeLockUpdate();
     }
 
@@ -228,7 +268,7 @@ public class AudioPlayerService extends Service {
     if (i == null) return;
 
     var res = new JSObject();
-    res.put("duration", i.player.getDuration());
+    res.put("duration", i.getDuration());
     call.resolve(res);
 
   }
@@ -243,7 +283,7 @@ public class AudioPlayerService extends Service {
     if (i == null) return;
 
     var res = new JSObject();
-    res.put("currentTime", i.player.getCurrentPosition());
+    res.put("currentTime", i.getCurrentPosition());
     call.resolve(res);
 
   }
@@ -258,7 +298,7 @@ public class AudioPlayerService extends Service {
     var toBeEnabled = false;
     try {
       for (var i : players.values()) {
-        if (i.player.isPlaying()) {
+        if (i.isPlaying()) {
           toBeEnabled = true;
           break;
         }
@@ -288,7 +328,7 @@ public class AudioPlayerService extends Service {
    * Return the existing media player instance from id
    */
   @Nullable
-  private MediaPlayerInstance getPlayerInstance(PluginCall call) {
+  private MediaPlayerEx getPlayerInstance(PluginCall call) {
 
     var id = getPlayerId(call);
     if (id == null) return null;
@@ -299,63 +339,6 @@ public class AudioPlayerService extends Service {
     }
 
     return i;
-
-  }
-
-  /**
-   * Show multimedia notification
-   */
-  public void showMediaNotification(MediaPlayerInstance playerInstance) {
-
-    // Notification manager service
-    var notificationManager = (NotificationManager) getApplicationContext().getSystemService(NOTIFICATION_SERVICE);
-    if (notificationManager == null) {
-      return;
-    }
-
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      var channel = new NotificationChannel(
-        NOTIFICATION_CHANNEL_ID,
-        NOTIFICATION_CHANNEL_NAME,
-        NotificationManager.IMPORTANCE_DEFAULT
-      );
-      notificationManager.createNotificationChannel(channel);
-    }
-
-    // Create an Intent for the "bring-to-front"" action
-    Intent customIntent = new Intent(getApplicationContext(), MainActivity.class);
-    customIntent.setAction(Intent.ACTION_MAIN);
-    customIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-
-    // Create a PendingIntent
-    PendingIntent pendingIntent = PendingIntent.getActivity(
-      getApplicationContext(), 0, customIntent,
-      PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
-    );
-
-    var builder = new NotificationCompat.Builder(getApplicationContext(), NOTIFICATION_CHANNEL_ID)
-      .setContentTitle(playerInstance.title)
-      .setContentText(playerInstance.text)
-      .setSmallIcon(R.drawable.notification)
-      .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.notification))
-      .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-      .setContentIntent(pendingIntent) // Set the PendingIntent
-      .setOngoing(true) // Set as "persistant"
-    ;
-    var notification = builder.build();
-    notificationManager.notify(playerInstance.id, notification);
-
-  }
-  /**
-   * Cancel existing multimedia notification
-   */
-  public void cancelMediaNotification(MediaPlayerInstance playerInstance) {
-
-    // Notification manager service
-    var notificationManager = (NotificationManager) getApplicationContext().getSystemService(NOTIFICATION_SERVICE);
-    if (notificationManager != null) {
-      notificationManager.cancel(playerInstance.id);
-    }
 
   }
 

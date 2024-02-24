@@ -22,6 +22,7 @@ export interface AudioPlayer extends EventManagerPlugin {
 
   // events
   addListener(eventName: 'playCompleted', listenerFunc: (data: IBaseParams) => void): Promise<PluginListenerHandle> & PluginListenerHandle;
+  addListener(eventName: 'update', listenerFunc: (data: IUpdateData) => void): Promise<PluginListenerHandle> & PluginListenerHandle;
 
 }
 
@@ -30,5 +31,9 @@ export interface IBaseParams {
 }
 
 export interface IPlayParams extends IBaseParams {
-  position?: number;  // seek position to start play from
+  position?: number;  // seek position to start play from (in ms)
+}
+
+export interface IUpdateData extends IBaseParams {
+  position: number;  // current play position (in ms)
 }
