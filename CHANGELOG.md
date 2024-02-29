@@ -1,5 +1,14 @@
 # Version history
 
+## Version 1.6.0 (2024-02-29)
+
+New features:
+
+- Added support to AMR recordings (fixes #81)
+- Replaced light splash screen images with dark versions, to avoid "flashing" at startup in dark mode
+- Improved play notification, now including play progress
+- Clicking play notification now brings the app to foreground
+
 ## Version 1.5.0 (2024-02-18)
 
 New features:
