@@ -29,7 +29,7 @@
     "@capacitor/android": "^5.7.0",
     "@capacitor/app": "^5.0.7",
     "@capacitor/clipboard": "^5.0.7",
-    "@capacitor/core": "^5.7.0",
+    "@capacitor/core": "^5.7.1",
     "@capacitor/filesystem": "^5.2.1",
     "@capacitor/preferences": "^5.0.7",
     "@capacitor/share": "^5.0.7",
