@@ -10,3 +10,24 @@ updates:
     schedule:
       interval: "weekly"
     target-branch: "dev"
+
+    groups:
+      all-updates:
+        patterns:
+          - "*"
+      # angular:
+      #   patterns:
+      #     - "@angular*"
+      #   update-types:
+      #     - "minor"
+      #     - "patch"
+      # capacitor:
+      #   patterns:
+      #     - "@capacitor*"
+      #   update-types:
+      #     - "minor"
+      #     - "patch"
+
+    ignore:
+      - dependency-name: "@angular*"
+        update-types: ["version-update:semver-major"]
