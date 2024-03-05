@@ -3,6 +3,7 @@ import { BcrGui } from 'src/plugins/bcrgui';
 import { Injectable } from '@angular/core';
 import { ContactPayload, Contacts } from '@capacitor-community/contacts';
 import { PermissionState } from '@capacitor/core';
+import { I18nService } from './i18n.service';
 import { MessageBoxService } from './message-box.service';
 import { SettingsService } from './settings.service';
 
@@ -10,6 +11,7 @@ import { SettingsService } from './settings.service';
 export class ContactsService {
 
   constructor(
+    private i18n: I18nService,
     private mbs: MessageBoxService,
     private settings: SettingsService,
   ) {}
@@ -101,18 +103,12 @@ export class ContactsService {
     if (perm !== 'granted') {
       // show info alert
       await this.mbs.showConfirm({
-        header: 'Contacts permission needed',
-        message: [
-          'This feature needs Contacts permission to work.',
-          'If you were already asked for permission (and denied it), please open application settings and allow Contacts permission...',
-        ],
-        cancelText: 'Cancel',
-        confirmText: 'Open app settings',
+        header: this.i18n.get('CONTACTS_PERM_TITLE'),
+        message: this.i18n.get('CONTACTS_PERM_TEXT'),
+        confirmText: this.i18n.get('CONTACTS_PERM_CONFIRM'),
         onConfirm: async () => {
           // open application settings
-          await NativeSettings.openAndroid({
-            option: AndroidSettings.ApplicationDetails
-          });
+          await NativeSettings.openAndroid({ option: AndroidSettings.ApplicationDetails });
         }
       });
     }

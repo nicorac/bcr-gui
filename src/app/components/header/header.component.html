@@ -28,10 +28,7 @@
 
     <!-- load progressbar -->
     <ng-container *ngIf="recordingsService.refreshProgress | async as value">
-      <ion-progress-bar
-        class="progress"
-        buffersss=".001"
-        [value]="value"
+      <ion-progress-bar class="progress" [value]="value"
       />
     </ng-container>
 

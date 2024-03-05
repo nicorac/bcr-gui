@@ -1,4 +1,4 @@
-<app-header />
+<app-header title="{{ 'MAINMENU_ABOUT' | translatePipe }}" />
 
 <ion-content id="main-content" class="main ion-padding">
 
@@ -6,10 +6,7 @@
 
     <div>
       <div class="title">{{ version.appName }}</div>
-      <div>
-        {{ version.appName }} is a companion app for
-        <a href="https://github.com/chenxiaolong/BCR">BCR</a> (Basic Call Recorder)
-        to ease management of its recordings database
+      <div [innerHTML]="'ABOUT_DESCRIPTION' | translatePipe:descData">
       </div>
     </div>
 
@@ -19,32 +16,29 @@
 
   <div class="item">
     <ion-label class="ion-text-wrap">
-      <h2>Version</h2>
+      <h2>{{ 'ABOUT_VERSION' | translatePipe }}</h2>
       <p>{{ version.version }}</p>
     </ion-label>
   </div>
 
   <div class="item">
     <ion-label class="ion-text-wrap">
-      <h2>Copyright</h2>
+      <h2>{{ 'ABOUT_COPYRIGHT' | translatePipe }}</h2>
       <p>{{ version.copyright }} (<a href="{{ version.websiteUri }}">{{ version.websiteUri }}</a>)</p>
     </ion-label>
   </div>
 
   <div class="item">
     <ion-label class="ion-text-wrap">
-      <h2>Source code</h2>
+      <h2>{{ 'ABOUT_HOMEPAGE' | translatePipe }}</h2>
       <p>GitHub (<a href="{{ version.sourcesUri }}">{{ version.sourcesUri }}</a>)</p>
     </ion-label>
   </div>
 
   <div class="item">
     <ion-label class="ion-text-wrap donations">
-      <h2>Donations</h2>
-      <p>
-        This app is free as in speech, nothing to pay, no ads.<br>
-        If you appreciate my work and want to support it, feel free to use one the links below.
-      </p>
+      <h2>{{ 'ABOUT_DONATIONS' | translatePipe }}</h2>
+      <p>{{ 'ABOUT_DONATIONS_TEXT' | translatePipe }}</p>
       <div class="images">
         <a href="https://paypal.me/nicorac" target="_blank">
           <img src="assets/images/paypal.png" alt="PayPal">
@@ -58,7 +52,7 @@
 
   <div class="item">
     <ion-label class="ion-text-wrap">
-      <h2>Attributions</h2>
+      <h2>{{ 'ABOUT_THANKS' | translatePipe }}</h2>
       <ul>
         <li>Call icons by <a href="https://freesvg.org/1547046949" target="_blank">FreeSVG (public domain icons)</a></li>
         <li>DateTime Angular pipes with Intl.* support by <a href="https://github.com/json-derulo/angular-ecmascript-intl" target="_blank">angular-ecmascript-intl</a></li>

@@ -23,10 +23,8 @@
       <ng-template>
         <ion-content>
           <ion-list lines="none">
-            <ion-item (click)="selectAll()">Select all</ion-item>
-            <ion-item (click)="deleteItems(getSelectedItems())">
-              Delete
-            </ion-item>
+            <ion-item (click)="selectAll()">{{ 'LBL_SELECTALL' | translatePipe }}</ion-item>
+            <ion-item (click)="deleteItems(getSelectedItems())">{{ 'LBL_DELETE' | translatePipe }}</ion-item>
           </ion-list>
         </ion-content>
       </ng-template>
@@ -42,6 +40,7 @@
     show-clear-button="focus"
     [debounce]="750"
     [(ngModel)]="searchValue"
+    [placeholder]="'LBL_SEARCH' | translatePipe"
     (ngModelChange)="updateFilter()"
     (ionClear)="clearFilter()"
   />
@@ -73,9 +72,9 @@
       >
         <ion-refresher-content
           pullingIcon="refresh"
-          pullingText="Pull to refresh"
+          pullingText="'HOME_PULL_TO_REFRESH' | translatePipe"
           refreshingSpinner="circles"
-          refreshingText="Refreshing..."
+          refreshingText="'HOME_REFRESHING' | translatePipe"
         />
       </ion-refresher>
 
@@ -117,9 +116,11 @@
 
               <!-- details -->
               <div class="details">
-                <p *ngIf="item.opName !== item.opNumber">Number: {{ item.opNumber }}</p>
-                <p>Type: {{ item.mimeType }}</p>
-                <p>Size: {{ item.filesize | filesize }}</p>
+                <p *ngIf="item.opName !== item.opNumber">
+                  {{ 'HOME_REC_PHONE_NUMBER' | translatePipe}}: {{ item.opNumber }}
+                </p>
+                <p>{{ 'HOME_REC_TYPE' | translatePipe}}: {{ item.mimeType }}</p>
+                <p>{{ 'HOME_REC_SIZE' | translatePipe}}: {{ item.filesize | filesize }}</p>
               </div>
 
               <!-- audio player -->

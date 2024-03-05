@@ -1,5 +1,6 @@
 import { Subscription } from 'rxjs';
 import { AppRoutesEnum } from 'src/app/app-routing.module';
+import { I18nService } from 'src/app/services/i18n.service';
 import { MessageBoxService } from 'src/app/services/message-box.service';
 import { RecordingsService } from 'src/app/services/recordings.service';
 import { SortModeEnum } from 'src/app/utils/recordings-sorter';
@@ -14,7 +15,6 @@ import { FilenamePatternEditorComponent } from './filename-pattern-editor/filena
   selector: 'app-settings',
   templateUrl: './settings.page.html',
   styleUrls: ['./settings.page.scss'],
-  // hostDirectives
 })
 export class SettingsPage {
 
@@ -25,6 +25,7 @@ export class SettingsPage {
   private backSub?: Subscription;
 
   constructor(
+    protected i18n: I18nService,
     protected messageBoxService: MessageBoxService,
     protected modalController: ModalController,
     protected platform: Platform,
@@ -64,10 +65,8 @@ export class SettingsPage {
           await this.save();
           // ask for rescan
           await this.messageBoxService.showConfirm({
-            header: 'Rescan',
-            message: 'Do you want to rescan all of your files (without metadata JSON file) using the new filename pattern?',
-            confirmText: 'Yes, rescan',
-            cancelText: 'No',
+            header: this.i18n.get('SETTINGS_RESCAN_TITLE'),
+            message: this.i18n.get('SETTINGS_RESCAN_TEXT'),
             onConfirm: () => this.recordingsService.refreshContent({ forceFilenameParse: true }),
           })
         },
@@ -103,6 +102,13 @@ export class SettingsPage {
         this.settings.defaultCountryPrefix = prefix;
       }
     }
+  }
+
+  /**
+   * Causes page reload to clear pipes cache (i.e. to update translations...)
+   */
+  protected clearPipesCache() {
+    location.reload();
   }
 
 }

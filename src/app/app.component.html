@@ -5,7 +5,7 @@
 
     <ion-header>
       <ion-toolbar translucent>
-        <ion-title>Menu</ion-title>
+        <ion-title>{{ 'MAINMENU_MENU_TITLE' | translatePipe }}</ion-title>
       </ion-toolbar>
     </ion-header>
 
@@ -16,21 +16,21 @@
         <ion-menu-toggle autoHide="true">
           <ion-item [routerLink]="AppRoutesEnum.Main" menuClose>
             <ion-icon name="home-sharp" slot="start"></ion-icon>
-            <ion-label>Home</ion-label>
+            <ion-label>{{ 'MAINMENU_HOME' | translatePipe }}</ion-label>
           </ion-item>
         </ion-menu-toggle>
 
         <ion-menu-toggle autoHide="true">
           <ion-item [routerLink]="AppRoutesEnum.Settings" menuClose>
             <ion-icon name="options-sharp" slot="start"></ion-icon>
-            <ion-label>Settings</ion-label>
+            <ion-label>{{ 'MAINMENU_SETTINGS' | translatePipe }}</ion-label>
           </ion-item>
         </ion-menu-toggle>
 
         <ion-menu-toggle autoHide="true">
           <ion-item [routerLink]="AppRoutesEnum.About" menuClose>
             <ion-icon name="information-circle-sharp" slot="start"></ion-icon>
-            <ion-label>About</ion-label>
+            <ion-label>{{ 'MAINMENU_ABOUT' | translatePipe }}</ion-label>
           </ion-item>
         </ion-menu-toggle>
 

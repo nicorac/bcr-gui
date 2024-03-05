@@ -1,17 +1,16 @@
-<app-header title="Date/time format editor" />
+<app-header title="{{ 'DTF_EDITOR_TITLE' | translatePipe }}" />
 
 <ion-content class="ion-padding">
-
   <ion-list class="config-items" lines="full">
-
     <ion-item-divider>
-      <h4>Standard styles</h4>
+      <h4>{{ "DTF_EDITOR_STANDARD_FORMATS" | translatePipe }}</h4>
     </ion-item-divider>
 
     <!-- date format -->
     <ion-item>
       <!-- (ngModelChange)="updateDateTimeStyle($event, 'dateStyle')" -->
-      <ion-select label="Date style"
+      <ion-select
+        label="{{ 'DTF_EDITOR_DATE_FORMAT' | translatePipe }}"
         [disabled]="(format.customFormat?.length ?? 0) > 0"
         [(ngModel)]="format.dateStyle"
       >
@@ -22,79 +21,85 @@
           {{ dateTimeSample | datetime : { dateStyle: "long" } }}
         </ion-select-option>
         <ion-select-option [value]="'medium'">
-          {{ dateTimeSample | datetime : { dateStyle: "medium" } }}</ion-select-option>
+          {{
+            dateTimeSample | datetime : { dateStyle: "medium" }
+          }}</ion-select-option
+        >
         <ion-select-option [value]="'short'">
-          {{ dateTimeSample | datetime : { dateStyle: "short" } }}</ion-select-option>
-        <ion-select-option [value]="''">
-          None
-        </ion-select-option>
+          {{
+            dateTimeSample | datetime : { dateStyle: "short" }
+          }}</ion-select-option
+        >
+        <ion-select-option [value]="''"> None </ion-select-option>
       </ion-select>
     </ion-item>
 
     <!-- time format -->
     <ion-item>
       <!-- (ngModelChange)="updateDateTimeStyle($event, 'timeStyle')" -->
-      <ion-select label="Time style"
+      <ion-select
+        label="{{ 'DTF_EDITOR_TIME_FORMAT' | translatePipe }}"
         [disabled]="(format.customFormat?.length ?? 0) > 0"
         [(ngModel)]="format.timeStyle"
       >
         <ion-select-option [value]="'full'">
-          {{ dateTimeSample | datetime : { timeStyle: "full" } }}</ion-select-option>
+          {{
+            dateTimeSample | datetime : { timeStyle: "full" }
+          }}</ion-select-option
+        >
         <ion-select-option [value]="'long'">
-          {{ dateTimeSample | datetime : { timeStyle: "long" } }}</ion-select-option>
+          {{
+            dateTimeSample | datetime : { timeStyle: "long" }
+          }}</ion-select-option
+        >
         <ion-select-option [value]="'medium'">
-          {{ dateTimeSample | datetime : { timeStyle: "medium" } }}</ion-select-option>
+          {{
+            dateTimeSample | datetime : { timeStyle: "medium" }
+          }}</ion-select-option
+        >
         <ion-select-option [value]="'short'">
-          {{ dateTimeSample | datetime : { timeStyle: "short" } }}</ion-select-option>
+          {{
+            dateTimeSample | datetime : { timeStyle: "short" }
+          }}</ion-select-option
+        >
         <ion-select-option [value]="''">None</ion-select-option>
       </ion-select>
     </ion-item>
 
     <!-- custom format -->
     <ion-item-divider>
-      <h4>Custom format</h4>
+      <h4>{{ "DTF_EDITOR_CUSTOM_FORMAT" | translatePipe }}</h4>
     </ion-item-divider>
 
     <ion-item>
       <ion-input
-        placeholder="Custom date/time format"
         fill="none"
         [clearInput]="true"
         [(ngModel)]="format.customFormat"
       />
     </ion-item>
 
-    <pre *ngIf="format.customFormat" class="format-legend">
-  Preview: {{ dateTimeSample | datetime : { customFormat: format.customFormat } }}</pre>
+    @if (format.customFormat) {
+      <pre class="format-legend">
+  {{ "DTF_EDITOR_PREVIEW" | translatePipe }}:
+  {{ dateTimeSample | datetime : { customFormat: format.customFormat } }}
+      </pre>
+    }
 
     <!-- format legend -->
-    <pre class="format-legend">
-  YY    Two-digit year
-  YYYY  Four-digit year
-  M     Month
-  MM    Month, 2-digits
-  MMM   Abbreviated month name
-  MMMM  Full month name
-  D     Day of month
-  DD    Day of month, 2-digits
-  H     Hours
-  HH    Hours, 2-digits
-  h     Hours, 12-hour clock
-  hh    Hours, 12-hour clock, 2-digits
-  m     Minutes
-  mm    Minutes, 2-digits
-  s     Seconds
-  ss    Seconds, 2-digits
-  A     Post or ante meridiem, upper-case
-  a     Post or ante meridiem, lower-case
-    </pre>
-
+    @for (el of DATETIME_FORMAT_ELEMS; track el) {
+      <pre class="format-legend">{{ '  ' + el.padEnd(6, ' ') + (getElementKey(el) | translatePipe) }}</pre>
+    }
   </ion-list>
 
 </ion-content>
 
 <!-- footer -->
 <ion-footer class="right-container buttons-container">
-  <ion-button color="primary" fill="clear" (click)="cancel()">Cancel</ion-button>
-  <ion-button color="primary" fill="clear" (click)="confirm()">Ok</ion-button>
+  <ion-button color="primary" fill="clear" (click)="cancel()">{{
+    "LBL_CANCEL" | translatePipe
+  }}</ion-button>
+  <ion-button color="primary" fill="clear" (click)="confirm()">{{
+    "LBL_OK" | translatePipe
+  }}</ion-button>
 </ion-footer>

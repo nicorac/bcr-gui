@@ -2,12 +2,15 @@
   "name": "bcrgui",
   "version": "0.0.0",
   "author": "Claudio Nicora",
+  "description": "BCR-GUI is a companion app for BCR (Basic Call Recorder)",
   "homepage": "https://github.com/nicorac/bcr-gui",
   "scripts": {
     "ng": "ng",
     "start": "ionic serve",
     "build": "ng build",
-    "prebuild:android": "node scripts\\check-android-version.js",
+    "fix-android-permissions": "adb shell su -c chmod a+rw /proc/net/unix",
+    "check-i18n-files": "node -r ts-node/register scripts/check-i18n-files.ts",
+    "prebuild:android": "node scripts/check-android-version.js",
     "build:android": "ionic capacitor build android --no-open --prod && cd android && gradlew assembleRelease && cd ..",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
@@ -30,6 +33,7 @@
     "@capacitor/app": "^5.0.7",
     "@capacitor/clipboard": "^5.0.7",
     "@capacitor/core": "^5.7.1",
+    "@capacitor/device": "^5.0.7",
     "@capacitor/filesystem": "^5.2.1",
     "@capacitor/preferences": "^5.0.7",
     "@capacitor/share": "^5.0.7",
@@ -62,7 +66,7 @@
     "eslint": "^8.57.0",
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-jsdoc": "^48.2.0",
+    "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
-  },
-  "description": "BCR-GUI is a companion app for BCR (Basic Call Recorder)"
+  }
 }

@@ -17,9 +17,9 @@ export type ActionButton = {
   standalone: true,
   imports: [ AsyncPipe, NgFor, NgIf, IonicModule ]
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent {
 
-  @Input() title?: string = undefined;
+  @Input({ required: true }) title!: string;
   @Input() actionButtons?: ActionButton[];
   @Input() showCustomContent = false;
 
@@ -28,13 +28,5 @@ export class HeaderComponent implements OnInit {
     protected recordingsService: RecordingsService,
   )
   { }
-
-  ngOnInit(): void {
-    //Called after the constructor, initializing input properties, and the first call to ngOnChanges.
-    //Add 'implements OnInit' to the class.
-    if (this.title === undefined) {
-      this.title = this.route.snapshot.routeConfig?.title as string;
-    }
-  }
 
 }
