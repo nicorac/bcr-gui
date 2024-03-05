@@ -1,4 +1,5 @@
 .wrapper {
+  padding: .35em 0;
   display: grid;
   grid-template-columns: minmax(0, 1fr) max-content;
   gap: 1em;
@@ -7,8 +8,7 @@
 }
 
 .item-input .sc-ion-label-md-h,
-.in-item.legacy-select,
-.ion-label.label {
+.in-item.legacy-select {
   max-width: initial;
 }
 
@@ -19,6 +19,15 @@ ion-button {
 }
 
 .label {
+  display: flex;
+  flex-direction: column;
+  gap: .2em;
+  text-overflow: ellipsis;
+  .help {
+    color: var(--ion-color-step-600, #666666);
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
 }
 
 .phone-prefix {

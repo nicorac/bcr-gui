@@ -3,24 +3,24 @@ import { replaceExtension, stripExtension } from '../utils/filesystem';
 import { JsonProperty } from '../utils/json-serializer';
 import { BcrRecordingMetadata, CallDirection } from './BcrRecordingMetadata';
 
-export const FILENAME_PATTERN_SUPPORTED_VARS = {
-  'date': 'Full date in YYYYMMDD-HHmmss.ddd+ format',
-  'date:year': 'Year (4 digits)',
-  'date:month': 'Month (2 digits)',
-  'date:day': 'Day of month (2 digits)',
-  'date:hours': 'Hours (2 digits, 12H or 24H)',
-  'date:minutes': 'Minutes (2 digits)',
-  'date:seconds': 'Seconds (2 digits)',
-  'date:ampm': 'AM/PM indicator (can be AM or PM, case insensitive)',
-  'date:tzHours': 'Timezone hours (2 digits): +02, -06, +00',
-  'date:tzMinutes': 'Timezone minutes (2 digits)',
-  'direction': 'Call direction: "in" | "out" | "conference"',
-  'sim_slot': 'SIM slot number: 0, 1, 2, undefined',
-  'phone_number': 'Caller phone number: 0-9, +, -, <space>',
-  'caller_name': 'Caller name: any character',
-  'contact_name': 'Caller name: any character',
-  'call_log_name': 'Caller name: any character',
-};
+export const FILENAME_PATTERN_SUPPORTED_VARS = [
+  'date',
+  'date:year',
+  'date:month',
+  'date:day',
+  'date:hours',
+  'date:minutes',
+  'date:seconds',
+  'date:ampm',
+  'date:tzHours',
+  'date:tzMinutes',
+  'direction',
+  'sim_slot',
+  'phone_number',
+  'caller_name',
+  'contact_name',
+  'call_log_name',
+];
 
 // default (well-known) filename patterns
 export const FILENAME_PATTERN_TEMPLATES: { name:string, pattern:string }[] = [
@@ -269,7 +269,7 @@ export class Recording {
 
     // all variables must exist
     for (const v of vars) {
-      if (!Object.keys(FILENAME_PATTERN_SUPPORTED_VARS).includes(v)) {
+      if (!FILENAME_PATTERN_SUPPORTED_VARS.includes(v)) {
         return `Unsupported variable {${v}}`;
       }
     }

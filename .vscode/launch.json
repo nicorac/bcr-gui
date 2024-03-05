@@ -21,5 +21,16 @@
       "webRoot": "${workspaceFolder}",
       "preLaunchTask": "Ionic serve (localhost)",
     },
+    {
+      "name": "Check i18n files",
+      "request": "launch",
+      "runtimeArgs": [ "run-script", "check-i18n-files" ],
+      "runtimeExecutable": "npm",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "type": "node",
+      "console": "integratedTerminal"
+    }
   ],
 }

@@ -1,5 +1,7 @@
 import { HeaderComponent } from 'src/app/components/header/header.component';
 import { DatetimePipe } from 'src/app/pipes/datetime.pipe';
+import { TranslatePipe } from 'src/app/pipes/translate.pipe';
+import { I18nKey, I18nService } from 'src/app/services/i18n.service';
 import { AppDateTimeFormat, SettingsService } from 'src/app/services/settings.service';
 import { NgIf } from '@angular/common';
 import { Component } from '@angular/core';
@@ -16,7 +18,8 @@ import { IonicModule, ModalController } from '@ionic/angular';
     FormsModule,
     HeaderComponent,
     IonicModule,
-    NgIf
+    NgIf,
+    TranslatePipe,
   ],
 })
 export class DatetimeFormatEditorComponent {
@@ -28,7 +31,30 @@ export class DatetimeFormatEditorComponent {
 
   protected format!: AppDateTimeFormat;
 
+  // datetime format elements
+  protected readonly DATETIME_FORMAT_ELEMS = [
+    'YY',
+    'YYYY',
+    'M',
+    'MM',
+    'MMM',
+    'MMMM',
+    'D',
+    'DD',
+    'H',
+    'HH',
+    'h',
+    'hh',
+    'm',
+    'mm',
+    's',
+    'ss',
+    'A',
+    'a',
+  ];
+
   constructor(
+    protected i18n: I18nService,
     protected mc: ModalController,
     protected settings: SettingsService,
   ) {
@@ -46,6 +72,10 @@ export class DatetimeFormatEditorComponent {
     await this.settings.save();
     location.reload();  // force page reload to clear pipes cache (if date format has changed)
     this.cancel();
+  }
+
+  protected getElementKey(el: string): I18nKey {
+    return <I18nKey>("DTF_EDITOR_PH_" + el);
   }
 
 }

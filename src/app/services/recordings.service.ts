@@ -149,9 +149,12 @@ export class RecordingsService {
       await this.save();
 
     }
-    catch(err) {
-      console.error(err);
-      this.mbs.showError({ message: 'Error updating cache', error: err });
+    catch(error) {
+      console.error(error);
+      this.mbs.showError({
+        appErrorCode: 'ERR_DB001',
+        error
+      });
     };
 
     this.refreshProgress.next(0);
@@ -184,7 +187,8 @@ export class RecordingsService {
       }
       catch(err) {
         this.mbs.showError({
-          message: 'There was an error while deleting item: ' + fileUri,
+          appErrorCode: 'ERR_OS004',
+          appErrorArgs: { filename: fileUri },
           error: err,
         });
         return false;
@@ -215,6 +219,7 @@ export class RecordingsService {
    */
   async selectRecordingsDirectory(afterSelect?: () => void) {
 
+    // TODO: fix!
     const alert = await this.alertController.create({
       header: 'Select recordings directory',
       message: new IonicSafeString(
@@ -241,6 +246,10 @@ export class RecordingsService {
             }
             catch (error: any) {
               if (error.code !== ErrorCode.ERR_CANCELED) {
+                this.mbs.showError({
+                  appErrorCode: 'ERR_OS005',
+                  error,
+                })
                 console.error('Error selecting directory:', error);
               }
             }
@@ -294,14 +303,17 @@ export class RecordingsService {
             }
           }
           else {
-            this.mbs.showError({ error, message: 'Error reading database content' });
+            this.mbs.showError({
+              appErrorCode: 'ERR_DB002',
+              error,
+            });
           }
         }
       }
 
     } catch (error) {
       this.mbs.showError({
-        message: 'Error loading database',
+        appErrorCode: 'ERR_DB002',
         error,
       });
     }
@@ -344,7 +356,7 @@ export class RecordingsService {
 
     } catch (error) {
       this.mbs.showError({
-        message: 'Error saving database',
+        appErrorCode: 'ERR_DB003',
         error,
       });
     }

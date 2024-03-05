@@ -2,10 +2,11 @@ import { Subscription } from 'rxjs';
 import { Recording } from 'src/app/models/recording';
 import { DatetimePipe } from 'src/app/pipes/datetime.pipe';
 import { ToHmsPipe } from 'src/app/pipes/to-hms.pipe';
+import { MessageBoxService } from 'src/app/services/message-box.service';
 import { SettingsService } from 'src/app/services/settings.service';
 import { AudioPlayer, IBaseParams } from 'src/plugins/audioplayer';
 import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { AlertController, IonicModule, RangeCustomEvent } from '@ionic/angular';
+import { IonicModule, RangeCustomEvent } from '@ionic/angular';
 
 export enum PlayerStatusEnum {
   Paused = 0,
@@ -37,9 +38,6 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
   private removePlayCompletedListener?: () => Promise<void>;
   private removeUpdateListener?: () => Promise<void>;
 
-  // play update interval
-  private updateInterval?: ReturnType<typeof setInterval>;
-
   // inputs
   @Input({ required: true }) recording!: Recording;
 
@@ -48,9 +46,9 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
 
 
   constructor(
-    private alertController: AlertController,
     private cdr: ChangeDetectorRef,
     private dateTimePipe: DatetimePipe,
+    private mbs: MessageBoxService,
     private settings: SettingsService,
   ) { }
 
@@ -60,7 +58,7 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
       // preload audio file
       await this.preloadAudio();
     } catch (error: any) {
-      this.showError(error.message);
+      this.showError(error, 'ngOnInit()');
     }
 
   }
@@ -76,53 +74,50 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
    */
   private async preloadAudio() {
 
-    await AudioPlayer.init({
-      fileUri: this.recording.audioUri,
-      notificationTitle: this.recording.opName,
-      notificationText: this.dateTimePipe.transform(this.recording.date, this.settings.dateTimeFormat),
-    })
-      .then(res => {
-        this.playerRef = res;
+    try {
 
-        // subscribe to playComplete event
-        AudioPlayer.addListener('playCompleted', (res) => {
-          if (res.id === this.playerRef?.id) {
-            this.status = PlayerStatusEnum.Paused;
-            this.progress = 0;
-            this.cdr.detectChanges(); // workaround needed to let Angular update values...
-          }
-        }).then(res => {
-          // save reference to listener remove function
-          this.removePlayCompletedListener = res.remove;
-        });
+      this.playerRef = await AudioPlayer.init({
+        fileUri: this.recording.audioUri,
+        notificationTitle: this.recording.opName,
+        notificationText: this.dateTimePipe.transform(this.recording.date, this.settings.dateTimeFormat),
+      });
 
-        // subscribe to update event
-        AudioPlayer.addListener('update', (res) => {
-          if (res.id === this.playerRef?.id) {
-            this.progress = Math.floor(res.position / 1000);
-          }
-        }).then(res => {
-          // save reference to listener remove function
-          this.removeUpdateListener = res.remove;
-        });
+      // subscribe to playComplete event and
+      // save reference to listener remove function
+      this.removePlayCompletedListener = await AudioPlayer.addListener('playCompleted', (res) => {
+        if (res.id === this.playerRef?.id) {
+          this.status = PlayerStatusEnum.Paused;
+          this.progress = 0;
+          this.cdr.detectChanges(); // workaround needed to let Angular update values...
+        }
+      }).remove;
 
-        // get audio duration
-        AudioPlayer.getDuration(this.playerRef!).then(res2 => {
-          this.duration = res2.duration / 1000;
+      // subscribe to update event and
+      // save reference to listener remove function
+      this.removeUpdateListener = await AudioPlayer.addListener('update', (res) => {
+        if (res.id === this.playerRef?.id) {
+          this.progress = Math.floor(res.position / 1000);
+        }
+      }).remove;
 
-          // set duration to recording item
-          // (if not already set with JSON metadata file)
-          if (!this.recording.duration) {
-            this.recording.duration = this.duration;
-          }
-          // init complete
-          this.ready = true;
-        })
-      })
-      .catch(error => this.showError(error.message));
+      // get audio duration
+      this.duration = (await AudioPlayer.getDuration(this.playerRef!)).duration / 1000;
 
-    // workaround needed to let Angular update values...
-    this.cdr.detectChanges();
+      // set duration to recording item
+      // (if not already set with JSON metadata file)
+      if (!this.recording.duration) {
+        this.recording.duration = this.duration;
+      }
+
+      // init complete
+      this.ready = true;
+
+      // workaround needed to let Angular update values...
+      this.cdr.detectChanges();
+
+    } catch (error) {
+      this.showError(error, 'preloadAudio()')
+    }
 
   }
 
@@ -131,7 +126,6 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
    */
   public async unloadAudio() {
 
-    await this.stopUpdateInterval();
     this.status = PlayerStatusEnum.Paused;
     this.ready = false;
 
@@ -143,45 +137,15 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Start a JS interval to update player status
-   */
-  private startUpdateInterval() {
-
-    // this.stopUpdateInterval();
-
-    // // start update interval
-    // this.updateInterval = setInterval(() => {
-    //   AudioPlayer.getCurrentTime(this.playerRef!).then(res => {
-    //     if (!this.isMovingKnob) {
-    //       this.progress = Math.ceil(res.currentTime / 1000);
-    //     }
-    //   });
-    // }, 500);
-
-  }
-
-  /**
-   * Clear update interval
-   */
-  private stopUpdateInterval() {
-
-    // if (this.updateInterval) {
-    //   clearInterval(this.updateInterval);
-    // }
-
-  }
-
-  /**
    * Show error alert
    */
-  private async showError(error: string) {
-    const alert = await this.alertController.create({
-      header: 'Play error',
-      message: error,
-      buttons: [ 'Close' ],
+  private showError(error: any, context: string) {
+    this.mbs.showError({
+      error: error,
+      appErrorCode: 'ERR_PLAYER',
+      appErrorArgs: { context: context },
     });
-    await alert.present();
-  }
+}
 
   /**
    * Toggle between play and pause
@@ -207,9 +171,8 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
     AudioPlayer.play({ id: this.playerRef!.id, position: position * 1000 })
       .then(async _ => {
         this.status = PlayerStatusEnum.Playing;
-        this.startUpdateInterval();
       })
-      .catch(error => this.showError(error.message));
+      .catch(error => this.showError(error, 'play()'));
   }
 
   /**
@@ -232,9 +195,8 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
     await AudioPlayer.pause(this.playerRef!)
       .then(_ => {
         this.status = PlayerStatusEnum.Paused;
-        this.stopUpdateInterval();
       })
-      .catch(error => this.showError(error.message));
+      .catch(error => this.showError(error, 'pause()'));
   }
 
   /**

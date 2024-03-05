@@ -1,6 +1,7 @@
 import { BehaviorSubject } from 'rxjs';
 import { AndroidDateTimeSettings } from 'src/plugins/androiddatetimesettings';
 import { Injectable } from '@angular/core';
+import { Device } from '@capacitor/device';
 import { Preferences } from '@capacitor/preferences';
 import { FILENAME_PATTERN_TEMPLATES } from '../models/recording';
 import { deserializeObject, JsonProperty, serializeObject } from '../utils/json-serializer';
@@ -101,6 +102,26 @@ export class SettingsService {
   }
   private _appearance: Appearance = 'system';
 
+  /**
+   * Configured app culture
+   *  '': use system default
+   *  string (i.e. 'it-IT') forces this culture
+   */
+  @JsonProperty()
+  public get culture(): string {
+    return this._culture;
+  };
+  public set culture(value: string) {
+    this._culture = value;
+    this.save();
+  }
+  private _culture = '';
+
+  public get defaultCulture(): string {
+    return this._defaultCulture;
+  };
+  private _defaultCulture = '';
+
   // attach to system settings
   private systemThemeModeChangeDetector?:MediaQueryList;
   private systemThemeMode: Theme = 'dark'; // set dark as default to avoid "light" flash at startup when dark is set
@@ -135,7 +156,7 @@ export class SettingsService {
 
   constructor(
     private mbs: MessageBoxService,
-  ) {}
+  ) { }
 
   /**
    * Load app settings from storage
@@ -144,6 +165,7 @@ export class SettingsService {
 
     // load android settings
     ({ is12Hours: this.is12Hours } = await AndroidDateTimeSettings.is12Hours());
+    this._defaultCulture = (await Device.getLanguageTag()).value;
 
     // load settings
     const { value: jsonContent } = await Preferences.get({ key: 'settings' });
@@ -153,7 +175,10 @@ export class SettingsService {
         let jsonObj = JSON.parse(jsonContent);
         deserializeObject(jsonObj, this);
       } catch (error) {
-        this.mbs.showError({ error: error, message: 'Error reading settings' });
+        this.mbs.showError({
+          error: error,
+          appErrorCode: 'ERR_CFG001',
+        });
       } finally {
         this.isLoadingSaving = false;
       }
@@ -183,8 +208,11 @@ export class SettingsService {
       const jsonObj = serializeObject(this);
       return Preferences.set({ key: 'settings', value: JSON.stringify(jsonObj) });
     } catch (error) {
-      this.mbs.showError({ error, message: 'Error saving settings'});
-    } finally {
+      this.mbs.showError({
+        error: error,
+        appErrorCode: 'ERR_CFG002',
+      });
+  } finally {
       this.isLoadingSaving = false;
     }
   }

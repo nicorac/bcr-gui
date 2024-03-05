@@ -11,6 +11,7 @@ import { AudioPlayerComponent } from './components/audio-player/audio-player.com
 import { CallIconComponent } from './components/call-icon/call-icon.component';
 import { HeaderComponent } from './components/header/header.component';
 import { VirtualScrollbarComponent } from './components/virtual-scrollbar/virtual-scrollbar.component';
+import { IonicI18nDirective } from './directives/ionic-i18n.directive';
 import { LongPressDirective } from './directives/long-press.directive';
 import { AboutPage } from './pages/about/about.page';
 import { MainPage } from './pages/main/main.page';
@@ -19,8 +20,9 @@ import { SettingsPage } from './pages/settings/settings.page';
 import { DatetimePipe } from './pipes/datetime.pipe';
 import { FilesizePipe } from './pipes/filesize.pipe';
 import { ToHmsPipe } from './pipes/to-hms.pipe';
+import { TranslatePipe } from './pipes/translate.pipe';
 import { ContactsService } from './services/contacts.service';
-import { RecordingsService } from './services/recordings.service';
+import { I18nService } from './services/i18n.service';
 import { SettingsService } from './services/settings.service';
 import version from './version';
 
@@ -43,17 +45,19 @@ import version from './version';
     DatetimePipe,
     FormsModule,
     HeaderComponent,
+    IonicI18nDirective,
     IonicModule.forRoot({ innerHTMLTemplatesEnabled: true }),
     LongPressDirective,
     RouterModule,
     ScrollingModule,
     ToHmsPipe,
+    TranslatePipe,
   ],
   providers: [
     ContactsService,
     DatePipe,
     ToHmsPipe,
-    { provide: APP_INITIALIZER, useFactory: appInitializer, deps: [ RecordingsService, SettingsService, Platform ], multi: true },
+    { provide: APP_INITIALIZER, useFactory: appInitializer, deps: [ I18nService, SettingsService, Platform ], multi: true },
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
   ],
   bootstrap: [
@@ -65,7 +69,7 @@ export class AppModule {}
 /**
  * Load settings and set languages before app start
  */
-function appInitializer(recordingsService: RecordingsService, settings: SettingsService, platform: Platform) {
+function appInitializer(i18n: I18nService, settings: SettingsService, platform: Platform) {
   return async () => {
 
     // if (!environment.production) {
@@ -78,6 +82,10 @@ function appInitializer(recordingsService: RecordingsService, settings: Settings
     // initialize version & settings
     await version.initialize();
     await settings.initialize();
+
+    // initialize i18n & load culture
+    await i18n.initialize();
+    await i18n.load(settings.culture ? settings.culture : settings.defaultCulture);
 
   }
 }
