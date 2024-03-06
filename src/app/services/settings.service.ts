@@ -115,7 +115,7 @@ export class SettingsService {
   //#endregion
 
   /**
-   * Supported file types
+   * Supported file MIME types
    */
   public readonly supportedTypes: string[] = [
     'audio/flac',
@@ -123,6 +123,8 @@ export class SettingsService {
     'audio/ogg',
     'audio/x-wav',
     'audio/amr',
+    'audio/amr-wb',
+    'audio/amr-wb+',
   ];
 
   /**

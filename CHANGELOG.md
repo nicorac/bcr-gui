@@ -1,5 +1,11 @@
 # Version history
 
+## Version 1.6.1 (2024-03-07)
+
+New features:
+
+- Added support to AMR-WB and AMR-WB+ recordings (fixes #96)
+
 ## Version 1.6.0 (2024-02-29)
 
 New features:
