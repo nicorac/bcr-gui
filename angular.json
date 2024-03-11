@@ -22,6 +22,21 @@
             "assets": [
               {
                 "glob": "**/*",
+                "input": "src/assets/icons",
+                "output": "assets/icons"
+              },
+              {
+                "glob": "**/*",
+                "input": "src/assets/images",
+                "output": "assets/images"
+              },
+              {
+                "glob": "**/*.json",
+                "input": "src/assets/i18n",
+                "output": "assets/i18n"
+              },
+              {
+                "glob": "**/*",
                 "input": "src/assets",
                 "output": "assets"
               },
