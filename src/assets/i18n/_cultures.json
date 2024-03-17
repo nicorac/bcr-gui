@@ -1,4 +1,5 @@
 [
   { "id": "en-US", "name": "English (US)" },
-  { "id": "it-IT", "name": "Italiano" }
+  { "id": "it-IT", "name": "Italiano" },
+  { "id": "es-ES", "name": "Español" }
 ]
