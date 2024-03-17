@@ -1,5 +1,19 @@
 # Version history
 
+## Version 1.7.0 (2024-03-17)
+
+New features:
+
+- Added application localizations (#99). \
+  Currently supported languages:
+  - English (@nicorac)
+  - Italian (@nicorac)
+  - Spanish (thanks to @gallegonovato)
+
+Bug fixes:
+
+- Fixed layout of filename pattern editor placeholders and templates action sheets
+
 ## Version 1.6.1 (2024-03-07)
 
 New features:
