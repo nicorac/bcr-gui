@@ -16,7 +16,7 @@ export class AboutPage {
   private backSub?: Subscription;
   protected readonly descData = {
     appName: version.appName,
-    bcrLink: `<a href="https://github.com/chenxiaolong/BCR">BCR</a>`,
+    bcrLink: version.bcrUri,
   };
 
   constructor(

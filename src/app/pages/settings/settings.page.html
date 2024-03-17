@@ -42,7 +42,12 @@
 
     <ion-item>
       <div class="wrapper">
-        <div class="label">{{ 'SETTINGS_LANGUAGE' | translatePipe }}</div>
+        <div class="label">
+          {{ 'SETTINGS_LANGUAGE' | translatePipe }}
+          <div class="help">{{ 'SETTINGS_LANGUAGE_TEXT' | translatePipe }}<br/>
+          (<a href="{{ version.addLanguageUri }}">{{ 'SETTINGS_LANGUAGE_ADD' | translatePipe }}</a>)
+          </div>
+        </div>
         <ion-select
           [(ngModel)]="settings.culture"
           (ngModelChange)="clearPipesCache()"

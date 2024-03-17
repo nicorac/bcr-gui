@@ -4,6 +4,7 @@ import { I18nService } from 'src/app/services/i18n.service';
 import { MessageBoxService } from 'src/app/services/message-box.service';
 import { RecordingsService } from 'src/app/services/recordings.service';
 import { SortModeEnum } from 'src/app/utils/recordings-sorter';
+import version from 'src/app/version';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { ModalController, Platform } from '@ionic/angular';
@@ -18,7 +19,8 @@ import { FilenamePatternEditorComponent } from './filename-pattern-editor/filena
 })
 export class SettingsPage {
 
-  SortMode = SortModeEnum;
+  protected SortMode = SortModeEnum;
+  protected version = version;
 
   protected editor?: HTMLIonModalElement;
 

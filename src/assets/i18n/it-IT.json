@@ -110,6 +110,8 @@
     "SETTINGS_FILENAME_PATTERN": "Modello del nome file",
     "SETTINGS_GENERAL_SECTION": "Generale",
     "SETTINGS_LANGUAGE": "Lingua",
+    "SETTINGS_LANGUAGE_ADD": "aggiungi nuova lingua",
+    "SETTINGS_LANGUAGE_TEXT": "Lingua applicazione",
     "SETTINGS_MAKE_SELECTION": "Seleziona un elemento",
     "SETTINGS_PLAYER_SECTION": "Riproduzione",
     "SETTINGS_PLAYER_SEEK_TIME": "Intervallo ricerca",

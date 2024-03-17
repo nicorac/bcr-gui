@@ -14,6 +14,8 @@ class versionClass {
   readonly copyright = "Claudio Nicora (nicorac) 2023";
   readonly websiteUri = "https://coolsoft.altervista.org";
   readonly sourcesUri = "https://github.com/nicorac/bcr-gui";
+  readonly addLanguageUri = "https://github.com/nicorac/bcr-gui/issues/99";
+  readonly bcrUri = "https://github.com/chenxiaolong/BCR";
 
   // read version
   async initialize() {
