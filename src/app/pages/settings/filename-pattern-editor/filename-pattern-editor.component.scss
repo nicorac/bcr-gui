@@ -15,12 +15,6 @@
   --padding-bottom: .5em;
 }
 
-.section-title {
-  font-size: 20px;
-  font-weight: 500;
-  line-height: 1.2;
-}
-
 .section {
   display: flex;
   flex-direction: column;
@@ -32,16 +26,6 @@
   font-size: 1.2em;
   background-color: var(--ion-item-background);
   padding: .5em;
-}
-
-.var-buttons-wrapper {
-  display: flex;
-  flex-wrap: wrap;
-  gap: .2em;
-}
-
-.var-button {
-  width: max-content;
 }
 
 .error {

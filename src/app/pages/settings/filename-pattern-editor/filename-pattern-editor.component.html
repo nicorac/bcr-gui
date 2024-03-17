@@ -4,113 +4,112 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content class="ion-padding content">
 
-  <div class="content">
+  <!-- pattern -->
+  <!-- <div class="section"> -->
+    <h5>{{ 'FNP_EDITOR_PATTERN' | translatePipe }}</h5>
+    <ion-label class="help">{{ 'FNP_EDITOR_PATTERN_TEXT' | translatePipe }}</ion-label>
 
     <!-- pattern -->
-    <div class="section">
-      <div class="section-title">{{ 'FNP_EDITOR_PATTERN' | translatePipe }}</div>
-      <ion-label>{{ 'FNP_EDITOR_PATTERN_TEXT' | translatePipe }}</ion-label>
+    <ion-textarea #patternField class="pattern-field"
+      fill="outline"
+      rows="5"
+      autocapitalize="off"
+      debounce="1000"
+      [(ngModel)]="pattern"
+      (ngModelChange)="validatePattern()"
+    />
+    <div class="error" *ngIf="patternError">{{ patternError }}</div>
+    <div class="right-container">
 
-      <!-- pattern -->
-      <ion-textarea #patternField class="pattern-field"
-        fill="outline"
-        rows="5"
-        autocapitalize="off"
-        debounce="1000"
-        [(ngModel)]="pattern"
-        (ngModelChange)="validatePattern()"
-      />
-      <div class="error" *ngIf="patternError">{{ patternError }}</div>
-      <div class="right-container">
+      <!-- placeholders button -->
+      <ion-button id="placeholders-button" color="primary" fill="clear">
+        {{ 'FNP_EDITOR_PLACEHOLDERS' | translatePipe }}
+      </ion-button>
 
-        <!-- placeholders button -->
-        <ion-button id="placeholders-button" color="primary" fill="clear">
-          {{ 'FNP_EDITOR_PLACEHOLDERS' | translatePipe }}
-        </ion-button>
+      <!-- placeholders sheet -->
+      <ion-modal
+        #placeholdersModal
+        class="sheet-list actions"
+        trigger="placeholders-button"
+        [initialBreakpoint]="1" [breakpoints]="[0, 1]"
+      >
+        <ng-template>
+          <ion-toolbar slot="fixed">
+            <ion-title>{{ 'FNP_EDITOR_PLACEHOLDERS' | translatePipe }}</ion-title>
+          </ion-toolbar>
+          <ion-content>
+            <ion-list>
+              <ion-item *ngFor="let item of placeholders" (click)="insertPlaceholder(item.text);">
+                <ion-label>
+                  <h2>{{ item.text }}</h2>
+                  <p class="description">{{ item.description }}</p>
+                </ion-label>
+              </ion-item>
+            </ion-list>
+          </ion-content>
+        </ng-template>
+      </ion-modal>
 
-        <!-- placeholders sheet -->
-        <ion-modal
-          #placeholdersModal
-          class="sheet-list actions"
-          trigger="placeholders-button"
-          initialBreakpoint="0.50"
-        >
-          <ng-template>
-            <ion-toolbar slot="fixed">
-              <ion-title>{{ 'FNP_EDITOR_PLACEHOLDERS' | translatePipe }}</ion-title>
-            </ion-toolbar>
-            <ion-content>
-              <ion-list>
-                <ion-item *ngFor="let item of placeholders" (click)="insertPlaceholder(item.text);">
-                  <ion-label>
-                    <h2>{{ item.text }}</h2>
-                    <p class="description">{{ item.description }}</p>
-                  </ion-label>
-                </ion-item>
-              </ion-list>
-            </ion-content>
-          </ng-template>
-        </ion-modal>
+      <!-- load template pattern button -->
+      <ion-button id="templates-button" color="primary" fill="clear">
+        {{ 'FNP_EDITOR_TEMPLATES' | translatePipe }}
+      </ion-button>
 
-        <!-- load template pattern button -->
-        <ion-button id="templates-button" color="primary" fill="clear">
-          {{ 'FNP_EDITOR_TEMPLATES' | translatePipe }}
-        </ion-button>
-
-        <!-- pattern templates sheet -->
-        <ion-modal
-          #templateLoadModal
-          class="sheet-list actions"
-          trigger="templates-button"
-          initialBreakpoint="0.25"
-        >
-          <ng-template>
-            <ion-toolbar slot="fixed">
-              <ion-title>{{ 'FNP_EDITOR_TEMPLATES' | translatePipe }}</ion-title>
-            </ion-toolbar>
-            <ion-content>
-              <ion-list>
-                <ion-item *ngFor="let item of FILENAME_PATTERN_TEMPLATES" (click)="loadTemplate(item.pattern);">
-                  <ion-label>
-                    <h2>{{ item.name }}</h2>
-                    <p class="description">{{ item.pattern }}</p>
-                  </ion-label>
-                </ion-item>
-              </ion-list>
-            </ion-content>
-          </ng-template>
-        </ion-modal>
+      <!-- pattern templates sheet -->
+      <ion-modal
+        #templateLoadModal
+        class="sheet-list actions"
+        trigger="templates-button"
+        [initialBreakpoint]="1" [breakpoints]="[0, 1]"
+      >
+        <ng-template>
+          <ion-toolbar slot="fixed">
+            <ion-title>{{ 'FNP_EDITOR_TEMPLATES' | translatePipe }}</ion-title>
+          </ion-toolbar>
+          <ion-content>
+            <ion-list>
+              <ion-item *ngFor="let item of FILENAME_PATTERN_TEMPLATES" (click)="loadTemplate(item.pattern);">
+                <ion-label>
+                  <h2>{{ item.name }}</h2>
+                  <p class="description">{{ item.pattern }}</p>
+                </ion-label>
+              </ion-item>
+            </ion-list>
+          </ion-content>
+        </ng-template>
+      </ion-modal>
 
 
-      </div>
     </div>
+  <!-- </div> -->
 
-    <!-- test filename -->
-    <div class="section">
-      <div class="section-title">{{ 'FNP_EDITOR_TEST' | translatePipe }}</div>
-      <ion-textarea class="pattern-field"
-        type="text"
-        [(ngModel)]="testFilename"
-        placeholder="{{ 'FNP_EDITOR_TEST_INFO' | translatePipe }}"
-      />
-      <div class="right-container buttons-container">
-        <ion-button fill="clear" (click)="selectTestFile()">
-          {{ 'FNP_EDITOR_TEST_SELECT' | translatePipe }}
-        </ion-button>
-        <ion-button fill="clear" (click)="testPattern()" [disabled]="!testFilename">
-          {{ 'FNP_EDITOR_TEST_RUN' | translatePipe }}
-        </ion-button>
-      </div>
+  <!-- test filename -->
+  <div class="section">
+    <h5>
+      {{ 'FNP_EDITOR_TEST' | translatePipe }}
+    </h5>
+    <ion-textarea class="pattern-field"
+      type="text"
+      [(ngModel)]="testFilename"
+      placeholder="{{ 'FNP_EDITOR_TEST_INFO' | translatePipe }}"
+    />
+
+    <div class="right-container buttons-container">
+      <ion-button fill="clear" (click)="selectTestFile()">
+        {{ 'FNP_EDITOR_TEST_SELECT' | translatePipe }}
+      </ion-button>
+      <ion-button fill="clear" (click)="testPattern()" [disabled]="!testFilename">
+        {{ 'FNP_EDITOR_TEST_RUN' | translatePipe }}
+      </ion-button>
     </div>
+  </div>
 
-    <!-- test result -->
-    <div class="section" *ngIf="testResult">
-      <ion-label>Test result</ion-label>
-      <pre class="result">{{ testResult }}</pre>
-    </div>
-
+  <!-- test result -->
+  <div class="section" *ngIf="testResult">
+    <ion-label>Test result</ion-label>
+    <pre class="result">{{ testResult }}</pre>
   </div>
 
 </ion-content>

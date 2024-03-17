@@ -8,7 +8,7 @@ import { IonModal, IonTextarea, ModalController, Platform } from '@ionic/angular
 @Component({
   selector: 'app-filename-pattern-editor',
   templateUrl: './filename-pattern-editor.component.html',
-  styleUrls: ['./filename-pattern-editor.component.scss'],
+  styleUrls: ['../shared.scss', './filename-pattern-editor.component.scss'],
 })
 export class FilenamePatternEditorComponent implements OnInit {
 

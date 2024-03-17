@@ -1,0 +1,16 @@
+.ion-padding {
+  --padding-top: 0;
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  gap: .2em;
+  text-overflow: ellipsis;
+}
+
+.help {
+  color: var(--ion-color-step-600, #666666);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}

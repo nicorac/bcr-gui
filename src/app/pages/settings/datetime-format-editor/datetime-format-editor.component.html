@@ -1,14 +1,12 @@
 <app-header title="{{ 'DTF_EDITOR_TITLE' | translatePipe }}" />
 
 <ion-content class="ion-padding">
-  <ion-list class="config-items" lines="full">
-    <ion-item-divider>
-      <h4>{{ "DTF_EDITOR_STANDARD_FORMATS" | translatePipe }}</h4>
-    </ion-item-divider>
+
+    <!-- standard formats -->
+    <h5>{{ 'DTF_EDITOR_STANDARD_FORMATS' | translatePipe }}</h5>
 
     <!-- date format -->
     <ion-item>
-      <!-- (ngModelChange)="updateDateTimeStyle($event, 'dateStyle')" -->
       <ion-select
         label="{{ 'DTF_EDITOR_DATE_FORMAT' | translatePipe }}"
         [disabled]="(format.customFormat?.length ?? 0) > 0"
@@ -36,7 +34,6 @@
 
     <!-- time format -->
     <ion-item>
-      <!-- (ngModelChange)="updateDateTimeStyle($event, 'timeStyle')" -->
       <ion-select
         label="{{ 'DTF_EDITOR_TIME_FORMAT' | translatePipe }}"
         [disabled]="(format.customFormat?.length ?? 0) > 0"
@@ -67,9 +64,7 @@
     </ion-item>
 
     <!-- custom format -->
-    <ion-item-divider>
-      <h4>{{ "DTF_EDITOR_CUSTOM_FORMAT" | translatePipe }}</h4>
-    </ion-item-divider>
+    <h5>{{ 'DTF_EDITOR_CUSTOM_FORMAT' | translatePipe }}</h5>
 
     <ion-item>
       <ion-input
@@ -90,7 +85,6 @@
     @for (el of DATETIME_FORMAT_ELEMS; track el) {
       <pre class="format-legend">{{ '  ' + el.padEnd(6, ' ') + (getElementKey(el) | translatePipe) }}</pre>
     }
-  </ion-list>
 
 </ion-content>
 
