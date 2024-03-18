@@ -66,6 +66,7 @@
     "FNP_EDITOR_VAR_date:tzHours": "Ora fuso orario (2 cifre): +02, -06, +00",
     "FNP_EDITOR_VAR_date:tzMinutes": "Minuti fuso orario (2 cifre)",
     "FNP_EDITOR_VAR_date:year": "Anno (4 cifre)",
+    "FNP_EDITOR_VAR_date:year2": "Anno (2 cifre)",
     "FNP_EDITOR_VAR_direction": "Direzione chiamata: %values%",
     "FNP_EDITOR_VAR_phone_number": "Numero chiamante: 0-9, +, -, <spazio>",
     "FNP_EDITOR_VAR_sim_slot": "SIM slot: 0, 1, 2, non definito",
