@@ -26,8 +26,9 @@ export const FILENAME_PATTERN_SUPPORTED_VARS = [
 // default (well-known) filename patterns
 export const FILENAME_PATTERN_TEMPLATES: { name:string, pattern:string }[] = [
   { name: 'BCR (Basic Call Recorder)', pattern: '^{date}(_{direction})?(_sim{sim_slot})?_{phone_number}(_{contact_name})?' },
-  { name: 'GrapheneOS Call Recorder', pattern: '^CallRecord_{date:year}{date:month}{date:day}-{date:hours}{date:minutes}{date:seconds}_{phone_number}' },
-  { name: 'Huawei Call Recorder', pattern: '^{contact_name}@{phone_number}_{date:year}{date:month}{date:day}{date:hours}{date:minutes}{date:seconds}' },
+  { name: 'ColorOS call recorder', pattern: '^{contact_name}-{date:year2}{date:month}{date:day}{date:hours}{date:minutes}' },
+  { name: 'GrapheneOS call recorder', pattern: '^CallRecord_{date:year}{date:month}{date:day}-{date:hours}{date:minutes}{date:seconds}_{phone_number}' },
+  { name: 'Huawei call recorder', pattern: '^{contact_name}@{phone_number}_{date:year}{date:month}{date:day}{date:hours}{date:minutes}{date:seconds}' },
 ]
 
 /**
