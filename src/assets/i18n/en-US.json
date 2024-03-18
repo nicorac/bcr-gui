@@ -66,6 +66,7 @@
     "FNP_EDITOR_VAR_date:tzHours": "Timezone hours (2 digits): +02, -06, +00",
     "FNP_EDITOR_VAR_date:tzMinutes": "Timezone minutes (2 digits)",
     "FNP_EDITOR_VAR_date:year": "Year (4 digits)",
+    "FNP_EDITOR_VAR_date:year2": "Year (2 digits)",
     "FNP_EDITOR_VAR_direction": "Call direction: %values%",
     "FNP_EDITOR_VAR_phone_number": "Caller phone number: 0-9, +, -, <space>",
     "FNP_EDITOR_VAR_sim_slot": "SIM slot number: 0, 1, 2, undefined",

@@ -106,6 +106,7 @@
     "FNP_EDITOR_VAR_date:month": "Mes (2 dígitos)",
     "FNP_EDITOR_VAR_date:seconds": "Segundos (2 dígitos)",
     "FNP_EDITOR_VAR_date:year": "Año (4 dígitos)",
+    "FNP_EDITOR_VAR_date:year2": "Año (2 dígitos)",
     "FNP_EDITOR_VAR_direction": "Sentido de la llamada: %values%",
     "FNP_EDITOR_VAR_phone_number": "Número de teléfono de la persona que llama: 0-9, +, -, <space>",
     "HOME_DELETE_CONFIRM_TEXT#N": "¿Realmente quieres borrar %value% grabaciones seleccionadas?",

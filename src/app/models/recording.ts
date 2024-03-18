@@ -6,6 +6,7 @@ import { BcrRecordingMetadata, CallDirection } from './BcrRecordingMetadata';
 export const FILENAME_PATTERN_SUPPORTED_VARS = [
   'date',
   'date:year',
+  'date:year2',
   'date:month',
   'date:day',
   'date:hours',
@@ -181,7 +182,7 @@ export class Recording {
 
     // extract recording date
     try {
-      let year = groups['date_year'];
+      let year = groups['date_year'] ?? ('20' + groups['date_year2']);
       let month = groups['date_month'];
       let day = groups['date_day'];
       let hours = groups['date_hours'];
@@ -299,6 +300,7 @@ export class Recording {
           replacement = Recording.getFilenameRegExpPattern('{date:year}{date:month}{date:day}_{date:hours}{date:minutes}{date:seconds}{date:tzHours}{date:tzMinutes}');
           break;
         case 'date:year':       replacement = String.raw`(?<date_year>\d{4})`; break;
+        case 'date:year2':      replacement = String.raw`(?<date_year2>\d{2})`; break;
         case 'date:month':      replacement = String.raw`(?<date_month>\d{2})`; break;
         case 'date:day':        replacement = String.raw`(?<date_day>\d{2})`; break;
         case 'date:hours':      replacement = String.raw`(?<date_hours>\d{2})`; break;
