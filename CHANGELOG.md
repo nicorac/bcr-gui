@@ -1,5 +1,17 @@
 # Version history
 
+## Version 1.7.1 (2024-03-19)
+
+New features:
+
+- New language supported: Chinese simplified (thanks to @HuangSmith)
+- New filename template to support ColorOS call recorder
+- New filename placeholder `{date:year2}` to parse 2 digits years (no century)
+
+Bug fixes:
+
+- Fixed home page "pull to refresh" translation
+
 ## Version 1.7.0 (2024-03-17)
 
 New features:
