@@ -32,7 +32,7 @@
     "DTF_EDITOR_PREVIEW": "Anteprima",
     "DTF_EDITOR_STANDARD_FORMATS": "Formati predefiniti",
     "DTF_EDITOR_TIME_FORMAT": "Formato ora",
-    "DTF_EDITOR_TITLE": "Formato data/ora",
+    "DTF_EDITOR_TITLE": "Editor formato data/ora",
     "ERR_CFG001": "Errore durante la lettura della configurazione",
     "ERR_CFG002": "Errore durante il salvataggio della configurazione",
     "ERR_DB001": "Errore durante l'aggiornamento del database",

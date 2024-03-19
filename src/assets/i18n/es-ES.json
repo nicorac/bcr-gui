@@ -123,5 +123,7 @@
     "SETTINGS_RESCAN_TEXT": "¿Desea volver a escanear todos sus archivos (sin archivo JSON de metadatos) utilizando el nuevo formato del nombre del archivo?",
     "ABOUT_DONATIONS": "Donaciones",
     "ABOUT_DONATIONS_TEXT": "Esta aplicación es libre como en la cerveza y como en el discurso, nada que pagar, sin anuncios. Si usted aprecia mi trabajo y quiere apoyarlo, no dude en utilizar uno de los enlaces de abajo.",
-    "FNP_EDITOR_PATTERN_TEXT": "Formato utilizado para analizar los nombres de archivo de las grabaciones que no tienen un archivo de metadatos .json correspondiente. Debe ser una expresión regular válida de Javascript, con marcadores de posición personalizados."
+    "FNP_EDITOR_PATTERN_TEXT": "Formato utilizado para analizar los nombres de archivo de las grabaciones que no tienen un archivo de metadatos .json correspondiente. Debe ser una expresión regular válida de Javascript, con marcadores de posición personalizados.",
+    "SETTINGS_LANGUAGE_ADD": "añadir un nuevo idioma",
+    "SETTINGS_LANGUAGE_TEXT": "Idioma de la aplicación"
 }

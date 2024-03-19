@@ -1,5 +1,6 @@
 [
   { "id": "en-US", "name": "English (US)" },
   { "id": "it-IT", "name": "Italiano" },
-  { "id": "es-ES", "name": "Español" }
+  { "id": "es-ES", "name": "Español" },
+  { "id": "zh-Hans", "name": "中文（简体）" }
 ]
