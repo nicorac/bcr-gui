@@ -88,7 +88,7 @@
     "FNP_EDITOR_TEST_RUN": "运行测试",
     "FNP_EDITOR_VAR_call_log_name": "通话记录名称：任意字符",
     "FNP_EDITOR_TITLE": "文件名匹配格式编辑器",
-    "FNP_EDITOR_VAR_date:ampm": "上午/下午指示（可写作AM或PM，区分大小写）",
+    "FNP_EDITOR_VAR_date:ampm": "上午/下午（可写作AM或PM，区分大小写）",
     "FNP_EDITOR_VAR_date:day": "日（两位数）",
     "FNP_EDITOR_VAR_date": "完整格式：YYYYMMDD-HHmmss.ddd+",
     "FNP_EDITOR_VAR_caller_name": "来电者名称：任意字符",
