@@ -2,5 +2,7 @@
   { "id": "en-US", "name": "English (US)" },
   { "id": "it-IT", "name": "Italiano" },
   { "id": "es-ES", "name": "Español" },
+  { "id": "fa-IR", "name": "فارسی" },
+  { "id": "ru-RU", "name": "Русский" },
   { "id": "zh-Hans", "name": "中文（简体）" }
 ]
