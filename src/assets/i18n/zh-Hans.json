@@ -52,7 +52,7 @@
     "FNP_EDITOR_PATTERN_TEXT": "匹配格式用于解析没有对应 JSON 元数据文件的录音文件。必须是包含自定义占位符的有效Javascript正则表达式。",
     "ABOUT_DESCRIPTION": "%appName% 是管理%bcrLink%（Basic Call Recorder）录音数据文件夹的配套应用",
     "ABOUT_DONATIONS_TEXT": "本应用自由开源，免费使用，没有广告。如果你喜欢并愿意支持我的应用，欢迎点击下面的链接。",
-    "CONTACTS_PERM_TEXT": "此功能需要读取通讯录才能使用。\n\n如果你收到过权限请求并已拒绝，请打开应用设置授予通讯录权限……",
+    "CONTACTS_PERM_TEXT": "此功能需要读取通讯录才能使用。\n\n如果你收到并拒绝授予权限，请打开应用设置并授予通讯录权限……",
     "ABOUT_DONATIONS": "捐赠",
     "ABOUT_HOMEPAGE": "主页",
     "ABOUT_THANKS": "贡献",
@@ -91,7 +91,7 @@
     "FNP_EDITOR_VAR_date:ampm": "上午/下午（可写作AM或PM，区分大小写）",
     "FNP_EDITOR_VAR_date:day": "日（两位数）",
     "FNP_EDITOR_VAR_date": "完整格式：YYYYMMDD-HHmmss.ddd+",
-    "FNP_EDITOR_VAR_caller_name": "来电者名称：任意字符",
+    "FNP_EDITOR_VAR_caller_name": "来电人名称：任意字符",
     "HOME_EDIT_COPYNUMBER": "复制号码至剪贴板",
     "HOME_EDIT_ADDEDIT": "使用此姓名/号码新建/编辑联系人",
     "HOME_EDIT_NAME": "编辑录音名称",
@@ -125,5 +125,5 @@
     "SETTINGS_RESCAN_TITLE": "重新搜索",
     "SETTINGS_SYSTEM_DEFAULT": "系统默认",
     "SETTINGS_RECORDINGS_SORT_DURATION_ASC": "按录音时长（升序）",
-    "SETTINGS_RESCAN_TEXT": "是否使用新的文件匹配格式重新扫描所有文件（不使用JSON元文件）？"
+    "SETTINGS_RESCAN_TEXT": "使用新的文件匹配格式重新扫描所有文件吗（不使用JSON元文件）？"
 }
