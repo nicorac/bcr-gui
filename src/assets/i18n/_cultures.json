@@ -1,8 +1,10 @@
 [
   { "id": "en-US", "name": "English (US)" },
-  { "id": "it-IT", "name": "Italiano" },
+  { "id": "de-DE", "name": "Deutsch" },
   { "id": "es-ES", "name": "Español" },
   { "id": "fa-IR", "name": "فارسی" },
+  { "id": "it-IT", "name": "Italiano" },
   { "id": "ru-RU", "name": "Русский" },
+  { "id": "vi-VN", "name": "Tiếng Việt" },
   { "id": "zh-Hans", "name": "中文（简体）" }
 ]
