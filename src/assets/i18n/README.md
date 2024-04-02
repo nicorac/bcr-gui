@@ -22,3 +22,5 @@ Example: `en-US.json` contains **English** language as spoken in **USA**.
 2. copy the reference language file `en-US.json` to a new file (i.e. `fr-FR.json`)
 3. open the new language file and translate each item
 4. open a pull request to merge your changes into sources
+
+Please check [this issue](https://github.com/nicorac/bcr-gui/issues/99) for further info.
