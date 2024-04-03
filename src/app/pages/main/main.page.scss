@@ -10,6 +10,13 @@
 
 }
 
+.toolbar-menu-items {
+  ion-icon {
+    margin-right: .5em;
+    color: unset;
+  }
+}
+
 .main-content {
   position: relative;
   // make room for virtual-scrollbar

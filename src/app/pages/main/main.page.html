@@ -22,9 +22,15 @@
     <ion-popover trigger="context-menu-button" [dismissOnSelect]="true">
       <ng-template>
         <ion-content>
-          <ion-list lines="none">
-            <ion-item (click)="selectAll()">{{ 'LBL_SELECTALL' | translatePipe }}</ion-item>
-            <ion-item (click)="deleteItems(getSelectedItems())">{{ 'LBL_DELETE' | translatePipe }}</ion-item>
+          <ion-list lines="none" class="toolbar-menu-items">
+            <ion-item (click)="selectAll()">
+              <ion-icon src="/assets/icons/select-all.svg" />
+              {{ 'LBL_SELECTALL' | translatePipe }}
+            </ion-item>
+            <ion-item (click)="deleteItems(getSelectedItems())">
+              <ion-icon name="trash" />
+              {{ 'LBL_DELETE' | translatePipe }}
+            </ion-item>
           </ion-list>
         </ion-content>
       </ng-template>
