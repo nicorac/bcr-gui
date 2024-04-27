@@ -1,5 +1,14 @@
 # Version history
 
+## Version 1.7.4 (2024-04-27)
+
+Bug fixes:
+
+- Added icons to multiselection menu items
+- Fixed add contact icon
+- Fixed call duration (removed seconds decimals)
+- Updated translations (German, Russian)
+
 ## Version 1.7.3 (2024-04-02)
 
 New features:
