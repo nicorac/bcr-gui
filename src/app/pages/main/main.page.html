@@ -96,16 +96,17 @@
         <ion-card *cdkVirtualFor="let item of items; let index = index"
           class="item"
           [class.selected]="item.selected && !isMultiselect"
-          (click)="onItemClick(item)"
-          longPress
-          (longPress)="startMultiselection(item)"
         >
           <!-- isMultiselect checkbox -->
           <div>
             <ion-checkbox *ngIf="isMultiselect" class="checkbox" [(ngModel)]="item.selected" />
           </div>
 
-          <div>
+          <div
+            (click)="onItemClick(item);"
+            longPress
+            (longPress)="startMultiselection(item)"
+          >
             <!-- card content -->
             <ion-card-header>
               <ion-card-title class="title">
