@@ -7,10 +7,10 @@ BCR-GUI is a _companion app_ for the great [BCR](https://github.com/chenxiaolong
 It also supports other recording applications:
 
 - [BCR - Basic Call Recorder](https://github.com/chenxiaolong/BCR)
-
 - [GrapheneOS](https://grapheneos.org/) Call Recorder (see [here](https://github.com/nicorac/bcr-gui/issues/30))
-
+- [ColorOS](https://www.oppo.com/en/coloros12/) Call Recorder (see [here](https://github.com/nicorac/bcr-gui/issues/100))
 - Huawei Call Recorder (see [here](https://github.com/nicorac/bcr-gui/issues/44))
+- [LineageOS](https://lineageos.org/) Call Recorder (see [here](https://github.com/nicorac/bcr-gui/issues/121))
 
 <img src="docs/images/screenshot-main.jpg?nocache=1">
 

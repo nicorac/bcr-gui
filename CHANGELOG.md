@@ -1,5 +1,15 @@
 # Version history
 
+## Version 1.7.5 (2024-05-29)
+
+New features:
+
+- New filename template to support LineageOS call recorder (thanks to @loziniak)
+
+Bug fixes:
+
+- Improved item selection/deselection in multiselect mode (avoid checkbox click to prevent selection change)
+
 ## Version 1.7.4 (2024-04-27)
 
 Bug fixes:
