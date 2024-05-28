@@ -29,6 +29,7 @@ export const FILENAME_PATTERN_TEMPLATES: { name:string, pattern:string }[] = [
   { name: 'ColorOS call recorder', pattern: '^{contact_name}-{date:year2}{date:month}{date:day}{date:hours}{date:minutes}' },
   { name: 'GrapheneOS call recorder', pattern: '^CallRecord_{date:year}{date:month}{date:day}-{date:hours}{date:minutes}{date:seconds}_{phone_number}' },
   { name: 'Huawei call recorder', pattern: '^{contact_name}@{phone_number}_{date:year}{date:month}{date:day}{date:hours}{date:minutes}{date:seconds}' },
+  { name: 'LineageOS call app', pattern: '^{phone_number}_{date:year2}{date:month}{date:day}_{date:hours}{date:minutes}{date:seconds}' },
 ]
 
 /**
