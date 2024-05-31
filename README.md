@@ -2,9 +2,7 @@
 
 ## What is BCR-GUI
 
-BCR-GUI is a _companion app_ for the great [BCR](https://github.com/chenxiaolong/BCR) (Basic Call Recorder) Android application.
-
-It also supports other recording applications:
+BCR-GUI is a call recordings manager app, started as _companion app_ for the great [BCR](https://github.com/chenxiaolong/BCR) (Basic Call Recorder) Android application and grown up to support many other call recorders:
 
 - [BCR - Basic Call Recorder](https://github.com/chenxiaolong/BCR)
 - [GrapheneOS](https://grapheneos.org/) Call Recorder (see [here](https://github.com/nicorac/bcr-gui/issues/30))
@@ -12,16 +10,16 @@ It also supports other recording applications:
 - Huawei Call Recorder (see [here](https://github.com/nicorac/bcr-gui/issues/44))
 - [LineageOS](https://lineageos.org/) Call Recorder (see [here](https://github.com/nicorac/bcr-gui/issues/121))
 
-<img src="docs/images/screenshot-main.jpg?nocache=1">
+<img src="docs/images/screenshot-main.jpg?ver=1.7.5">
 
-To manage BCR call recordings, you actually need to use a file manager... and thats not so user-friendly 😉.
-It's hard to "extract" call informations from audio filename, and its even harder to search them when the list grows.
+To manage BCR (and other call recorders) recordings, you need to use a file manager... and that's not so user-friendly 😉.
+It's hard to "extract" call informations from audio filename, and it's even harder to search them when the list grows.
 
-Such a feature was [already requested](https://github.com/chenxiaolong/BCR/issues/135#issuecomment-1642889831), but **chenxiaolong** (the author of BCR) wants to keep BCR **Basic**; and I do agree with him! Call recording on Android is a hard work, and I'd like (and hope) him to stay focused on it... recordings management is a job made for BCR-GUI 😂.
+Such a feature was [already requested](https://github.com/chenxiaolong/BCR/issues/135#issuecomment-1642889831), but **chenxiaolong** (the author of BCR) wants to keep BCR **Basic**; and I do agree with him! Call recording on Android is a hard work, and I'd like (and hope) him to stay focused on it... recordings management is a job made for BCR-GUI 😂. Other call recorders never had one.
 
 ## Requirements
 
-BCR-GUI needs **BCR v.1.49** (or newer) to work at its best, because it needs the new [JSON call metadata](https://github.com/chenxiaolong/BCR/issues/380) feature to extract and show detailed call info in its call list. In case of missing JSON file (eg. recordings done before 1.49 or using another recording app), BCR-GUI will parse filename to extract call data. You can customize the format of the filename being parsed.
+If used with BCR, BCR-GUI needs **BCR v.1.49** (or newer) to work at its best; that version features the new [JSON call metadata file](https://github.com/chenxiaolong/BCR/issues/380), used by BCR-GUI to read detailed call info and show them in its call list. In case of missing JSON file (eg. recordings done before 1.49 or when using **another** recording app), BCR-GUI will try to extract call data from recording filename. You can customize the format of the filename being parsed.
 
 ## Permissions
 
@@ -31,7 +29,7 @@ BCR-GUI needs **BCR v.1.49** (or newer) to work at its best, because it needs th
 - It **does not need Internet access** at all. \
   _NOTE:_ this may change in the future if an auto-update feature will be added, but actually the app can't send/receive anything to/from internet.
 
-- _(optional)_ It needs **Contacts** permission to update recordings names with contacts or create new contacts for recordings from unknown callers. Feel free to **deny** this permission: app will remember you how to enable it whthe next time you use a feature that requires it.
+- _(optional)_ It needs **Contacts** permission to update recordings names with contacts or create new contacts for recordings from unknown callers. Feel free to **deny** the permission: app will remember you how to enable it the next time you use a feature requiring it.
 
 ## What's working/missing?
 
@@ -61,7 +59,7 @@ Feel free to share your thoughts!
 
 BCR-GUI is not available in the PlayStore (...yet).
 
-I'll publish it there if its popularity grows but... since **BCR** is a Magisk module, and it requires some skills to be installed, I'm sure that if you were also able to download & install a simple APK 😉.
+I'll publish it there if its popularity grows but... since **BCR** is a Magisk module, and it requires some skills to be installed, I'm sure that you're also able to download & install a simple APK 😉.
 
 Latest version is [available here](https://github.com/nicorac/bcr-gui/releases/).
 
