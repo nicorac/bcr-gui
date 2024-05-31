@@ -28,7 +28,7 @@
     "@angular/platform-browser": "^17.3.2",
     "@angular/platform-browser-dynamic": "^17.3.2",
     "@angular/router": "^17.3.2",
-    "@capacitor-community/contacts": "file:packages/capacitor-community-contacts-5.0.4.tgz",
+    "@capacitor-community/contacts": "^5.0.5",
     "@capacitor/android": "^5.7.4",
     "@capacitor/app": "^5.0.7",
     "@capacitor/clipboard": "^5.0.7",
