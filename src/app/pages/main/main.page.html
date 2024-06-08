@@ -41,16 +41,18 @@
 </app-header>
 
 <!-- search panel -->
-<ion-toolbar *ngIf="isSearch">
-  <ion-searchbar #searchBar
-    show-clear-button="focus"
-    [debounce]="750"
-    [(ngModel)]="searchValue"
-    [placeholder]="'LBL_SEARCH' | translatePipe"
-    (ngModelChange)="updateFilter()"
-    (ionClear)="clearFilter()"
-  />
-</ion-toolbar>
+@if (isSearch) {
+  <ion-toolbar>
+    <ion-searchbar #searchBar
+      show-clear-button="focus"
+      [debounce]="750"
+      [(ngModel)]="searchValue"
+      [placeholder]="'LBL_SEARCH' | translatePipe"
+      (ngModelChange)="updateFilter()"
+      (ionClear)="clearFilter()"
+    />
+  </ion-toolbar>
+}
 
 <!-- main content (list) -->
 <ion-content #content
@@ -69,21 +71,22 @@
       [style.--item-gap]="itemGap + 'px'"
     >
 
-      <ion-refresher *ngIf="topIndex === 0 && !isDraggingCursor"
-        slot="fixed"
-        pullFactor=".5"
-        pullMin="60"
-        pullMax="120"
-        (ionRefresh)="refreshList($any($event))"
-      >
-        <ion-refresher-content
-          pullingIcon="refresh"
-          pullingText="{{ 'HOME_PULL_TO_REFRESH' | translatePipe }}"
-          refreshingSpinner="circles"
-          refreshingText="{{ 'HOME_REFRESHING' | translatePipe }}"
-        />
-      </ion-refresher>
-
+      @if (topIndex === 0 && !isDraggingCursor) {
+        <ion-refresher
+          slot="fixed"
+          pullFactor=".5"
+          pullMin="60"
+          pullMax="120"
+          (ionRefresh)="refreshList($any($event))"
+        >
+          <ion-refresher-content
+            pullingIcon="refresh"
+            pullingText="{{ 'HOME_PULL_TO_REFRESH' | translatePipe }}"
+            refreshingSpinner="circles"
+            refreshingText="{{ 'HOME_REFRESHING' | translatePipe }}"
+          />
+        </ion-refresher>
+      }
       <cdk-virtual-scroll-viewport #vsv
         class="virtual-scroll-viewport ion-content-scroll-host"
         [maxBufferPx]="1500"
@@ -99,7 +102,9 @@
         >
           <!-- isMultiselect checkbox -->
           <div>
-            <ion-checkbox *ngIf="isMultiselect" class="checkbox" [(ngModel)]="item.selected" />
+            @if (isMultiselect) {
+              <ion-checkbox class="checkbox" [(ngModel)]="item.selected" />
+            }
           </div>
 
           <div
@@ -115,48 +120,56 @@
               </ion-card-title>
               <ion-card-subtitle class="left-right-container subtitle">
                 <div>{{ item?.date | datetime }}</div>
-                <div *ngIf="item.duration">{{ item.duration | toHms }}</div>
+                @if (item.duration) {
+                  <div>{{ item.duration | toHms }}</div>
+                }
               </ion-card-subtitle>
             </ion-card-header>
 
-            <ion-card-content *ngIf="!isMultiselect && item.selected" class="content">
+            @if (!isMultiselect && item.selected) {
+              <ion-card-content class="content">
 
-              <!-- details -->
-              <div class="details">
-                <p *ngIf="item.opName !== item.opNumber">
-                  {{ 'HOME_REC_PHONE_NUMBER' | translatePipe}}: {{ item.opNumber }}
-                </p>
-                <p>{{ 'HOME_REC_TYPE' | translatePipe}}: {{ item.mimeType }}</p>
-                <p>{{ 'HOME_REC_SIZE' | translatePipe}}: {{ item.filesize | filesize }}</p>
-              </div>
+                <div class="details-actions">
 
-              <!-- audio player -->
-              <app-audio-player #audioPlayer class="player" [recording]="item" />
+                  <!-- details -->
+                  <div class="details">
+                    @if (item.opName !== item.opNumber) {
+                      <p>{{ 'HOME_REC_PHONE_NUMBER' | translatePipe}}: {{ item.opNumber }}</p>
+                    }
+                    <p>{{ 'HOME_REC_TYPE' | translatePipe}}: {{ item.mimeType }}</p>
+                    <p>{{ 'HOME_REC_SIZE' | translatePipe}}: {{ item.filesize | filesize }}</p>
+                  </div>
 
-              <!-- action buttons -->
-              <div class="actions">
+                  <!-- action buttons -->
+                  <div class="actions">
 
-                <!-- edit -->
-                <ion-icon name="pencil"
-                  class="action"
-                  (click)="editItem(item)"
-                />
+                    <!-- edit -->
+                    <ion-icon name="pencil"
+                      class="action"
+                      (click)="editItem(item)"
+                    />
 
-                <!-- share -->
-                <ion-icon name="share-social"
-                  class="action"
-                  (click)="shareRecording(item, $event)"
-                />
+                    <!-- share -->
+                    <ion-icon name="share-social"
+                      class="action"
+                      (click)="shareRecording(item, $event)"
+                    />
 
-                <!-- delete -->
-                <ion-icon name="trash"
-                  class="action"
-                  (click)="deleteItems([item])"
-                />
+                    <!-- delete -->
+                    <ion-icon name="trash"
+                      class="action"
+                      (click)="deleteItems([item])"
+                    />
 
-              </div>
+                  </div>
 
-            </ion-card-content>
+                </div>
+
+                <!-- audio player -->
+                <app-audio-player #audioPlayer class="player" [recording]="item" />
+
+              </ion-card-content>
+            }
 
           </div>
 
@@ -166,7 +179,10 @@
 
     </ion-list>
 
-    <app-virtual-scrollbar class="virtual-scrollbar" [virtualScrollViewport]="vsv" (isDragging)="isDraggingCursor = $event" />
+    <app-virtual-scrollbar class="virtual-scrollbar"
+      [virtualScrollViewport]="vsv"
+      (isDragging)="isDraggingCursor = $event"
+    />
 
   </div>
 

@@ -1,3 +1,15 @@
+<div class="progress">
+  <ion-range
+    label="{{ progress | toHms }}"
+    labelPlacement="end"
+    [disabled]="!ready"
+    [value]="progress"
+    [max]="duration"
+    (ionKnobMoveStart)="onIonKnobMoveStart($event)"
+    (ionKnobMoveEnd)="onIonKnobMoveEnd($event)"
+  />
+</div>
+
 <div class="controls">
   <ion-icon
     class="buttons"
@@ -19,17 +31,5 @@
     [class.disabled]="!ready"
     name="play-forward"
     (click)="seek(+1)"
-  />
-</div>
-
-<div class="progress">
-  <ion-range
-    label="{{ progress | toHms }}"
-    labelPlacement="end"
-    [disabled]="!ready"
-    [value]="progress"
-    [max]="duration"
-    (ionKnobMoveStart)="onIonKnobMoveStart($event)"
-    (ionKnobMoveEnd)="onIonKnobMoveEnd($event)"
   />
 </div>

@@ -31,6 +31,20 @@
   height: 100%;
 }
 
+.player {
+  box-shadow: rgba(var(--ion-text-color-rgb), 0.1) 0px 10px 36px 0px,
+              rgba(var(--ion-text-color-rgb), 0.16) 0px 0px 0px 1px;
+}
+
+.details-actions {
+  display: flex;
+  justify-content: space-between;
+}
+
+.actions {
+  align-self: end;
+}
+
 .title {
   font-size: 14pt;
   line-height: 16pt;
