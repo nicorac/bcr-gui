@@ -1,5 +1,12 @@
 # Version history
 
+## Version 1.7.6 (2024-06-08)
+
+New features:
+
+- Improved recording layout to give more space to player progress bar and buttons (#62)
+- Icons for incoming/outgoing call type now have different colors to make it easier to recognize them (#126)
+
 ## Version 1.7.5 (2024-05-29)
 
 New features:

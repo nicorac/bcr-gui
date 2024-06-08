@@ -10,7 +10,7 @@ BCR-GUI is a call recordings manager app, started as _companion app_ for the gre
 - Huawei Call Recorder (see [here](https://github.com/nicorac/bcr-gui/issues/44))
 - [LineageOS](https://lineageos.org/) Call Recorder (see [here](https://github.com/nicorac/bcr-gui/issues/121))
 
-<img src="docs/images/screenshot-main.jpg?ver=1.7.5">
+<img src="docs/images/screenshot-main.jpg?ver=1.7.6">
 
 To manage BCR (and other call recorders) recordings, you need to use a file manager... and that's not so user-friendly 😉.
 It's hard to "extract" call informations from audio filename, and it's even harder to search them when the list grows.
