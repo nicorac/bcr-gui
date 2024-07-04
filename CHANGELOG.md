@@ -1,5 +1,12 @@
 # Version history
 
+## Version 1.7.7 (2024-07-04)
+
+New features:
+
+- Updated Vietnamese translation
+- Completed Ukrainian translation
+
 ## Version 1.7.6 (2024-06-08)
 
 New features:
