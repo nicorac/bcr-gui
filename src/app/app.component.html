@@ -41,4 +41,21 @@
   <!-- main content -->
   <ion-router-outlet />
 
+  <ion-tabs>
+    <ion-tab-bar slot="bottom">
+      <ion-tab-button tab="home">
+        <ion-icon name="home-sharp" />
+        {{ 'MAINMENU_HOME' | translatePipe }}
+      </ion-tab-button>
+      <ion-tab-button tab="radio">
+        <ion-icon name="options-sharp" />
+        {{ 'MAINMENU_SETTINGS' | translatePipe }}
+      </ion-tab-button>
+      <ion-tab-button tab="library">
+        <ion-icon name="information-circle-sharp" />
+        {{ 'MAINMENU_ABOUT' | translatePipe }}
+      </ion-tab-button>
+    </ion-tab-bar>
+  </ion-tabs>
+
 </ion-app>

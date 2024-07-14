@@ -44,6 +44,10 @@ body {
 
 }
 
+ion-tab-bar {
+  --color: var(--ion-toolbar-color);
+  --ion-background-color: var(--ion-toolbar-background);
+}
 ion-menu {
   --ion-item-color: var(--menu-color);
   --ion-text-color: var(--menu-color);
