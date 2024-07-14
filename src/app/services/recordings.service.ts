@@ -149,15 +149,22 @@ export class RecordingsService {
       await this.save();
 
     }
-    catch(error) {
-      console.error(error);
-      this.mbs.showError({
-        appErrorCode: 'ERR_DB001',
-        error
-      });
-    };
+    catch(error: any) {
+      if (error.code === ErrorCode.ERR_INVALID_URI) {
+        this.selectRecordingsDirectory(() => this.refreshContent());
+      }
+      else {
+        console.error(error);
+        this.mbs.showError({
+          appErrorCode: 'ERR_DB001',
+          error
+        });
+      }
+    }
+    finally {
+      this.refreshProgress.next(0);
+    }
 
-    this.refreshProgress.next(0);
   }
 
   /**
@@ -388,7 +395,17 @@ export class RecordingsService {
       directoryUri: this.settings.recordingsDirectoryUri,
       name: DB_FILENAME,
     };
-    this.settings.dbFileUri = (await AndroidSAF.getFileUri(opt)).uri;
+    try {
+      this.settings.dbFileUri = (await AndroidSAF.getFileUri(opt)).uri;
+    }
+    catch (e: any) {
+      if (e.code === ErrorCode.ERR_INVALID_URI) {
+        this.settings.dbFileUri = undefined;
+      }
+      else {
+        throw e;
+      }
+    }
     this.settings.save();
   }
 
