@@ -28,7 +28,11 @@ export class ContactsService {
    * Cleanup the given phone number by keeping only "+" and digits.
    */
   cleanupPhoneNumber(phoneNumber: string): string {
-    return phoneNumber.replace(/[^\d\+]/g, '');
+    let cleaned = phoneNumber.replace(/[^\d\+]/g, '');
+    if (this.settings.ignoreLeadingZeroes) {
+      cleaned = cleaned.replace(/^0+/g, '');
+    }
+    return cleaned;
   }
 
   /**

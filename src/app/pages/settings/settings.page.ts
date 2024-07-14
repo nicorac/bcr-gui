@@ -44,7 +44,7 @@ export class SettingsPage {
     await this.save();
   }
 
-  async save() {
+  async save(val: any = '') {
     await this.settings.save();
   }
 

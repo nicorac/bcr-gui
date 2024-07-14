@@ -87,6 +87,19 @@
       </div>
     </ion-item>
 
+    <ion-item>
+      <div class="wrapper">
+        <div class="label">
+          <div>{{ 'SETTINGS_IGNORE_LEADING_ZEROES' | translatePipe }}</div>
+          <div class="help">{{ 'SETTINGS_IGNORE_LEADING_ZEROES_HELP' | translatePipe }}</div>
+        </div>
+        <ion-toggle
+          [checked]="settings.ignoreLeadingZeroes"
+          (ionChange)="settings.ignoreLeadingZeroes = !settings.ignoreLeadingZeroes; save();"
+        />
+      </div>
+    </ion-item>
+
     <ion-item-divider>
       <h4>{{ 'SETTINGS_RECORDINGS_SECTION' | translatePipe }}</h4>
     </ion-item-divider>

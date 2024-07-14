@@ -66,6 +66,15 @@ export class SettingsService {
   public defaultCountryPrefix: string = '';
 
   /**
+   * Ignore leading zeroes when searching for existing contacts numbers.
+   * (this is needed in some countries, where incoming numbers have country code
+   * but need a leading-zero to call the same numberd within the same country
+   * https://github.com/nicorac/bcr-gui/issues/122)
+   */
+  @JsonProperty()
+  public ignoreLeadingZeroes: boolean = false;
+
+  /**
    * Custom filename format
    */
   @JsonProperty()

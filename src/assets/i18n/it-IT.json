@@ -110,6 +110,8 @@
   "SETTINGS_DATETIME_FORMAT": "Formato data/ora",
   "SETTINGS_FILENAME_PATTERN": "Modello del nome file",
   "SETTINGS_GENERAL_SECTION": "Generale",
+  "SETTINGS_IGNORE_LEADING_ZEROES": "Ignora zeri iniziali",
+  "SETTINGS_IGNORE_LEADING_ZEROES_HELP": "Ignora gli zeri iniziali del numero telefonico durante la ricerca nei contatti",
   "SETTINGS_LANGUAGE": "Lingua",
   "SETTINGS_LANGUAGE_ADD": "aggiungi nuova lingua",
   "SETTINGS_LANGUAGE_TEXT": "Lingua applicazione",
