@@ -196,7 +196,7 @@ export class Recording {
         // is timezone missing? then use current...
         let tz = '';
         if (groups['date_tzHours'] !== undefined && groups['date_tzMinutes'] !== undefined) {
-          tz = (groups['date_tzHours'] ?? '+00') + ':' + groups['date_tzMinutes'] ?? '00';
+          tz = (groups['date_tzHours'] ?? '+00') + ':' + (groups['date_tzMinutes'] ?? '00');
           // ensure TZ has a sign
           if (!(tz.startsWith('+') || tz.startsWith('-'))) {
             tz = '+' + tz;
