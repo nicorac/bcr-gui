@@ -38,7 +38,7 @@
     "@capacitor/preferences": "^6.0.1",
     "@capacitor/share": "^6.0.1",
     "@capacitor/status-bar": "^6.0.0",
-    "@capgo/capacitor-navigation-bar": "^6.1.24",
+    "@capgo/capacitor-navigation-bar": "^6.1.28",
     "@ionic/angular": "^8.2.5",
     "capacitor-native-settings": "^6.0.0",
     "filesize": "^10.1.4",
