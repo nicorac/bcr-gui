@@ -1,11 +1,16 @@
 # Version history
 
-## Version 1.7.7 (2024-07-04)
+## Version 1.7.7 (2024-08-15)
 
 New features:
 
-- Updated Vietnamese translation
-- Completed Ukrainian translation
+- Added French translation (thanks to NSO)
+- Updated Persian, Russian, Ukrainian and Vietnamese translations
+
+Bug fixes:
+
+- Fixed possible error in timezone parsing
+- Fixed possible loop on first recording directory selection after app install/update
 
 ## Version 1.7.6 (2024-06-08)
 
