@@ -15,11 +15,11 @@ const versionCode = /^\s+versionCode\s+(?<ver>.*?)$/gm.exec(content)?.groups['ve
 console.log('Found versionCode:', versionCode);
 
 // build expected versionCode
-const expectedVersionCode = versionName.split('.').map(p => p.padStart(3, '0')).join('');
+const expectedVersionCode = versionName.split('.').map((p, ix) => p.padStart(ix === 0 ? 0 : 3, '0')).join('');
 
 // test
 if (versionCode !== expectedVersionCode) {
   console.log('Expected version code:', expectedVersionCode);
-  console.error('[ERROR] Please fix "versionCode" it in file:', versionFile);
+  console.error('[ERROR] Please fix "versionCode" in file:', versionFile);
   process.exit(1);
 }

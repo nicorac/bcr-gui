@@ -29,7 +29,7 @@ android {
     targetSdkVersion rootProject.ext.targetSdkVersion
     // version parts: M = Major, m = minor, b = build
     // -------- MMMmmmbbb
-    versionCode 001007007
+    versionCode 1007007
     versionName "1.7.7"
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     aaptOptions {
