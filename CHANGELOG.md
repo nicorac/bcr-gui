@@ -1,5 +1,11 @@
 # Version history
 
+## Version 1.7.8 (2024-08-25)
+
+New features:
+
+- Added Czech translation (thanks to Kunago)
+
 ## Version 1.7.7 (2024-08-15)
 
 New features:
