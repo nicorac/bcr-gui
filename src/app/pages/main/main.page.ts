@@ -129,6 +129,8 @@ export class MainPage implements AfterViewInit {
     // filter
     if (this.searchValue) {
       res = filterList(res, this.searchValue, r => `${r.opName} ${r.opNumber}`);
+      // close any open player to let the list update without leaving "orphaned" player IDs
+      this.clearSelection();
     }
 
     // sort
