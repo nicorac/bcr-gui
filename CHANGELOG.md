@@ -1,5 +1,15 @@
 # Version history
 
+## Version 1.7.9 (2024-08-27)
+
+New features:
+
+- Added Finnish translation (thanks to Ogloppi)
+
+Bug fixes:
+
+- Fixed runtime error when filtering recording list with one selected item
+
 ## Version 1.7.8 (2024-08-25)
 
 New features:
