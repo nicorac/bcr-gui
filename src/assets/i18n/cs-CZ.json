@@ -125,5 +125,5 @@
   "SETTINGS_RECORDINGS_SORT_DURATION_DESC": "Délka (sestupně)",
   "SETTINGS_RESCAN_TEXT": "Přejete si přeskenovat všechny soubory (vyjma JSON metadata souboru) s použitím nové šablony názvu souboru?",
   "SETTINGS_RESCAN_TITLE": "Přeskenovat",
-  "SETTINGS_SYSTEM_DEFAULT": "Výchozí systému"
+  "SETTINGS_SYSTEM_DEFAULT": "Dle systému"
 }
