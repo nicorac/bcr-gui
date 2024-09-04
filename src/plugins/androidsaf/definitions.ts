@@ -69,15 +69,22 @@ export interface AndroidSAFPlugin {
   /**
    * Returns the duration (in ms) of one or more media files.
    */
-  getMediaFilesDuration(options: FileOptions): Promise<{ durations: { fileUri: string, duration: number }[] }>;
+  getMediaFilesDuration(options: { jsonFileUris: string }): Promise<{ jsonResult: string }>;
 
 }
 
 export class AndroidSAFUtils {
+
   static async listFiles(options: DirectoryOptions): Promise<IDocumentFile[]> {
     const { itemsJson } = await AndroidSAF.listFiles(options);
     return JSON.parse(itemsJson);
   }
+
+  static async getMediaFilesDuration(jsonFileUris: string[]): Promise<{ [key:string]: number }> {
+    const { jsonResult } = await AndroidSAF.getMediaFilesDuration({ jsonFileUris: JSON.stringify(jsonFileUris) });
+    return JSON.parse(jsonResult);
+  }
+
 }
 
 /**
@@ -105,11 +112,6 @@ export enum Encoding {
 interface FileOptions {
   // filename
   fileUri: string;
-}
-
-interface FilesOptions {
-  // filenames
-  fileUri: string[];
 }
 
 export interface DirectoryOptions {

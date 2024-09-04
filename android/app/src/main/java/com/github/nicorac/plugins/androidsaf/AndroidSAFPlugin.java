@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.provider.ContactsContract;
 import android.provider.DocumentsContract;
 import android.util.Base64;
+import android.util.JsonReader;
 import android.util.JsonWriter;
 import android.webkit.MimeTypeMap;
 
@@ -22,7 +23,9 @@ import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.ActivityCallback;
 import com.getcapacitor.annotation.CapacitorPlugin;
 
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -30,6 +33,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -159,8 +163,7 @@ public class AndroidSAFPlugin extends Plugin {
       var res = new JSObject();
       res.put("itemsJson", this.listFileFaster(directoryDF.getUri()));
       call.resolve(res);
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       call.reject("Error retrieving files list", ERR_IO_EXCEPTION, e);
     }
 
@@ -178,7 +181,7 @@ public class AndroidSAFPlugin extends Plugin {
 
     var uri = DF.getUri();
     try (
-      Cursor c = getContext().getContentResolver().query(uri, new String[] {
+      Cursor c = getContext().getContentResolver().query(uri, new String[]{
         DocumentsContract.Document.COLUMN_LAST_MODIFIED,   // 0
       }, null, null, null);
     ) {
@@ -196,8 +199,7 @@ public class AndroidSAFPlugin extends Plugin {
   /**
    * Load and return file content
    *
-   * @param call
-   *  call.uri: URI of the file to read
+   * @param call call.uri: URI of the file to read
    */
   @PluginMethod()
   public void readFile(PluginCall call) {
@@ -222,8 +224,7 @@ public class AndroidSAFPlugin extends Plugin {
       } else {
         content = readFileAsBase64EncodedData(is);
       }
-    }
-    catch (FileNotFoundException e) {
+    } catch (FileNotFoundException e) {
       call.reject(e.toString(), ERR_NOT_FOUND);
       return;
     } catch (IOException e) {
@@ -242,10 +243,8 @@ public class AndroidSAFPlugin extends Plugin {
   /**
    * Create a new file and write content
    *
-   * @param call
-   *  call.directoryUri: URI of the directory that will contain the new file
-   *  call.name: new filename
-   *
+   * @param call call.directoryUri: URI of the directory that will contain the new file
+   *             call.name: new filename
    */
   @PluginMethod()
   public void createFile(PluginCall call) {
@@ -265,7 +264,8 @@ public class AndroidSAFPlugin extends Plugin {
     if (fileDF == null) {
       call.reject("Error creating file", ERR_IO_EXCEPTION);
       return;
-    };
+    }
+    ;
 
     // call writeFile() passing the created fileDF
     _writeFile(call, fileDF);
@@ -275,9 +275,7 @@ public class AndroidSAFPlugin extends Plugin {
   /**
    * Write content to an existing file or create a new file
    *
-   * @param call
-   *  call.fileUri: URI of the EXISTING file to be overwritten
-   *
+   * @param call call.fileUri: URI of the EXISTING file to be overwritten
    */
   @PluginMethod()
   public void writeFile(PluginCall call) {
@@ -329,8 +327,7 @@ public class AndroidSAFPlugin extends Plugin {
           osw.write(content);
           osw.flush();
         }
-      }
-      else {
+      } else {
         // remove header from dataURL
         if (content.contains(",")) {
           content = content.split(",")[1];
@@ -353,8 +350,7 @@ public class AndroidSAFPlugin extends Plugin {
     // delete file
     if (fileDF != null && !fileDF.delete()) {
       call.reject("Error deleting file", ERR_IO_EXCEPTION);
-    }
-    else {
+    } else {
       call.resolve();
     }
   }
@@ -390,7 +386,7 @@ public class AndroidSAFPlugin extends Plugin {
   /**
    * More efficient method to find a file, avoiding calls to
    * slow DocumentFile methods like .getDisplayName()
-   *
+   * <p>
    * BEWARE: can't filter results of getContentResolver().query(), so it could be slow for crowded directories...
    *
    * @return Uri of the searched file or null
@@ -402,14 +398,13 @@ public class AndroidSAFPlugin extends Plugin {
     var dirUri = directoryDf.getUri();
     try {
       childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(dirUri, DocumentsContract.getDocumentId(dirUri));
-    }
-    catch (Exception ex) {
+    } catch (Exception ex) {
       return null;
     }
 
     // load all of the needed data in a single shot
     try (
-      Cursor c = getContext().getContentResolver().query(childrenUri, new String[] {
+      Cursor c = getContext().getContentResolver().query(childrenUri, new String[]{
         DocumentsContract.Document.COLUMN_DOCUMENT_ID,    // 0
         DocumentsContract.Document.COLUMN_DISPLAY_NAME,   // 1
       }, null, null, null);
@@ -424,15 +419,14 @@ public class AndroidSAFPlugin extends Plugin {
     }
     return null;
   }
+
   /**
    * More efficient method to retrieve directory content, avoiding calls to
    * slow DocumentFile methods like .getDisplayName()
    *
-   * @see "https://stackoverflow.com/questions/42186820/why-is-documentfile-so-slow-and-what-should-i-use-instead"
-   *
    * @param directoryUri URI of the directory to be searched
-   *
    * @return JSArray of JSObject items, ready to be returned to JS
+   * @see "https://stackoverflow.com/questions/42186820/why-is-documentfile-so-slow-and-what-should-i-use-instead"
    */
   @Nullable
   private String listFileFaster(Uri directoryUri) {
@@ -441,7 +435,7 @@ public class AndroidSAFPlugin extends Plugin {
 
     // load all of the needed data in a single shot
     try (
-      Cursor c = getContext().getContentResolver().query(childrenUri, new String[] {
+      Cursor c = getContext().getContentResolver().query(childrenUri, new String[]{
         DocumentsContract.Document.COLUMN_DOCUMENT_ID,    // 0
         DocumentsContract.Document.COLUMN_DISPLAY_NAME,   // 1
         DocumentsContract.Document.COLUMN_MIME_TYPE,      // 2
@@ -473,8 +467,7 @@ public class AndroidSAFPlugin extends Plugin {
       jw.endArray();
       jw.close();
       return sw.toString();
-    }
-    catch (Exception ignored) {
+    } catch (Exception ignored) {
       return null;
     }
   }
@@ -551,8 +544,8 @@ public class AndroidSAFPlugin extends Plugin {
     try {
       // could throw errors if malformed
       directoryDf = DocumentFile.fromTreeUri(getContext(), Uri.parse(directoryUri));
+    } catch (Exception ignored) {
     }
-    catch (Exception ignored) { }
     if (directoryDf == null || !directoryDf.exists()) {
       call.reject("Invalid or missing directory", ERR_INVALID_URI);
       return null;
@@ -580,60 +573,63 @@ public class AndroidSAFPlugin extends Plugin {
   }
 
   /**
-   * Return the duration (in ms) of the given media filenames
+   * Return the duration (in ms) of the given media filenames.
+   * It returns a JSON serialized object where the keys are fileUris and values are durations.
    */
   @PluginMethod()
   public void getMediaFilesDuration(PluginCall call) {
 
-    // get file uris
-    var fileUris = call.getArray("fileUri");
+    // get file uris (array of uris serialized to JSON)
+    var fileUris = call.getString("jsonFileUris");
     if (fileUris == null) {
       call.reject(ERR_INVALID_URI);
       return;
     }
 
-    List<String> files;
-    try {
-      files = fileUris.toList();
-    } catch (JSONException e) {
-      call.reject(ERR_INVALID_URI);
-      return;
-    }
-
-    // run for each file
-    for (var fileUri : files) {
-
-    }
-
-    var uri = Uri.parse(fileUriStr);
-    if (uri == null) {
-      call.reject(ERR_INVALID_URI);
-      return;
-    }
-
+    // result is returned as JSon object, to avoid inefficiency in case of large result array
     try (
+      var sr = new StringReader(fileUris);
+      var jr = new JsonReader(sr);
+      var sw = new StringWriter();
+      var jw = new JsonWriter(sw);
       var metaRetriever = new MediaMetadataRetriever();
     ) {
-      metaRetriever.setDataSource(getContext(), uri);
-      String durationStr = metaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-      int durationMs = 0;
-      if (durationStr != null) {
-        durationMs = Integer.parseInt(durationStr);
-      }
-      else {
-        call.reject(ERR_INVALID_URI);
-        return;
+      jw.beginObject();
+
+      // extract uris from JSON array
+      jr.beginArray();
+
+      // loop on each file
+      var context = getContext();
+      while (jr.hasNext()) {
+        var file = jr.nextString();
+        var uri = Uri.parse(file);
+        metaRetriever.setDataSource(context, uri);
+        var durationStr = metaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+        int durationMs = 0;
+        if (durationStr != null) {
+          durationMs = Integer.parseInt(durationStr);
+        } else {
+          call.reject(ERR_INVALID_URI);
+          return;
+        }
+
+        // append to result
+        jw.name(file).value(durationMs);         // file URI as key, duration as value
       }
 
+      // close JSON
+      jw.endObject();
+      jw.close();
+
+      // return result
       var res = new JSObject();
-      res.put("duration", durationMs);
+      res.put("jsonResult", sw.toString());
       call.resolve(res);
 
     } catch (IOException e) {
       call.reject(e.getMessage(), ERR_IO_EXCEPTION);
     }
-
   }
-
 
 }

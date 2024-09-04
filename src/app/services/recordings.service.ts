@@ -143,6 +143,20 @@ export class RecordingsService {
         }
       }
 
+      // retrieve duration for recordings that miss it
+      const noDurationRecsFileUris = Object.values(currentDbObj)
+        .filter(r => !r.duration               || true)
+        .map(r => r.audioUri)
+      ;
+
+      if (noDurationRecsFileUris.length) {
+        const durations = await AndroidSAFUtils.getMediaFilesDuration(noDurationRecsFileUris);
+        for (const [uri, duration] of Object.entries(durations)) {
+          const r = Object.values(currentDbObj).find(r => r.audioUri === uri);
+          if (r) r.duration = duration / 1000;
+        }
+      }
+
       // update collection & cache
       this.lastUpdate = new Date().getTime();
       this.recordings.next(Object.values(currentDbObj));
