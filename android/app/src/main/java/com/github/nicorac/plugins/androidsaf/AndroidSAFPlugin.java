@@ -2,6 +2,7 @@ package com.github.nicorac.plugins.androidsaf;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.provider.ContactsContract;
 import android.provider.DocumentsContract;
@@ -21,6 +22,8 @@ import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.ActivityCallback;
 import com.getcapacitor.annotation.CapacitorPlugin;
 
+import org.json.JSONException;
+
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -30,6 +33,7 @@ import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Objects;
 
 @CapacitorPlugin(name = "AndroidSAF")
@@ -574,5 +578,62 @@ public class AndroidSAFPlugin extends Plugin {
     }
     return df;
   }
+
+  /**
+   * Return the duration (in ms) of the given media filenames
+   */
+  @PluginMethod()
+  public void getMediaFilesDuration(PluginCall call) {
+
+    // get file uris
+    var fileUris = call.getArray("fileUri");
+    if (fileUris == null) {
+      call.reject(ERR_INVALID_URI);
+      return;
+    }
+
+    List<String> files;
+    try {
+      files = fileUris.toList();
+    } catch (JSONException e) {
+      call.reject(ERR_INVALID_URI);
+      return;
+    }
+
+    // run for each file
+    for (var fileUri : files) {
+
+    }
+
+    var uri = Uri.parse(fileUriStr);
+    if (uri == null) {
+      call.reject(ERR_INVALID_URI);
+      return;
+    }
+
+    try (
+      var metaRetriever = new MediaMetadataRetriever();
+    ) {
+      metaRetriever.setDataSource(getContext(), uri);
+      String durationStr = metaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+      int durationMs = 0;
+      if (durationStr != null) {
+        durationMs = Integer.parseInt(durationStr);
+      }
+      else {
+        call.reject(ERR_INVALID_URI);
+        return;
+      }
+
+      var res = new JSObject();
+      res.put("duration", durationMs);
+      call.resolve(res);
+
+    } catch (IOException e) {
+      call.reject(e.getMessage(), ERR_IO_EXCEPTION);
+    }
+
+  }
+
 
 }

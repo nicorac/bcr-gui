@@ -113,6 +113,12 @@ export class Recording {
     }
     res.setMetadata(metadata);
 
+    // media duration (read from file)
+    if (!res.duration) {
+      const { duration: durationMs } = await AndroidSAF.getMediaFilesDuration({ fileUri: file.uri });
+      res.duration = durationMs / 1000;
+    }
+
     return res;
   }
 

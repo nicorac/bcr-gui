@@ -14,7 +14,7 @@ export interface AndroidSAFPlugin {
 
   /**
    * Return a string containing the serialized version of IDocumentFile[].
-   * This is due avoid inefficiency in speed and memory of returning a big array (in case of more then 2000 files).
+   * This is to avoid inefficiency in speed and memory of returning a big array (in case of more then 2000 files).
    *
    * NOTE: call AndroidSAFUtils.listFiles() to directly get IDocumentFile[]
    *
@@ -66,6 +66,11 @@ export interface AndroidSAFPlugin {
    */
   deleteFile(options: DeleteFileOptions): Promise<void>;
 
+  /**
+   * Returns the duration (in ms) of one or more media files.
+   */
+  getMediaFilesDuration(options: FileOptions): Promise<{ durations: { fileUri: string, duration: number }[] }>;
+
 }
 
 export class AndroidSAFUtils {
@@ -100,6 +105,11 @@ export enum Encoding {
 interface FileOptions {
   // filename
   fileUri: string;
+}
+
+interface FilesOptions {
+  // filenames
+  fileUri: string[];
 }
 
 export interface DirectoryOptions {
