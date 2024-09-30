@@ -5,6 +5,7 @@ import { Encoding } from '@capacitor/filesystem';
 import { AlertController, IonicSafeString, Platform } from '@ionic/angular';
 import { DB_FILENAME, DB_SCHEMA_VERSION, DbContent } from '../models/dbContent';
 import { Recording } from '../models/recording';
+import { MainPage } from '../pages/main/main.page';
 import { replaceExtension } from '../utils/filesystem';
 import { deserializeObject, serializeObject } from '../utils/json-serializer';
 import { MessageBoxService } from './message-box.service';
@@ -22,6 +23,9 @@ export class RecordingsService {
 
   // timestamp of last update, used to automatically refresh recording on app resume
   private lastUpdate: number = 0;
+
+  // reference to main page (if active)
+  public mainPageRef?: MainPage = undefined;
 
   /**
    * Refresh status:

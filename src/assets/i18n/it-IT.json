@@ -43,6 +43,7 @@
   "ERR_OS003": "Errore durante la condivisione della registrazione",
   "ERR_OS004": "Errore durante la cancellazione del file: %filename%",
   "ERR_OS005": "Errore durante la selezione della cartella di registrazione",
+  "ERR_OS006": "Impossibile aprire la registrazione richiesta: %filename%.\n\n%appname% può accedere solo ai file contenuti nella cartella registrazioni configurata.",
   "ERR_PLAYER": "Errore player audio: %context%",
   "FNP_EDITOR_PATTERN": "Formato del nome del file",
   "FNP_EDITOR_PATTERN_TEXT": "Formato usato per estrarre le informazioni della registrazione dai file che non hanno il corrispondente file metadati .json. Deve essere una Regular Expression Javascript, con segnaposti speciali.",

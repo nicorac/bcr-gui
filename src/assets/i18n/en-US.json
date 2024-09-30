@@ -43,6 +43,7 @@
   "ERR_OS003": "Error sharing recording",
   "ERR_OS004": "Error deleting file: %filename%",
   "ERR_OS005": "Error selecting recordings directory",
+  "ERR_OS006": "Can't open requested recording file: %filename%.\n\n%appname% can only access files in configured recordings directory.",
   "ERR_PLAYER": "Audio player error: %context%",
   "FNP_EDITOR_PATTERN": "Filename pattern",
   "FNP_EDITOR_PATTERN_TEXT": "Pattern used to parse filenames of recordings that don't have a corresponding .json metadata file. It must be a valid Javascript Regular Expression, with custom placeholders.",

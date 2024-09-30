@@ -11,10 +11,12 @@ import { SettingsService } from 'src/app/services/settings.service';
 import { filterList } from 'src/app/utils/filterList';
 import { sortRecordings } from 'src/app/utils/recordings-sorter';
 import { bringIntoView } from 'src/app/utils/scroll';
+import { asyncWaitForCondition } from 'src/app/utils/waitForAsync';
 import { AndroidSAF } from 'src/plugins/androidsaf';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { DatePipe } from '@angular/common';
 import { AfterViewInit, Component, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 import { Clipboard } from '@capacitor/clipboard';
 import { Directory, Filesystem } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
@@ -61,14 +63,19 @@ export class MainPage implements AfterViewInit {
     private mbs: MessageBoxService,
     private toHms: ToHmsPipe,
     protected recordingsService: RecordingsService,
+    protected router: Router,
     protected settings: SettingsService,
   ) { }
 
   async ionViewWillEnter() {
 
+    // save reference to myself
+    this.recordingsService.mainPageRef = this;
+
     // subscribe
     [
       this.recordingsService.recordings.subscribe((res) => {
+        this.clearSelection();
         this.itemsAll = res;
         this.updateFilter();
       })
@@ -77,9 +84,60 @@ export class MainPage implements AfterViewInit {
   }
 
   /**
+   * Handle the VIEW intent request
+   */
+  async playIntentFile(viewIntentFilename: string, forceListRefresh = false) {
+
+    // wait for refresh completion
+    if (forceListRefresh) {
+      await this.refreshList();
+    }
+
+    this.clearFilter();
+
+    // find the required filename
+    const playItemIx = this.items.findIndex(i => i.audioUri === viewIntentFilename);
+    if (playItemIx >= 0) {
+
+      const playItem = this.items[playItemIx];
+
+      // ensure it's visible
+      this.scrollViewport.scrollToIndex(playItemIx);
+
+      // select it
+      playItem.selected = true;
+
+      // play it (need to wait for player initialization)
+      asyncWaitForCondition(
+        () => this.player?.recording === playItem && this.player.isReady(),
+        () => this.player!.play(),
+      );
+
+    }
+    else if (!forceListRefresh) {
+      // retry forcing list refresh
+      this.playIntentFile(viewIntentFilename, true);
+    }
+    else {
+      // error
+      this.mbs.showError({
+        appErrorCode: 'ERR_OS006',
+        appErrorArgs: {
+          appname: 'BCR-GUI',
+          filename: viewIntentFilename,
+        },
+      });
+    }
+
+  }
+
+  /**
    * Stop the player before leaving the page
    */
   async ionViewWillLeave() {
+    // clear reference to myself
+    this.recordingsService.mainPageRef = undefined;
+
     await this.stopPlayer();
     this._subs.unsubscribe();
   }
@@ -88,10 +146,10 @@ export class MainPage implements AfterViewInit {
     await this.recordingsService.initialize();
   }
 
-  async refreshList(event: RefresherCustomEvent) {
-    event.target.complete();
+  refreshList(event?: RefresherCustomEvent) {
+    event?.target.complete();
     this.clearSelection();
-    await this.recordingsService.refreshContent();
+    return this.recordingsService.refreshContent();
   }
 
   clearSelection() {

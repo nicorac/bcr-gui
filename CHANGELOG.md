@@ -1,5 +1,16 @@
 # Version history
 
+## Version 1.7.xx (2024-xx-xx)
+
+New features:
+
+- BCR-GUI can now be selected as default player for BCR recordings \
+  (just press `OPEN` button in BCR notification that appears when recording completes)
+
+Bug fixes:
+
+- Updated French and Czech translations
+
 ## Version 1.7.9 (2024-08-27)
 
 New features:

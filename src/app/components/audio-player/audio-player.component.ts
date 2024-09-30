@@ -137,6 +137,11 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Test if the player is ready to play
+   */
+  public isReady() { return this.ready };
+
+  /**
    * Show error alert
    */
   private showError(error: any, context: string) {
@@ -145,7 +150,7 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
       appErrorCode: 'ERR_PLAYER',
       appErrorArgs: { context: context },
     });
-}
+  }
 
   /**
    * Toggle between play and pause
@@ -162,13 +167,13 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
   /**
    * Play the given record file (already loaded with load())
    */
-  protected play(position?: number) {
+  async play(position?: number) {
 
     if (position === undefined) {
       position = this.progress;
     }
 
-    AudioPlayer.play({ id: this.playerRef!.id, position: position * 1000 })
+    return AudioPlayer.play({ id: this.playerRef!.id, position: position * 1000 })
       .then(async _ => {
         this.status = PlayerStatusEnum.Playing;
       })

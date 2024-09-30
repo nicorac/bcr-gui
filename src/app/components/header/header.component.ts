@@ -1,7 +1,6 @@
 import { RecordingsService } from 'src/app/services/recordings.service';
 import { AsyncPipe, NgFor, NgIf } from '@angular/common';
-import { Component, Input, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, Input } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 
 export type ActionButton = {
@@ -24,7 +23,6 @@ export class HeaderComponent {
   @Input() showCustomContent = false;
 
   constructor(
-    private readonly route: ActivatedRoute,
     protected recordingsService: RecordingsService,
   )
   { }
