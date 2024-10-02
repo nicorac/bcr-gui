@@ -122,6 +122,19 @@
       </div>
     </ion-item>
 
+    <ion-item>
+      <div class="wrapper">
+        <div class="label">
+          <div>{{ 'SETTINGS_PLAYER_ENABLE_EARPIECE' | translatePipe }}</div>
+          <div class="help">{{ 'SETTINGS_PLAYER_ENABLE_EARPIECE_HELP' | translatePipe }}</div>
+        </div>
+        <ion-checkbox
+          [(ngModel)]="settings.enableEarpiece"
+          (ngModelChange)="save()"
+        />
+      </div>
+    </ion-item>
+
   </ion-list>
 
 </ion-content>

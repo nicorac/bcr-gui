@@ -6,6 +6,8 @@ import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.media.AudioAttributes;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
@@ -16,6 +18,8 @@ import androidx.core.app.NotificationCompat;
 
 import com.github.nicorac.bcrgui.R;
 
+import java.io.IOException;
+
 /**
  * Wrapper class to keep data of each media player instance together
  */
@@ -25,13 +29,16 @@ public class MediaPlayerEx {
   private static final String NOTIFICATION_CHANNEL_ID = "BCR-GUI";
   private static final String NOTIFICATION_CHANNEL_NAME = "BCR-GUI - Play status";
 
-  private final Context context;
+  public final Context context;
+  public final Uri fileUri;
   public final int id;
   public final String title;
   public final String text;
-  private final android.media.MediaPlayer player;
+  private OutputDeviceEnum device;
+  private android.media.MediaPlayer player;
+  private final AudioManager audioManager;
   @Nullable
-  public androidx.core.app.NotificationCompat.Builder notificationBuilder = null;
+  public androidx.core.app.NotificationCompat.Builder notificationBuilder;
 
   // events and update handler
   private final Handler handler = new Handler(Looper.getMainLooper());
@@ -42,12 +49,18 @@ public class MediaPlayerEx {
   private static NotificationManager notificationManager;
   private boolean isNotificationVisible = false;
 
-  MediaPlayerEx(Context context, Uri fileUri, String title, String text, OnEventListener listener) {
+
+  MediaPlayerEx(Context context, Uri fileUri, String title, String text, OnEventListener listener, OutputDeviceEnum device) {
+
     this.context = context;
+    this.fileUri = fileUri;
     this.id = fileUri.hashCode();
     this.title = title;
     this.text = text;
+    this.device = device;
     this.eventListener = listener;
+
+    audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
 
     // get instance of NotificationManager and create notifications channel
     if (notificationManager == null) {
@@ -68,8 +81,53 @@ public class MediaPlayerEx {
     notificationBuilder = new androidx.core.app.NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID);
 
     // create MediaPlayer instance
-    player = android.media.MediaPlayer.create(context, fileUri);
-    player.setLooping(false);
+    initializePlayer();
+
+  }
+
+  /**
+   * Initialize the MediaPlayer instance
+   */
+  private void initializePlayer() {
+
+    // release previous player (if any)
+    if (player != null) {
+      player.release();
+      player = null;
+    }
+
+    player = new android.media.MediaPlayer();
+    AudioAttributes audioAttributes = null;
+
+    // change device
+    switch (device) {
+
+      case Earpiece:
+        // Switch to earpiece
+        audioManager.setSpeakerphoneOn(false);
+        audioAttributes = new AudioAttributes.Builder()
+          .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
+          .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+          .build();
+        break;
+
+      case Loudspeaker:
+        // Switch to loudspeaker
+        audioManager.setSpeakerphoneOn(true);
+        audioAttributes = new AudioAttributes.Builder()
+          .setUsage(AudioAttributes.USAGE_MEDIA)
+          .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+          .build();
+        break;
+    }
+
+    try {
+      player.setAudioAttributes(audioAttributes);
+      player.setDataSource(context, fileUri);
+      player.prepare();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
 
     // attach completion handler
     player.setOnCompletionListener(mp -> {
@@ -77,6 +135,39 @@ public class MediaPlayerEx {
       cancelNotification();
       this.eventListener.onCompletion(this);
     });
+
+  }
+
+  /**
+   * (Re)initialize the MediaPlayer instance on a new output device
+   * @param newDevice can be "ear" or "loud"
+   */
+  public void setOutputDevice(OutputDeviceEnum newDevice) {
+
+    if (newDevice == null || newDevice.equals(device)) {
+      return;
+    }
+
+    // update device
+    this.device = newDevice;
+
+    // save current position and pause
+    var curPos = 0;
+    var wasPlaying = isPlaying();
+    if (wasPlaying) {
+      stop();
+      curPos = getCurrentPosition();
+    }
+
+    // re-init player
+    initializePlayer();
+
+    // restore previous status
+    if (wasPlaying) {
+      seekTo(curPos);
+      start();
+    }
+
   }
 
   // export player methods
@@ -169,6 +260,7 @@ public class MediaPlayerEx {
       cancelNotification();
     }
 
+    assert notificationBuilder != null;
     notificationBuilder
       .setContentTitle(title)
       .setSmallIcon(R.drawable.ic_notification)
@@ -188,6 +280,7 @@ public class MediaPlayerEx {
    */
   public void updateNotification() {
     if (isNotificationVisible) {
+      assert notificationBuilder != null;
       notificationBuilder.setContentText(getCurrentPositionHMS() + " / " + getDurationHMS());
       // set/update the notification
       notificationManager.notify(id, notificationBuilder.build());

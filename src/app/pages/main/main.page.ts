@@ -13,6 +13,7 @@ import { sortRecordings } from 'src/app/utils/recordings-sorter';
 import { bringIntoView } from 'src/app/utils/scroll';
 import { asyncWaitForCondition } from 'src/app/utils/waitForAsync';
 import { AndroidSAF } from 'src/plugins/androidsaf';
+import { AudioPlayer } from 'src/plugins/audioplayer';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { DatePipe } from '@angular/common';
 import { AfterViewInit, Component, ViewChild } from '@angular/core';
@@ -71,6 +72,9 @@ export class MainPage implements AfterViewInit {
 
     // save reference to myself
     this.recordingsService.mainPageRef = this;
+
+    // set audio output
+    await AudioPlayer.setConfiguration({ enableEarpiece: this.settings.enableEarpiece });
 
     // subscribe
     [

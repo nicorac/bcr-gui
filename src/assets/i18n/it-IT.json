@@ -115,6 +115,8 @@
   "SETTINGS_LANGUAGE_ADD": "aggiungi nuova lingua",
   "SETTINGS_LANGUAGE_TEXT": "Lingua applicazione",
   "SETTINGS_MAKE_SELECTION": "Seleziona un elemento",
+  "SETTINGS_PLAYER_ENABLE_EARPIECE": "Abilita auricolare",
+  "SETTINGS_PLAYER_ENABLE_EARPIECE_HELP": "Usa il sensore di prossimità per abilitare l'auricolare durante la riproduzione audio",
   "SETTINGS_PLAYER_SECTION": "Riproduzione",
   "SETTINGS_PLAYER_SEEK_TIME": "Intervallo ricerca",
   "SETTINGS_RECORDINGS_DIRECTORY": "Cartella registrazioni",

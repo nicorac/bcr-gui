@@ -5,6 +5,10 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
@@ -28,14 +32,21 @@ public class AudioPlayerService extends Service {
   private static PendingIntent bringAppToForegroundIntent;
   private static NotificationManager notificationManager;
 
-  // wakelock to keep the service alive when playing
-  private PowerManager.WakeLock wakeLock = null;
+  // wakelocks to keep the service alive when playing and turn off screen when in proximity
+  private PowerManager.WakeLock wakeLockPlay = null;
+  private PowerManager.WakeLock wakeLockProximity = null;
 
   // players collection
   private final HashMap<Integer, MediaPlayerEx> players = new HashMap<>();
 
   // reference to plugin
   private IJSEventSender plugin;
+
+  // proximity sensor management
+  private SensorManager sensorManager;
+  private Sensor proximitySensor;
+  private SensorEventListener proximityListener;
+  private OutputDeviceEnum currentOutputDevice = null;
 
   // Plugin <--> Service binding support
   private final IBinder binder = new AudioPlayerServiceBinder();
@@ -51,10 +62,11 @@ public class AudioPlayerService extends Service {
 
     super.onCreate();
     var powerManager = (PowerManager) getSystemService(POWER_SERVICE);
-    wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "AudioPlayerService::WakelockTag");
+    wakeLockPlay = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "BcrGuiAudioPlayerService::WakeLock");
+    wakeLockProximity = powerManager.newWakeLock(PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK, "BcrGuiAudioPlayerService::ProximityWakeLock");
 
     // Create an Intent for the "bring-to-front" action to be linked in notifications
-    Intent customIntent = new Intent(getApplicationContext(), MainActivity.class);
+    var customIntent = new Intent(getApplicationContext(), MainActivity.class);
     customIntent.setAction(Intent.ACTION_MAIN);
     customIntent.addCategory(Intent.CATEGORY_LAUNCHER);
 
@@ -86,7 +98,10 @@ public class AudioPlayerService extends Service {
       release(i);
     }
     players.clear();
-    wakeLockUpdate();
+    cleanupProximitySensor();
+    if (wakeLockPlay.isHeld()) wakeLockPlay.release();
+    if (wakeLockProximity.isHeld()) wakeLockProximity.release();
+
   }
 
   @Override
@@ -119,44 +134,16 @@ public class AudioPlayerService extends Service {
     // initialize media player (if needed)
     if (!players.containsKey(id)) {
       try {
-
         var fileUri = Uri.parse(fileUriStr);
-        var mpe = new MediaPlayerEx(
-          getApplicationContext(),
-          fileUri,
-          notificationTitle,
-          notificationText,
-          new OnEventListener() {
-
-            @Override
-            public PendingIntent getNotificationClickIntent() { return bringAppToForegroundIntent; }
-
-            @Override
-            public void onUpdate(MediaPlayerEx player) {
-              var res = new JSObject();
-              res.put("id", id);
-              res.put("position", player.getCurrentPosition());
-              plugin.sendJSEvent("update", res);
-            }
-
-            @Override
-            public void onCompletion(MediaPlayerEx mp) {
-              var res = new JSObject();
-              res.put("id", id);
-              plugin.sendJSEvent("playCompleted", res);
-            }
-
-          }
-        );
+        var mpe = createPlayerInstance(id, fileUri, notificationTitle, notificationText);
         players.put(id, mpe);
-
       } catch (Exception e) {
         call.reject("Error loading audio file: " + fileUriStr);
         return;
       }
     }
 
-    // return id of the new/existing mediaplayer instance
+    // return id of the new/existing MediaPlayer instance
     var res = new JSObject();
     res.put("id", id);
     call.resolve(res);
@@ -164,7 +151,62 @@ public class AudioPlayerService extends Service {
   }
 
   /**
-   * Release current audio file and free the linked mediaplayer
+   * Set player configuration
+   */
+  public void setConfiguration(PluginCall call) {
+
+    var enableEarpiece = call.getBoolean("enableEarpiece", false);
+
+    // initialize proximity sensor when earpiece is enabled
+    if (enableEarpiece != null && enableEarpiece) {
+      initProximitySensor();
+    }
+    else {
+      cleanupProximitySensor();
+    }
+
+    call.resolve();
+
+  }
+
+  /**
+   * Create a new instance of MediaPlayer class
+   */
+  private MediaPlayerEx createPlayerInstance(int id, Uri fileUri, String notificationTitle, String notificationText) {
+
+    return new MediaPlayerEx(
+      getApplicationContext(),
+      fileUri,
+      notificationTitle,
+      notificationText,
+      new OnEventListener() {
+
+        @Override
+        public PendingIntent getNotificationClickIntent() { return bringAppToForegroundIntent; }
+
+        @Override
+        public void onUpdate(MediaPlayerEx player) {
+          var res = new JSObject();
+          res.put("id", id);
+          res.put("position", player.getCurrentPosition());
+          plugin.sendJSEvent("update", res);
+        }
+
+        @Override
+        public void onCompletion(MediaPlayerEx mp) {
+          var res = new JSObject();
+          res.put("id", id);
+          plugin.sendJSEvent("playCompleted", res);
+        }
+
+      },
+      currentOutputDevice
+    );
+
+  }
+
+  /**
+   * Release current audio file and free the linked MediaPlayer
    */
   public void release(PluginCall call) {
 
@@ -172,7 +214,7 @@ public class AudioPlayerService extends Service {
     if (id == null) {
       call.reject(ERR_BAD_ID);
       return;
-    };
+    }
 
     // remove item
     var p = players.get(id);
@@ -306,11 +348,11 @@ public class AudioPlayerService extends Service {
     }
     catch (Exception ignored) {}
 
-    if (toBeEnabled && !wakeLock.isHeld()) {
-      wakeLock.acquire(4 * 60 * 60 * 1000L /* 4 hours */);
+    if (toBeEnabled && !wakeLockPlay.isHeld()) {
+      wakeLockPlay.acquire(4 * 60 * 60 * 1000L /* 4 hours */);
     }
-    else if (!toBeEnabled && wakeLock.isHeld()) {
-      wakeLock.release();
+    else if (!toBeEnabled && wakeLockPlay.isHeld()) {
+      wakeLockPlay.release();
     }
 
   }
@@ -342,4 +384,84 @@ public class AudioPlayerService extends Service {
 
   }
 
+  /**
+   * Change output device for all players
+   * @param newDevice Can be "ear" or "loud"
+   */
+  protected void changeOutputDevice(OutputDeviceEnum newDevice) {
+
+    currentOutputDevice = newDevice;
+
+    // change device (will reinitialize the players)
+    // and test if any player is playing?
+    var isPlaying = false;
+    for (MediaPlayerEx p : players.values()) {
+      isPlaying |= p.isPlaying();
+      p.setOutputDevice(newDevice);
+    }
+
+    // turn screen off when earpiece active
+    if (currentOutputDevice == OutputDeviceEnum.Earpiece) {
+      if (isPlaying && !wakeLockProximity.isHeld()) {
+        wakeLockProximity.acquire(4 * 60 * 60 * 1000L); /* 4 hours */
+      }
+    }
+    else {
+      if (wakeLockProximity.isHeld()) {
+        wakeLockProximity.release();
+      }
+    }
+
+  }
+
+  /**
+   * Initialize proximity sensor management
+   */
+  private void initProximitySensor() {
+
+    if (sensorManager != null) {
+      cleanupProximitySensor();
+    }
+
+    // audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+    sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+    proximitySensor = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
+
+    // listen to sensor events and call setOutputDevice() on changes
+    proximityListener = new SensorEventListener() {
+
+      @Override
+      public void onSensorChanged(SensorEvent event) {
+        var newDevice = event.values[0] < proximitySensor.getMaximumRange()
+          ? OutputDeviceEnum.Earpiece
+          : OutputDeviceEnum.Loudspeaker;
+        if (!newDevice.equals(currentOutputDevice)) {
+          changeOutputDevice(newDevice);
+        }
+      }
+
+      @Override
+      public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        // Handle accuracy changes if needed
+      }
+
+    };
+
+    // Register the proximity sensor listener
+    sensorManager.registerListener(proximityListener, proximitySensor, SensorManager.SENSOR_DELAY_NORMAL);
+
+  }
+
+  /**
+   * Cleanup proximity sensor management
+   */
+  private void cleanupProximitySensor() {
+    if (sensorManager != null && proximityListener != null) {
+      sensorManager.unregisterListener(proximityListener);
+      sensorManager = null;
+      proximityListener = null;
+    }
+  }
+
 }
+

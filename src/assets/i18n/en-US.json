@@ -115,6 +115,8 @@
   "SETTINGS_LANGUAGE_ADD": "add new language",
   "SETTINGS_LANGUAGE_TEXT": "Application language",
   "SETTINGS_MAKE_SELECTION": "Make a selection",
+  "SETTINGS_PLAYER_ENABLE_EARPIECE": "Enable earpiece",
+  "SETTINGS_PLAYER_ENABLE_EARPIECE_HELP": "Use proximity sensor to switch to earpiece while playing",
   "SETTINGS_PLAYER_SECTION": "Player",
   "SETTINGS_PLAYER_SEEK_TIME": "Seek time",
   "SETTINGS_RECORDINGS_DIRECTORY": "Recordings directory",

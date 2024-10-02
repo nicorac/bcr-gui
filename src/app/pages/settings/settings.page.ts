@@ -5,6 +5,7 @@ import { MessageBoxService } from 'src/app/services/message-box.service';
 import { RecordingsService } from 'src/app/services/recordings.service';
 import { SortModeEnum } from 'src/app/utils/recordings-sorter';
 import version from 'src/app/version';
+import { OutputDeviceEnum } from 'src/plugins/audioplayer';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { ModalController, Platform } from '@ionic/angular';
@@ -19,6 +20,7 @@ import { FilenamePatternEditorComponent } from './filename-pattern-editor/filena
 })
 export class SettingsPage {
 
+  protected OutputDeviceEnum = OutputDeviceEnum;
   protected SortMode = SortModeEnum;
   protected version = version;
 

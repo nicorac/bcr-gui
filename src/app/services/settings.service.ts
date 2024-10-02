@@ -154,6 +154,12 @@ export class SettingsService {
   @JsonProperty()
   public recordingsSortMode: SortModeEnum = SortModeEnum.Date_DESC;
 
+  /**
+   * Enable earpiece usage (together with proximity sensor)
+   */
+  @JsonProperty()
+  public enableEarpiece = true;
+
   constructor(
     private mbs: MessageBoxService,
   ) { }

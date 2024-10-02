@@ -61,6 +61,8 @@ public class AudioPlayerPlugin extends Plugin implements IJSEventSender {
   }
 
   // reflect plugin methods to service
+  @PluginMethod() public void setConfiguration(PluginCall call)
+  { apsvc.setConfiguration(call); }
   @PluginMethod() public void init(PluginCall call)
   { apsvc.init(call); }
   @PluginMethod() public void release(PluginCall call)

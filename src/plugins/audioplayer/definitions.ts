@@ -3,6 +3,9 @@ import { PluginListenerHandle } from '@capacitor/core';
 
 export interface AudioPlayer extends EventManagerPlugin {
 
+  // Set configuration
+  setConfiguration(config: { enableEarpiece: boolean }): Promise<void>;
+
   // Initialize a new MediaPlayer instance on the given file URI
   init(options: { fileUri: string, notificationTitle?: string, notificationText?: string }): Promise<IBaseParams>;
 
@@ -36,4 +39,10 @@ export interface IPlayParams extends IBaseParams {
 
 export interface IUpdateData extends IBaseParams {
   position: number;  // current play position (in ms)
+}
+
+export enum OutputDeviceEnum {
+  Auto = 0,
+  Earpiece = 1,
+  Loudspeaker = 2,
 }
