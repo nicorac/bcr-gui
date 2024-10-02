@@ -5,7 +5,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "External device (WebView debug)",
+      "name": "Real device (WebView debug)",
       "type": "android-webview",
       "request": "attach",
       "application": "com.github.nicorac.bcrgui.debug",
@@ -14,13 +14,21 @@
       "preLaunchTask": "Ionic run (ext device)",
     },
     {
-      "name": "Local Chrome (localhost)",
-      "type": "chrome",
+      "name": "Build ng app (use in case /www/index.html is missing)",
+      "type": "node-terminal",
       "request": "launch",
-      "url": "http://localhost:8100",
-      "webRoot": "${workspaceFolder}",
-      "preLaunchTask": "Ionic serve (localhost)",
+      "cwd": "${workspaceRoot}",
+      "command": "npm run build",
+      "autoAttachChildProcesses": false,
     },
+    // {
+    //   "name": "Local Chrome (localhost)",
+    //   "type": "chrome",
+    //   "request": "launch",
+    //   "url": "http://localhost:8100",
+    //   "webRoot": "${workspaceFolder}",
+    //   "preLaunchTask": "Ionic serve (localhost)",
+    // },
     {
       "name": "Check i18n files",
       "request": "launch",
