@@ -9,8 +9,8 @@
     <ion-item>
       <ion-select
         label="{{ 'DTF_EDITOR_DATE_FORMAT' | translatePipe }}"
-        [disabled]="(format.customFormat?.length ?? 0) > 0"
-        [(ngModel)]="format.dateStyle"
+        [disabled]="(format().customFormat?.length ?? 0) > 0"
+        [(ngModel)]="format().dateStyle"
       >
         <ion-select-option [value]="'full'">
           {{ dateTimeSample | datetime : { dateStyle: "full" } }}
@@ -36,8 +36,8 @@
     <ion-item>
       <ion-select
         label="{{ 'DTF_EDITOR_TIME_FORMAT' | translatePipe }}"
-        [disabled]="(format.customFormat?.length ?? 0) > 0"
-        [(ngModel)]="format.timeStyle"
+        [disabled]="(format().customFormat?.length ?? 0) > 0"
+        [(ngModel)]="format().timeStyle"
       >
         <ion-select-option [value]="'full'">
           {{
@@ -70,14 +70,14 @@
       <ion-input
         fill="none"
         [clearInput]="true"
-        [(ngModel)]="format.customFormat"
+        [(ngModel)]="format().customFormat"
       />
     </ion-item>
 
-    @if (format.customFormat) {
+    @if (format().customFormat) {
       <pre class="format-legend">
   {{ "DTF_EDITOR_PREVIEW" | translatePipe }}:
-  {{ dateTimeSample | datetime : { customFormat: format.customFormat } }}
+  {{ dateTimeSample | datetime : { customFormat: format().customFormat } }}
       </pre>
     }
 

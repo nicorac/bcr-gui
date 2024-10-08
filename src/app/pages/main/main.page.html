@@ -1,7 +1,7 @@
 <app-header
   [title]="version.appName"
   [actionButtons]="actionButtons"
-  [showCustomContent]="isMultiselect"
+  [showCustomContent]="isMultiselect()"
 >
   <!-- custom toolbar content -->
 
@@ -41,14 +41,13 @@
 </app-header>
 
 <!-- search panel -->
-@if (isSearch) {
+@if (isSearch()) {
   <ion-toolbar>
     <ion-searchbar #searchBar
       show-clear-button="focus"
       [debounce]="750"
       [(ngModel)]="searchValue"
       [placeholder]="'LBL_SEARCH' | translatePipe"
-      (ngModelChange)="updateFilter()"
       (ionClear)="clearFilter()"
     />
   </ion-toolbar>
@@ -58,20 +57,19 @@
 <ion-content #content
   id="main-content"
   class="ion-padding main-content"
-  [class.disabled]="recordingsService.refreshProgress | async"
+  [class.disabled]="recordingsService.refreshProgress()"
   [scrollY]="false"
 >
   <div class="content-wrapper">
 
     <ion-list class="items"
       lines="full"
-      style="height: 100%; min-height: 100%;"
       [style.--item-height]="itemHeight + 'px'"
       [style.--item-height-selected]="itemHeightSelected + 'px'"
       [style.--item-gap]="itemGap + 'px'"
     >
 
-      @if (topIndex === 0 && !isDraggingCursor) {
+      @if (topIndex === 0 && !scrollbar.isDragging()) {
         <ion-refresher
           slot="fixed"
           pullFactor=".5"
@@ -96,13 +94,13 @@
       >
 
         <!-- recording item -->
-        <ion-card *cdkVirtualFor="let item of items; let index = index"
+        <ion-card *cdkVirtualFor="let item of items(); let index = index"
           class="item"
-          [class.selected]="item.selected && !isMultiselect"
+          [class.selected]="item.selected && !isMultiselect()"
         >
-          <!-- isMultiselect checkbox -->
+          <!-- isMultiselect() checkbox -->
           <div>
-            @if (isMultiselect) {
+            @if (isMultiselect()) {
               <ion-checkbox class="checkbox" [(ngModel)]="item.selected" />
             }
           </div>
@@ -126,7 +124,7 @@
               </ion-card-subtitle>
             </ion-card-header>
 
-            @if (!isMultiselect && item.selected) {
+            @if (!isMultiselect() && item.selected) {
               <ion-card-content class="content">
 
                 <div class="details-actions">
@@ -179,9 +177,8 @@
 
     </ion-list>
 
-    <app-virtual-scrollbar class="virtual-scrollbar"
+    <app-virtual-scrollbar #scrollbar class="virtual-scrollbar"
       [virtualScrollViewport]="vsv"
-      (isDragging)="isDraggingCursor = $event"
     />
 
   </div>

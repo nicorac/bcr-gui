@@ -1,22 +1,33 @@
 import { Subscription } from 'rxjs';
 import { AppRoutesEnum } from 'src/app/app-routing.module';
+import { HeaderComponent } from 'src/app/components/header/header.component';
+import { TranslatePipe } from 'src/app/pipes/translate.pipe';
 import { I18nService } from 'src/app/services/i18n.service';
 import { MessageBoxService } from 'src/app/services/message-box.service';
 import { RecordingsService } from 'src/app/services/recordings.service';
 import { SortModeEnum } from 'src/app/utils/recordings-sorter';
 import version from 'src/app/version';
 import { OutputDeviceEnum } from 'src/plugins/audioplayer';
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ModalController, Platform } from '@ionic/angular';
+import { IonicModule, ModalController, Platform } from '@ionic/angular';
 import { SettingsService } from '../../services/settings.service';
 import { DatetimeFormatEditorComponent } from './datetime-format-editor/datetime-format-editor.component';
 import { FilenamePatternEditorComponent } from './filename-pattern-editor/filename-pattern-editor.component';
 
 @Component({
   selector: 'app-settings',
+  standalone: true,
   templateUrl: './settings.page.html',
   styleUrls: ['./shared.scss', './settings.page.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    FormsModule,
+    HeaderComponent,
+    IonicModule,
+    TranslatePipe,
+  ],
 })
 export class SettingsPage {
 

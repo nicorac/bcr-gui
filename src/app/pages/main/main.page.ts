@@ -1,8 +1,13 @@
-import { Subscription } from 'rxjs';
 import { AudioPlayerComponent } from 'src/app/components/audio-player/audio-player.component';
-import { ActionButton } from 'src/app/components/header/header.component';
+import { CallIconComponent } from 'src/app/components/call-icon/call-icon.component';
+import { ActionButton, HeaderComponent } from 'src/app/components/header/header.component';
+import { VirtualScrollbarComponent } from 'src/app/components/virtual-scrollbar/virtual-scrollbar.component';
+import { LongPressDirective } from 'src/app/directives/long-press.directive';
 import { Recording } from 'src/app/models/recording';
+import { DatetimePipe } from 'src/app/pipes/datetime.pipe';
+import { FilesizePipe } from 'src/app/pipes/filesize.pipe';
 import { ToHmsPipe } from 'src/app/pipes/to-hms.pipe';
+import { TranslatePipe } from 'src/app/pipes/translate.pipe';
 import { ContactsService } from 'src/app/services/contacts.service';
 import { I18nService } from 'src/app/services/i18n.service';
 import { MessageBoxService } from 'src/app/services/message-box.service';
@@ -11,53 +16,82 @@ import { SettingsService } from 'src/app/services/settings.service';
 import { filterList } from 'src/app/utils/filterList';
 import { sortRecordings } from 'src/app/utils/recordings-sorter';
 import { bringIntoView } from 'src/app/utils/scroll';
-import { asyncWaitForCondition } from 'src/app/utils/waitForAsync';
+import { untilTrue } from 'src/app/utils/waitForAsync';
 import { AndroidSAF } from 'src/plugins/androidsaf';
 import { AudioPlayer } from 'src/plugins/audioplayer';
-import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
+import { CdkVirtualScrollViewport, ScrollingModule } from '@angular/cdk/scrolling';
 import { DatePipe } from '@angular/common';
-import { AfterViewInit, Component, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, signal, untracked, viewChild } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Clipboard } from '@capacitor/clipboard';
 import { Directory, Filesystem } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
-import { ActionSheetController, IonSearchbar, RefresherCustomEvent } from '@ionic/angular';
+import { ActionSheetController, IonicModule, IonSearchbar, RefresherCustomEvent } from '@ionic/angular';
 import version from '../../version';
 
 @Component({
   selector: 'app-main',
+  standalone: true,
   templateUrl: './main.page.html',
   styleUrls: ['./main.page.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    AudioPlayerComponent,
+    CallIconComponent,
+    DatetimePipe,
+    FilesizePipe,
+    FormsModule,
+    HeaderComponent,
+    IonicModule,
+    LongPressDirective,
+    ScrollingModule,
+    ToHmsPipe,
+    TranslatePipe,
+    VirtualScrollbarComponent,
+  ],
+  providers: [
+    ContactsService,
+    DatePipe,
+    ToHmsPipe,
+  ],
 })
 export class MainPage implements AfterViewInit {
 
-  version = version;
-  isMultiselect = false;
-  isSearch = false;
-  searchValue = '';
+  protected version = version;
+  protected isMultiselect = signal(false);
+  protected isSearch = signal(false);
+  protected searchValue = signal('');
   actionButtons: ActionButton[] = [
     {
-      icon: () => this.searchValue ? 'search-circle' : 'search-circle-outline',
-      visible: () => !this.isMultiselect,
+      icon: () => this.searchValue() ? 'search-circle' : 'search-circle-outline',
+      visible: () => !this.isMultiselect(),
       onClick: () => this.toggleSearchBar(),
     },
   ];
-  protected itemsAll: Recording[] = [];
-  protected items: Recording[] = [];
+
+  // filtered items collection
+  protected items = computed<Recording[]>(() => {
+    // filter
+    const res = filterList(this.recordingsService.recordings(), this.searchValue(), r => `${r.opName} ${r.opNumber}`);
+    // close any open player to let the list update without leaving "orphaned" player IDs
+    untracked(() => this.clearSelection());
+    // sort
+    return sortRecordings(res, this.settings.recordingsSortMode);
+  });
+
   protected topIndex = 0; // index of top shown recording
   protected itemHeight = 78;
   protected itemHeightSelected = this.itemHeight + 180;
   protected itemGap = 12;
-  protected isDraggingCursor = false;
 
-  private _subs = new Subscription();
-
-  @ViewChild(AudioPlayerComponent) player?: AudioPlayerComponent;
-  @ViewChild(CdkVirtualScrollViewport) scrollViewport!: CdkVirtualScrollViewport;
-  @ViewChild('searchBar') searchBar!: IonSearchbar;
+  private player = viewChild(AudioPlayerComponent);
+  private scrollViewport = viewChild(CdkVirtualScrollViewport);
+  private searchBar = viewChild(IonSearchbar);
 
   constructor(
     private asc: ActionSheetController,
+    private cdr: ChangeDetectorRef,
     private contactsService: ContactsService,
     private datePipe: DatePipe,
     private i18n: I18nService,
@@ -76,14 +110,14 @@ export class MainPage implements AfterViewInit {
     // set audio output
     await AudioPlayer.setConfiguration({ enableEarpiece: this.settings.enableEarpiece });
 
-    // subscribe
-    [
-      this.recordingsService.recordings.subscribe((res) => {
-        this.clearSelection();
-        this.itemsAll = res;
-        this.updateFilter();
-      })
-    ].forEach(s => this._subs.add(s));
+    // // subscribe
+    // [
+    //   this.recordingsService.recordings.subscribe((res) => {
+    //     this.clearSelection();
+    //     this.itemsAll = res;
+    //     this.updateFilter();
+    //   })
+    // ].forEach(s => this._subs.add(s));
 
   }
 
@@ -97,25 +131,27 @@ export class MainPage implements AfterViewInit {
       await this.refreshList();
     }
 
+    // wait for already running refresh
+    // the await above could exit immediately if a refresh was already running
+    await untilTrue(() => this.recordingsService.refreshProgress() === undefined);
+
     this.clearFilter();
+    this.isMultiselect.set(false);
 
     // find the required filename
-    const playItemIx = this.items.findIndex(i => i.audioUri === viewIntentFilename);
+    const playItemIx = this.items().findIndex(i => i.audioUri === viewIntentFilename);
     if (playItemIx >= 0) {
 
-      const playItem = this.items[playItemIx];
+      const playItem = this.items()[playItemIx];
 
       // ensure it's visible
-      this.scrollViewport.scrollToIndex(playItemIx);
+      this.scrollViewport()?.scrollToIndex(playItemIx);
 
-      // select it
+      // select & play it (need to wait for player initialization)
       playItem.selected = true;
-
-      // play it (need to wait for player initialization)
-      asyncWaitForCondition(
-        () => this.player?.recording === playItem && this.player.isReady(),
-        () => this.player!.play(),
-      );
+      this.cdr.detectChanges(); // forcibly detect the .selected change above
+      await untilTrue(() => this.player()?.recording() === playItem && this.player()!.isReady());
+      this.player()?.play();
 
     }
     else if (!forceListRefresh) {
@@ -143,7 +179,7 @@ export class MainPage implements AfterViewInit {
     this.recordingsService.mainPageRef = undefined;
 
     await this.stopPlayer();
-    this._subs.unsubscribe();
+    // this._subs.unsubscribe();
   }
 
   async ngAfterViewInit() {
@@ -157,47 +193,47 @@ export class MainPage implements AfterViewInit {
   }
 
   clearSelection() {
-    this.itemsAll.forEach(r => r.selected = false); // remove flag from itemsAll, just to stay safe...😉
-    this.isMultiselect = false;
+    this.recordingsService.recordings().forEach(r => r.selected = false); // remove flag from itemsAll, just to stay safe...😉
+    this.isMultiselect.set(false);
   }
 
   getSelectedItems(): Recording[] {
-    return this.items.filter(r => r.selected);
+    return this.items().filter(r => r.selected);
   }
 
   /**
    * Show/hide the searchbar and set focus to search field
    */
   toggleSearchBar() {
-    this.isSearch = !this.isSearch;
-    if (this.isSearch) {
-      setTimeout(() => this.searchBar.setFocus(), 50);
+    this.isSearch.update(v => !v);
+    if (this.isSearch()) {
+      setTimeout(() => this.searchBar?.()?.setFocus(), 50);
     }
   }
 
   clearFilter() {
-    this.searchValue = '';
-    this.isSearch = false;
-    this.updateFilter();
+    this.searchValue.set('');
+    this.isSearch.set(false);
+    // this.updateFilter();
   }
 
-  /**
-   * Sort & filter recordings
-   */
-  updateFilter() {
+  // /**
+  //  * Sort & filter recordings
+  //  */
+  // updateFilter() {
 
-    let res = this.itemsAll;
+  //   let res = this.itemsAll;
 
-    // filter
-    if (this.searchValue) {
-      res = filterList(res, this.searchValue, r => `${r.opName} ${r.opNumber}`);
-      // close any open player to let the list update without leaving "orphaned" player IDs
-      this.clearSelection();
-    }
+  //   // filter
+  //   if (this.searchValue) {
+  //     res = filterList(res, this.searchValue(), r => `${r.opName} ${r.opNumber}`);
+  //     // close any open player to let the list update without leaving "orphaned" player IDs
+  //     this.clearSelection();
+  //   }
 
-    // sort
-    this.items = sortRecordings(res, this.settings.recordingsSortMode);
-  }
+  //   // sort
+  //   this.items = sortRecordings(res, this.settings.recordingsSortMode);
+  // }
 
   /**
    * Change selected status
@@ -205,20 +241,20 @@ export class MainPage implements AfterViewInit {
   async onItemClick(item: Recording) {
 
     if (item.selected) {
-      if (this.isMultiselect) {
+      if (this.isMultiselect()) {
         item.selected = false;
       }
       // disable multiselection if no element is still selected
       if (!this.getSelectedItems().length) {
-        this.isMultiselect = false;
+        this.isMultiselect.set(false);
       }
     }
     else {
-      if (!this.isMultiselect) {
+      if (!this.isMultiselect()) {
         this.clearSelection();
       }
       item.selected = true;
-      if (!this.isMultiselect) {
+      if (!this.isMultiselect()) {
         bringIntoView('.items .selected');
       }
     }
@@ -237,7 +273,7 @@ export class MainPage implements AfterViewInit {
       confirmText: this.i18n.get('LBL_DELETE'),
       onConfirm: async () => {
         // forcibly unload audio
-        await this.player?.unloadAudio();
+        await this.player()?.unloadAudio();
         this.recordingsService.deleteRecording(items);
         this.clearSelection();
       }
@@ -369,8 +405,8 @@ export class MainPage implements AfterViewInit {
    * Select all items
    */
   async selectAll() {
-    this.isMultiselect = true;
-    this.items.forEach(i => i.selected = true); // select all VISIBLE items
+    this.isMultiselect.set(true);
+    this.items().forEach(i => i.selected = true); // select all VISIBLE items
   }
 
   /**
@@ -484,9 +520,9 @@ Duration: ${this.toHms.transform(item.duration)}
    * Start multiselection and select the given item
    */
   protected startMultiselection(item?: Recording) {
-    if (!this.isMultiselect) {
+    if (!this.isMultiselect()) {
       this.clearSelection();
-      this.isMultiselect = true;
+      this.isMultiselect.set(true);
       if (item) {
         item.selected = true;
       }
@@ -505,7 +541,7 @@ Duration: ${this.toHms.transform(item.duration)}
    * Stop player (if it exists)
    */
   private async stopPlayer() {
-    await this.player?.pause();
+    await this.player()?.pause();
   }
 
 }

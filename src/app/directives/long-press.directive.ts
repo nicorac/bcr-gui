@@ -1,6 +1,6 @@
 /* eslint-disable @angular-eslint/directive-selector */
 /* eslint-disable @angular-eslint/no-output-on-prefix */
-import { Directive, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Directive, ElementRef, input, OnDestroy, OnInit, output } from '@angular/core';
 
 /**
  * HOW TO USE
@@ -13,8 +13,8 @@ import { Directive, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output }
 })
 export class LongPressDirective implements OnInit, OnDestroy {
 
-  @Input() holdTime: number = 500;
-  @Output() longPress: EventEmitter<void> = new EventEmitter();
+  public holdTime = input<number>(500);
+  public longPress = output<void>();
 
   private ne!: HTMLElement;
   private holdTimeout?: ReturnType<typeof setTimeout>;
@@ -53,10 +53,10 @@ export class LongPressDirective implements OnInit, OnDestroy {
     }
     // console.warn('Start timeout');
     this.holdTimeout = setTimeout(() => {
-      console.warn('Timeout handler');
+      // console.warn('Timeout handler');
       this.onEndPress();
       this.longPress.emit();
-    }, this.holdTime);
+    }, this.holdTime());
   }
 
   private onEndPress() {

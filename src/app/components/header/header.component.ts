@@ -1,6 +1,6 @@
 import { RecordingsService } from 'src/app/services/recordings.service';
 import { AsyncPipe, NgFor, NgIf } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 
 export type ActionButton = {
@@ -14,13 +14,14 @@ export type ActionButton = {
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [ AsyncPipe, NgFor, NgIf, IonicModule ]
 })
 export class HeaderComponent {
 
-  @Input({ required: true }) title!: string;
-  @Input() actionButtons?: ActionButton[];
-  @Input() showCustomContent = false;
+  title = input.required<string>();
+  actionButtons = input<ActionButton[]>([]);
+  showCustomContent = input(false);
 
   constructor(
     protected recordingsService: RecordingsService,

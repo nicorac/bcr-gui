@@ -1,6 +1,5 @@
-import { BehaviorSubject } from 'rxjs';
 import { AndroidSAF, AndroidSAFUtils, ErrorCode, GetFileUriOptions, ReadFileOptions } from 'src/plugins/androidsaf';
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { Encoding } from '@capacitor/filesystem';
 import { AlertController, IonicSafeString, Platform } from '@ionic/angular';
 import { DB_FILENAME, DB_SCHEMA_VERSION, DbContent } from '../models/dbContent';
@@ -19,7 +18,7 @@ export class RecordingsService {
   initialized = false;
 
   // recordings database
-  public recordings = new BehaviorSubject<Recording[]>([]);
+  public recordings = signal<Recording[]>([]);
 
   // timestamp of last update, used to automatically refresh recording on app resume
   private lastUpdate: number = 0;
@@ -32,7 +31,7 @@ export class RecordingsService {
    * value === 0    ==> no refresh running
    * 0 < value <=1  ==> refresh progress (%)
    */
-  public refreshProgress = new BehaviorSubject<number>(0);
+  public refreshProgress = signal<number|undefined>(undefined);
 
   constructor(
     private alertController: AlertController,
@@ -75,24 +74,24 @@ export class RecordingsService {
   async refreshContent(options?: { forceFilenameParse?: boolean }) {
 
     // exit if we're already refreshing
-    if (this.refreshProgress.value) {
+    if (this.refreshProgress() !== undefined) {
       return;
     }
 
     if (!this.settings.recordingsDirectoryUri) {
-      this.selectRecordingsDirectory(() => this.refreshContent());
+      await this.selectRecordingsDirectory(async () => await this.refreshContent());
       return;
     }
 
-    // immediately send a non-zero progress
-    this.refreshProgress.next(0.0001);
+    // immediately send a progress
+    this.refreshProgress.set(0.001);
     console.log("Reading files in folder:");
 
     // filename RegExp parser instance
     const filenameRegExp = Recording.getFilenameRegExp(this.settings.filenamePattern);
 
     // save current DB in object structure keyed by display name (to speedup search)
-    let currentDbObj = Object.fromEntries(this.recordings.value.map(i => [ i.audioDisplayName, i ]));
+    let currentDbObj = Object.fromEntries(this.recordings().map(i => [ i.audioDisplayName, i ]));
 
     try {
       // keep files only (no directories)
@@ -121,7 +120,7 @@ export class RecordingsService {
         for (const file of Object.values(audioFilesObj)) {
 
           // send progress update
-          this.refreshProgress.next(++i / count);
+          this.refreshProgress.set(++i / count);
 
           // compose metadata .json filename
           const metadataFileName = replaceExtension(file.displayName, '.json');
@@ -149,7 +148,7 @@ export class RecordingsService {
 
       // update collection & cache
       this.lastUpdate = new Date().getTime();
-      this.recordings.next(Object.values(currentDbObj));
+      this.recordings.set(Object.values(currentDbObj));
       await this.save();
 
     }
@@ -166,7 +165,7 @@ export class RecordingsService {
       }
     }
     finally {
-      this.refreshProgress.next(0);
+      this.refreshProgress.set(undefined);
     }
 
   }
@@ -207,7 +206,7 @@ export class RecordingsService {
     }
 
     // delete all items
-    let tmpDb = this.recordings.value;
+    let tmpDb = this.recordings();
     for (const item of deleteItems) {
       if (
         item && await deleteFileFn(item.audioUri)
@@ -219,7 +218,7 @@ export class RecordingsService {
     }
 
     // send update event & save DB
-    this.recordings.next(tmpDb);
+    this.recordings.set(tmpDb);
     await this.save();
 
   }
@@ -300,7 +299,7 @@ export class RecordingsService {
 
           // return DB
           this.lastUpdate = dbContent.lastUpdate;
-          this.recordings.next(dbContent.data);
+          this.recordings.set(dbContent.data);
           return true;
         }
         catch (error: any) {
@@ -339,7 +338,7 @@ export class RecordingsService {
 
     try {
       // serialize data
-      const dbContent = new DbContent(this.recordings.value, this.lastUpdate);
+      const dbContent = new DbContent(this.recordings(), this.lastUpdate);
       const jsonObj = serializeObject(dbContent);
 
       // test if file already exists
@@ -379,12 +378,12 @@ export class RecordingsService {
    */
   public async setNameByNumber(phoneNumber: string, name: string) {
 
-    this.recordings.value
+    this.recordings()
       .filter(i => i.opNumber === phoneNumber)
       .forEach(i => i.opName = name);
 
     // notify update
-    this.recordings.next(this.recordings.value);
+    this.recordings.set(this.recordings());
 
     // save DB
     await this.save();
@@ -430,7 +429,7 @@ export class RecordingsService {
          * (new audioUri/metadataUri props will be populated at next refresh)
          */
         case 1:
-          this.recordings.value.forEach(r => {
+          this.recordings().forEach(r => {
             r.audioDisplayName = (<any>r)['audioFile'];
           });
           dbContent.schemaVersion = 2;

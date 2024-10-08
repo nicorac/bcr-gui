@@ -1,7 +1,7 @@
 /* eslint-disable @angular-eslint/no-input-rename */
-import { BehaviorSubject, sampleTime, Subject, Subscription } from 'rxjs';
+import { sampleTime, Subject, Subscription } from 'rxjs';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
-import { Component, ElementRef, HostListener, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, HostListener, input, model, OnDestroy, OnInit } from '@angular/core';
 
 const MIN_CURSOR_HEIGHT = 40; // min cursor height in px
 
@@ -12,6 +12,9 @@ const MIN_CURSOR_HEIGHT = 40; // min cursor height in px
   selector: 'app-virtual-scrollbar',
   templateUrl: './virtual-scrollbar.component.html',
   styleUrls: ['./virtual-scrollbar.component.scss'],
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [ ],
 })
 export class VirtualScrollbarComponent implements OnInit, OnDestroy {
 
@@ -35,12 +38,11 @@ export class VirtualScrollbarComponent implements OnInit, OnDestroy {
   private _subs!: Subscription;
 
   // reference to CdkVirtualScrollViewport
-  @Input({ required: true, alias: 'virtualScrollViewport' })
-  cvsViewport!: CdkVirtualScrollViewport;
-  cvsSpacer!: HTMLDivElement;
+  public cvsViewport = input.required<CdkVirtualScrollViewport>({ alias: 'virtualScrollViewport' });
+  protected cvsSpacer!: HTMLDivElement;
 
   // event to notify dragging status
-  @Output() public isDragging = new BehaviorSubject<boolean>(false);
+  public isDragging = model<boolean>(false);
 
   // resize observer to children catch events
   private resizeObserver!: ResizeObserver;
@@ -57,11 +59,11 @@ export class VirtualScrollbarComponent implements OnInit, OnDestroy {
       .pipe(sampleTime(250))
       .subscribe((yPos: number) => {
         // scroll the CDK virtual list to the given Y coordinate
-        this.cvsViewport.scrollToOffset(yPos, 'instant');
+        this.cvsViewport().scrollToOffset(yPos, 'instant');
       });
 
     // extract vsv child elements
-    const viewportNe = this.cvsViewport.elementRef.nativeElement;
+    const viewportNe = this.cvsViewport().elementRef.nativeElement;
     this.cvsSpacer = viewportNe.getElementsByClassName('cdk-virtual-scroll-spacer')?.[0] as HTMLDivElement;
 
     // start an observer to catch size changes, both in this component and in CDK component
@@ -70,7 +72,7 @@ export class VirtualScrollbarComponent implements OnInit, OnDestroy {
     this.resizeObserver.observe(this.cvsSpacer, { box: 'border-box' });
 
     // attach to vsv scroll event
-    this.cvsViewportScrollSubscription = this.cvsViewport.elementScrolled().subscribe(e => {
+    this.cvsViewportScrollSubscription = this.cvsViewport().elementScrolled().subscribe(e => {
       if (e.target) {
         this.scrollHandler(e.target as HTMLDivElement);
       }
@@ -101,7 +103,7 @@ export class VirtualScrollbarComponent implements OnInit, OnDestroy {
 
       // handle resize of CDK spacer DIV
       if (entry.target === this.cvsSpacer) {
-        this.listHeight = this.cvsViewport.elementRef.nativeElement.offsetHeight;
+        this.listHeight = this.cvsViewport().elementRef.nativeElement.offsetHeight;
         this.listTotalHeight = this.cvsSpacer.offsetHeight;
         this.listYRange = this.listTotalHeight - this.listHeight;
       }
@@ -120,19 +122,19 @@ export class VirtualScrollbarComponent implements OnInit, OnDestroy {
 
   @HostListener('pointerdown', ['$event'])
   protected pointerDown(e: PointerEvent) {
-    this.isDragging.next(true);
+    this.isDragging.set(true);
     // console.log(`[pointerDown] isDragging: ${this.isDragging}`);
   }
 
   @HostListener('pointerup', ['$event'])
   protected pointerUp(e: PointerEvent) {
-    this.isDragging.next(false);
+    this.isDragging.set(false);
     // console.log(`[pointerUp] isDragging: ${this.isDragging}`);
   }
 
   @HostListener('pointermove', ['$event'])
   protected pointerMove(e: PointerEvent) {
-    if (this.isDragging.value) {
+    if (this.isDragging()) {
       this.setCursorYPos(e.clientY - this.topOffset - this.cursorHeight/2);
       // emit event to throttled Subject
       const newY = this.listTotalHeight * this.cursorYPos / this.cursorYRange;
@@ -145,7 +147,7 @@ export class VirtualScrollbarComponent implements OnInit, OnDestroy {
    * Handles virtual list scroll events and set cursor Y position
    */
   private scrollHandler(elem: HTMLDivElement) {
-    if (!this.isDragging.value) {
+    if (!this.isDragging()) {
       this.cursorYPos = this.clampYPos(this.cursorYRange * elem.scrollTop / this.listYRange);
     }
   }

@@ -2,7 +2,7 @@
 
   <ion-toolbar>
 
-    <ng-container *ngIf="!showCustomContent">
+    @if (!showCustomContent()) {
 
       <!-- menu button -->
       <ion-buttons slot="start">
@@ -10,27 +10,28 @@
       </ion-buttons>
 
       <!-- page title -->
-      <ion-title>{{ title }}</ion-title>
+      <ion-title>{{ title() }}</ion-title>
 
       <!-- action buttons -->
       <ion-buttons slot="secondary">
-        <ng-container *ngFor="let ab of actionButtons">
+        <ng-container *ngFor="let ab of actionButtons()">
           <ion-button *ngIf="!ab.visible || ab.visible()" (click)="ab.onClick()" >
             <ion-icon [name]="ab.icon()" slot="icon-only" />
           </ion-button>
         </ng-container>
       </ion-buttons>
 
-    </ng-container>
+    }
 
     <!-- custom content -->
-    <ng-content *ngIf="showCustomContent"></ng-content>
+    @if (showCustomContent()) {
+      <ng-content />
+    }
 
     <!-- load progressbar -->
-    <ng-container *ngIf="recordingsService.refreshProgress | async as value">
-      <ion-progress-bar class="progress" [value]="value"
-      />
-    </ng-container>
+    @if (recordingsService.refreshProgress(); as value) {
+      <ion-progress-bar class="progress" [value]="value" />
+    }
 
   </ion-toolbar>
 

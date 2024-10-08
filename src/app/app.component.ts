@@ -1,23 +1,31 @@
-import { Component, OnInit, Optional } from '@angular/core';
-import { Router } from '@angular/router';
+import { ChangeDetectionStrategy, Component, OnInit, Optional } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
 import { App } from '@capacitor/app';
 import { StatusBar } from '@capacitor/status-bar';
 import { NavigationBar } from '@capgo/capacitor-navigation-bar';
-import { IonRouterOutlet, Platform } from '@ionic/angular';
+import { IonicModule, IonRouterOutlet, Platform } from '@ionic/angular';
 import { AppRoutesEnum } from './app-routing.module';
+import { TranslatePipe } from './pipes/translate.pipe';
 import { I18nService } from './services/i18n.service';
 import { MessageBoxService } from './services/message-box.service';
 import { RecordingsService } from './services/recordings.service';
 import { SettingsService, Theme } from './services/settings.service';
-import { asyncWaitForCondition } from './utils/waitForAsync';
+import { untilTrue } from './utils/waitForAsync';
 
 const TOOLBAR_BACKGROUND_LIGHT = '#43a047';
 const TOOLBAR_BACKGROUND_DARK = '#1f241d';
 
 @Component({
   selector: 'app-root',
+  standalone: true,
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    IonicModule,
+    RouterLink,
+    TranslatePipe,
+  ],
 })
 export class AppComponent implements OnInit {
 
@@ -55,7 +63,7 @@ export class AppComponent implements OnInit {
    */
   private async viewIntentHandler(data: any) {
 
-    // Check if the URL is a file or content URI
+    // Check if the URL is a content:// URI
     // (AndroidManifest.xml already filtered for BCR content only)
     if (!data?.url?.startsWith('content://')) {
       return;
@@ -79,15 +87,11 @@ export class AppComponent implements OnInit {
     }
 
     // go to main page
-    this.router.navigateByUrl(AppRoutesEnum.Main, {
+    await this.router.navigateByUrl(AppRoutesEnum.Main, {
       onSameUrlNavigation: 'reload',
     });
-    asyncWaitForCondition(
-      () => !!this.recordingsService.mainPageRef,
-      () => this.recordingsService.mainPageRef?.playIntentFile(viewIntentFilename, true),
-      10000,  // wait for max 10s
-      500,    // test condition each 500ms
-    );
+    await untilTrue(() => !!this.recordingsService.mainPageRef, 250, 15000);
+    await this.recordingsService.mainPageRef?.playIntentFile(viewIntentFilename);
 
   }
 
