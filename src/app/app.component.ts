@@ -41,7 +41,7 @@ export class AppComponent implements OnInit {
     });
 
     // attach to Android received intent handler
-    App.addListener('appUrlOpen', async (data: any) => this.viewIntentHandler(data));
+    App.addListener('appUrlOpen', (data: any) => this.viewIntentHandler(data));
 
   }
 
@@ -84,7 +84,7 @@ export class AppComponent implements OnInit {
     });
     asyncWaitForCondition(
       () => !!this.recordingsService.mainPageRef,
-      () => this.recordingsService.mainPageRef?.playIntentFile(viewIntentFilename),
+      () => this.recordingsService.mainPageRef?.playIntentFile(viewIntentFilename, true),
       10000,  // wait for max 10s
       500,    // test condition each 500ms
     );
