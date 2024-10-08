@@ -3,6 +3,7 @@ import { Recording } from 'src/app/models/recording';
 import { DatetimePipe } from 'src/app/pipes/datetime.pipe';
 import { ToHmsPipe } from 'src/app/pipes/to-hms.pipe';
 import { MessageBoxService } from 'src/app/services/message-box.service';
+import { RecordingsService } from 'src/app/services/recordings.service';
 import { SettingsService } from 'src/app/services/settings.service';
 import { AudioPlayer, IBaseParams } from 'src/plugins/audioplayer';
 import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
@@ -49,6 +50,7 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private dateTimePipe: DatetimePipe,
     private mbs: MessageBoxService,
+    private recordingsService: RecordingsService,
     private settings: SettingsService,
   ) { }
 
@@ -107,6 +109,8 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
       // (if not already set with JSON metadata file)
       if (!this.recording.duration) {
         this.recording.duration = this.duration;
+        // forcibly save updated recordings DB
+        await this.recordingsService.save();
       }
 
       // init complete
