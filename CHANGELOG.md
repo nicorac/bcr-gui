@@ -1,15 +1,21 @@
 # Version history
 
-## Version 1.7.xx (2024-xx-xx)
+## Version 1.8.0 (2024-10-15)
 
 New features:
 
 - BCR-GUI can now be selected as default player for BCR recordings \
   (just press `OPEN` button in BCR notification that appears when recording completes)
 
-Bug fixes:
+- Recordings can now be played through earpiece (using proximity sensor)
+
+- Converted Web application to Angular signals & standalone components (to improve reactivity and efficiency)
 
 - Updated French and Czech translations
+
+Bug fixes:
+
+- Recording duration is not updated to DB when its read by the audio player instead of metadata file
 
 ## Version 1.7.9 (2024-08-27)
 
