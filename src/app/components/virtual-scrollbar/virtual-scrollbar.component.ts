@@ -1,7 +1,7 @@
 /* eslint-disable @angular-eslint/no-input-rename */
 import { sampleTime, Subject, Subscription } from 'rxjs';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
-import { ChangeDetectionStrategy, Component, ElementRef, HostListener, input, model, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, HostListener, input, model, OnDestroy, OnInit, signal } from '@angular/core';
 
 const MIN_CURSOR_HEIGHT = 40; // min cursor height in px
 
@@ -14,15 +14,14 @@ const MIN_CURSOR_HEIGHT = 40; // min cursor height in px
   styleUrls: ['./virtual-scrollbar.component.scss'],
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ ],
 })
 export class VirtualScrollbarComponent implements OnInit, OnDestroy {
 
   // protected isDragging = false;
   protected readonly cursorHeight = 48;
-  protected cursorYPos = 0;     // cursor current Y position
-  private cursorYRange = 0;   // Y cursor scroll range (starting from 0)
-  private topOffset = 0;      // pointer events coordinates are absolute, so we need to offset them
+  protected cursorYPos = signal(0);     // cursor current Y position
+  private cursorYRange = 0;     // Y cursor scroll range (starting from 0)
+  private topOffset = 0;        // pointer events coordinates are absolute, so we need to offset them
   private height = 0;
 
   // CDK list
@@ -137,7 +136,7 @@ export class VirtualScrollbarComponent implements OnInit, OnDestroy {
     if (this.isDragging()) {
       this.setCursorYPos(e.clientY - this.topOffset - this.cursorHeight/2);
       // emit event to throttled Subject
-      const newY = this.listTotalHeight * this.cursorYPos / this.cursorYRange;
+      const newY = this.listTotalHeight * this.cursorYPos() / this.cursorYRange;
       // console.log(`[pointerMove] newY: ${newY}`);
       this.throttledScrollSubj.next(newY);
     }
@@ -148,7 +147,7 @@ export class VirtualScrollbarComponent implements OnInit, OnDestroy {
    */
   private scrollHandler(elem: HTMLDivElement) {
     if (!this.isDragging()) {
-      this.cursorYPos = this.clampYPos(this.cursorYRange * elem.scrollTop / this.listYRange);
+      this.cursorYPos.set(this.clampYPos(this.cursorYRange * elem.scrollTop / this.listYRange));
     }
   }
 
@@ -157,7 +156,7 @@ export class VirtualScrollbarComponent implements OnInit, OnDestroy {
    */
   setCursorYPos(y: number) {
     // console.log("setCursorYPos", y);
-    this.cursorYPos = this.clampYPos(y);
+    this.cursorYPos.set(this.clampYPos(y));
   }
 
   clampYPos(y: number): number {

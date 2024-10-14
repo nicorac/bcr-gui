@@ -1,7 +1,7 @@
 <div class="cursor"
   (touchstart)="touchStart($event)"
   [class.notouch]="isDragging()"
-  [style.transform]="'translateY(' + cursorYPos + 'px)'"
+  [style.transform]="'translateY(' + cursorYPos() + 'px)'"
 >
   <div class="cursor-knob"
     [style.height]="cursorHeight + 'px'"
