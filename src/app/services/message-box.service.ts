@@ -80,7 +80,12 @@ export class MessageBoxService {
       message: this.formatMessage(options.message),
       buttons: [
         { text: options.cancelText ?? this.i18n.get('LBL_CANCEL'), handler: () => options.onCancel?.() },
-        { text: options.confirmText ?? this.i18n.get('LBL_OK'), handler: () => options.onConfirm?.() },
+        {
+          text: options.confirmText ?? this.i18n.get('LBL_OK'),
+          handler: () => {
+            options.onConfirm?.();
+          },
+        }
       ],
       cssClass: 'msgbox-confirm',
     });

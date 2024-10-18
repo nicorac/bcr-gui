@@ -128,5 +128,7 @@
   "SETTINGS_RECORDINGS_SORT_DURATION_DESC": "Durata (decrescente)",
   "SETTINGS_RESCAN_TEXT": "Riscansionare tutti i file (senza il file metadati JSON) usando il nuovo modello del nome file?",
   "SETTINGS_RESCAN_TITLE": "Riscansiona",
+  "SETTINGS_SELECT_DIRECTORY_TITLE": "Accesso alla cartella delle registrazioni",
+  "SETTINGS_SELECT_DIRECTORY_MESSAGE": "Questa applicazione necessita l'accesso alla cartella delle registrazioni.\n\nDopo aver cliccato OK, Android mostrerà il selettore di cartelle.\n\nSelezionare la cartella e consentire l'accesso al suo contenuto...",
   "SETTINGS_SYSTEM_DEFAULT": "Predefinito di sistema"
 }

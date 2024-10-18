@@ -1,12 +1,13 @@
 import { AndroidSAF, AndroidSAFUtils, ErrorCode, GetFileUriOptions, ReadFileOptions } from 'src/plugins/androidsaf';
 import { Injectable, signal } from '@angular/core';
 import { Encoding } from '@capacitor/filesystem';
-import { AlertController, IonicSafeString, Platform } from '@ionic/angular';
+import { Platform } from '@ionic/angular';
 import { DB_FILENAME, DB_SCHEMA_VERSION, DbContent } from '../models/dbContent';
 import { Recording } from '../models/recording';
 import { MainPage } from '../pages/main/main.page';
 import { replaceExtension } from '../utils/filesystem';
 import { deserializeObject, serializeObject } from '../utils/json-serializer';
+import { I18nService } from './i18n.service';
 import { MessageBoxService } from './message-box.service';
 import { SettingsService } from './settings.service';
 
@@ -34,7 +35,7 @@ export class RecordingsService {
   public refreshProgress = signal<number|undefined>(undefined);
 
   constructor(
-    private alertController: AlertController,
+    private i18n: I18nService,
     private mbs: MessageBoxService,
     private platform: Platform,
     protected settings: SettingsService,
@@ -229,47 +230,32 @@ export class RecordingsService {
    */
   async selectRecordingsDirectory(afterSelect?: () => void) {
 
-    // TODO: fix!
-    const alert = await this.alertController.create({
-      header: 'Select recordings directory',
-      message: new IonicSafeString(
-        `This app needs access to BCR recordings directory.
-
-        If you click <strong>OK</strong>, Android will show you a directory selector.
-
-        Select the recordings directory used by BCR and allow access to its content...`
-        .replace(/[\r\n]/g, '<br/>')),
-      buttons: [
-        'Cancel',
-        {
-          text: 'OK',
-          handler: async () => {
-            // show directory selector
-            try {
-              const { selectedUri } = await AndroidSAF.selectDirectory({});
-              console.log('Selected directory:', this.settings.recordingsDirectoryUri);
-              this.settings.recordingsDirectoryUri = selectedUri;
-              this.updateDbFileUri()
-              await this.settings.save();
-              this.initialized = false;
-              afterSelect?.();
-            }
-            catch (error: any) {
-              if (error.code !== ErrorCode.ERR_CANCELED) {
-                this.mbs.showError({
-                  appErrorCode: 'ERR_OS005',
-                  error,
-                })
-                console.error('Error selecting directory:', error);
-              }
-            }
-          },
-        },
-      ],
-      backdropDismiss: false,
+    await this.mbs.showConfirm({
+      header: this.i18n.get('SETTINGS_SELECT_DIRECTORY_TITLE'),
+      message: this.i18n.get('SETTINGS_SELECT_DIRECTORY_MESSAGE'),
+      onConfirm: async () => {
+        // show directory selector
+        try {
+          const { selectedUri } = await AndroidSAF.selectDirectory({});
+          console.log('Selected directory:', this.settings.recordingsDirectoryUri);
+          this.settings.recordingsDirectoryUri = selectedUri;
+          this.updateDbFileUri()
+          await this.settings.save();
+          this.initialized = false;
+          afterSelect?.();
+        }
+        catch (error: any) {
+          if (error.code !== ErrorCode.ERR_CANCELED) {
+            this.mbs.showError({
+              appErrorCode: 'ERR_OS005',
+              error,
+            })
+            console.error('Error selecting directory:', error);
+          }
+        }
+      },
     });
 
-    await alert.present();
   }
 
   /**
