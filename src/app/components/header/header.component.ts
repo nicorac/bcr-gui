@@ -1,7 +1,7 @@
+import { IonicBundleModule } from 'src/app/IonicBundle.module';
 import { RecordingsService } from 'src/app/services/recordings.service';
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
 
 export type ActionButton = {
   icon: () => string,
@@ -15,7 +15,7 @@ export type ActionButton = {
   styleUrls: ['./header.component.scss'],
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ AsyncPipe, NgFor, NgIf, IonicModule ]
+  imports: [ AsyncPipe, IonicBundleModule ]
 })
 export class HeaderComponent {
 

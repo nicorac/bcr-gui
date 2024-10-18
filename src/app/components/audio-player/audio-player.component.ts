@@ -1,4 +1,5 @@
 import { Subscription } from 'rxjs';
+import { IonicBundleModule } from 'src/app/IonicBundle.module';
 import { Recording } from 'src/app/models/recording';
 import { DatetimePipe } from 'src/app/pipes/datetime.pipe';
 import { ToHmsPipe } from 'src/app/pipes/to-hms.pipe';
@@ -7,7 +8,7 @@ import { RecordingsService } from 'src/app/services/recordings.service';
 import { SettingsService } from 'src/app/services/settings.service';
 import { AudioPlayer, IBaseParams } from 'src/plugins/audioplayer';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, input, OnDestroy, OnInit, signal } from '@angular/core';
-import { IonicModule, RangeCustomEvent } from '@ionic/angular';
+import { RangeCustomEvent } from '@ionic/angular';
 
 export enum PlayerStatusEnum {
   Paused = 0,
@@ -19,7 +20,7 @@ export enum PlayerStatusEnum {
   templateUrl: './audio-player.component.html',
   styleUrls: ['./audio-player.component.scss'],
   standalone: true,
-  imports: [ DatetimePipe, ToHmsPipe, IonicModule ],
+  imports: [ DatetimePipe, IonicBundleModule, ToHmsPipe ],
   providers: [ DatetimePipe ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

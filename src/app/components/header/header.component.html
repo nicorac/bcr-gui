@@ -14,11 +14,13 @@
 
       <!-- action buttons -->
       <ion-buttons slot="secondary">
-        <ng-container *ngFor="let ab of actionButtons()">
-          <ion-button *ngIf="!ab.visible || ab.visible()" (click)="ab.onClick()" >
-            <ion-icon [name]="ab.icon()" slot="icon-only" />
-          </ion-button>
-        </ng-container>
+        @for (ab of actionButtons(); track ab) {
+          @if (!ab.visible || ab.visible()) {
+            <ion-button (click)="ab.onClick()" >
+              <ion-icon [name]="ab.icon()" slot="icon-only" />
+            </ion-button>
+          }
+        }
       </ion-buttons>
 
     }

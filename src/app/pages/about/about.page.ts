@@ -1,10 +1,11 @@
 import { Subscription } from 'rxjs';
 import { AppRoutesEnum } from 'src/app/app-routing.module';
 import { HeaderComponent } from 'src/app/components/header/header.component';
+import { IonicBundleModule } from 'src/app/IonicBundle.module';
 import { TranslatePipe } from 'src/app/pipes/translate.pipe';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { IonicModule, Platform } from '@ionic/angular';
+import { Platform } from '@ionic/angular';
 import version from '../../version';
 
 @Component({
@@ -14,7 +15,7 @@ import version from '../../version';
   styleUrls: ['./about.page.scss'],
   imports: [
     HeaderComponent,
-    IonicModule,
+    IonicBundleModule,
     TranslatePipe
   ],
 })

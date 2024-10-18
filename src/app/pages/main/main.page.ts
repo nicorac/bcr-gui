@@ -3,6 +3,7 @@ import { CallIconComponent } from 'src/app/components/call-icon/call-icon.compon
 import { ActionButton, HeaderComponent } from 'src/app/components/header/header.component';
 import { VirtualScrollbarComponent } from 'src/app/components/virtual-scrollbar/virtual-scrollbar.component';
 import { LongPressDirective } from 'src/app/directives/long-press.directive';
+import { IonicBundleModule } from 'src/app/IonicBundle.module';
 import { Recording } from 'src/app/models/recording';
 import { DatetimePipe } from 'src/app/pipes/datetime.pipe';
 import { FilesizePipe } from 'src/app/pipes/filesize.pipe';
@@ -27,7 +28,7 @@ import { Router } from '@angular/router';
 import { Clipboard } from '@capacitor/clipboard';
 import { Directory, Filesystem } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
-import { ActionSheetController, IonicModule, IonSearchbar, RefresherCustomEvent } from '@ionic/angular';
+import { ActionSheetController, IonSearchbar, RefresherCustomEvent } from '@ionic/angular';
 import version from '../../version';
 
 @Component({
@@ -43,7 +44,7 @@ import version from '../../version';
     FilesizePipe,
     FormsModule,
     HeaderComponent,
-    IonicModule,
+    IonicBundleModule,
     LongPressDirective,
     ScrollingModule,
     ToHmsPipe,

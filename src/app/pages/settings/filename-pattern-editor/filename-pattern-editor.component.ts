@@ -1,4 +1,5 @@
 import { Subscription } from 'rxjs';
+import { IonicBundleModule } from 'src/app/IonicBundle.module';
 import { FILENAME_PATTERN_SUPPORTED_VARS, FILENAME_PATTERN_TEMPLATES, Recording } from 'src/app/models/recording';
 import { TranslatePipe } from 'src/app/pipes/translate.pipe';
 import { I18nKey, I18nService } from 'src/app/services/i18n.service';
@@ -6,7 +7,7 @@ import { AndroidSAF, ErrorCode } from 'src/plugins/androidsaf';
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { IonicModule, IonModal, IonTextarea, ModalController, Platform } from '@ionic/angular';
+import { IonModal, IonTextarea, ModalController, Platform } from '@ionic/angular';
 
 @Component({
   selector: 'app-filename-pattern-editor',
@@ -17,7 +18,7 @@ import { IonicModule, IonModal, IonTextarea, ModalController, Platform } from '@
   imports: [
     CommonModule,
     FormsModule,
-    IonicModule,
+    IonicBundleModule,
     TranslatePipe,
   ],
 })
