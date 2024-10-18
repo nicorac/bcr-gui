@@ -108,6 +108,7 @@
   "SETTINGS_APPEARANCE_LIGHT": "Light",
   "SETTINGS_COUNTRY_PREFIX": "Default country prefix",
   "SETTINGS_COUNTRY_PREFIX_HELP": "The country prefix (i.e. +1 for USA) to be used with numbers missing it",
+  "SETTINGS_DATETIME_EMPTY": "Empty",
   "SETTINGS_DATETIME_FORMAT": "Date/time format",
   "SETTINGS_FILENAME_PATTERN": "Filename pattern",
   "SETTINGS_GENERAL_SECTION": "General",

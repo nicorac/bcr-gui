@@ -108,6 +108,7 @@
   "SETTINGS_APPEARANCE_LIGHT": "Chiaro",
   "SETTINGS_COUNTRY_PREFIX": "Prefisso nazionale",
   "SETTINGS_COUNTRY_PREFIX_HELP": "Il prefisso della nazione (es. +39 per l'Italia) da usare per i numeri che non lo includono",
+  "SETTINGS_DATETIME_EMPTY": "Vuoto",
   "SETTINGS_DATETIME_FORMAT": "Formato data/ora",
   "SETTINGS_FILENAME_PATTERN": "Modello del nome file",
   "SETTINGS_GENERAL_SECTION": "Generale",

@@ -29,7 +29,7 @@ export class DatetimeFormatEditorComponent {
   // sample datetime (last second of current year)
   protected readonly dateTimeSample = new Date(new Date().getFullYear(), 11, 31, 23, 59, 59);
 
-  protected format = signal<AppDateTimeFormat>({...this.settings.dateTimeFormat });
+  protected format = signal<AppDateTimeFormat>({});
 
   // datetime format elements
   protected readonly DATETIME_FORMAT_ELEMS = [
@@ -57,7 +57,13 @@ export class DatetimeFormatEditorComponent {
     protected i18n: I18nService,
     protected mc: ModalController,
     protected settings: SettingsService,
-  ) { }
+  ) {
+    const initVal = <AppDateTimeFormat>{...this.settings.dateTimeFormat };
+    // fix datetime styles (undefined can't be set as [value], so we use '*')
+    if (!initVal.dateStyle) { initVal.dateStyle = <any>'*' };
+    if (!initVal.timeStyle) { initVal.timeStyle = <any>'*' };
+    this.format.set(initVal);
+   }
 
   cancel() {
     this.mc.dismiss();
@@ -65,13 +71,23 @@ export class DatetimeFormatEditorComponent {
 
   async confirm() {
     this.settings.dateTimeFormat = this.format();
+    // fix datetime styles (undefined can't be set as [value], so we use '*')
+    if (this.settings.dateTimeFormat.dateStyle === <any>'*') { this.settings.dateTimeFormat.dateStyle = undefined };
+    if (this.settings.dateTimeFormat.timeStyle === <any>'*') { this.settings.dateTimeFormat.timeStyle = undefined };
+    // save format
     await this.settings.save();
     location.reload();  // force page reload to clear pipes cache (if date format has changed)
-    this.cancel();
+    this.mc.dismiss();
   }
 
   protected getElementKey(el: string): I18nKey {
-    return <I18nKey>("DTF_EDITOR_PH_" + el);
+    return <I18nKey>('DTF_EDITOR_PH_' + el);
+  }
+
+  protected isValid() {
+    return this.format().customFormat
+      || this.format().dateStyle !== <any>'*'
+      || this.format().timeStyle !== <any>'*';
   }
 
 }

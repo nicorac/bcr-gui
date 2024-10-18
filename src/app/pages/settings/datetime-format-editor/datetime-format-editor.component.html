@@ -28,7 +28,9 @@
             dateTimeSample | datetime : { dateStyle: "short" }
           }}</ion-select-option
         >
-        <ion-select-option [value]="''"> None </ion-select-option>
+        <ion-select-option [value]="'*'">
+          {{ 'SETTINGS_DATETIME_EMPTY' | translatePipe }}
+        </ion-select-option>
       </ion-select>
     </ion-item>
 
@@ -59,7 +61,9 @@
             dateTimeSample | datetime : { timeStyle: "short" }
           }}</ion-select-option
         >
-        <ion-select-option [value]="''">None</ion-select-option>
+        <ion-select-option [value]="'*'">
+          {{ 'SETTINGS_DATETIME_EMPTY' | translatePipe }}
+        </ion-select-option>
       </ion-select>
     </ion-item>
 
@@ -90,10 +94,10 @@
 
 <!-- footer -->
 <ion-footer class="right-container buttons-container">
-  <ion-button color="primary" fill="clear" (click)="cancel()">{{
-    "LBL_CANCEL" | translatePipe
-  }}</ion-button>
-  <ion-button color="primary" fill="clear" (click)="confirm()">{{
-    "LBL_OK" | translatePipe
-  }}</ion-button>
+  <ion-button color="primary" fill="clear" (click)="cancel()">
+    {{ 'LBL_CANCEL' | translatePipe }}
+  </ion-button>
+  <ion-button color="primary" fill="clear" (click)="confirm()" [disabled]="!isValid()">
+    {{ 'LBL_OK' | translatePipe }}
+  </ion-button>
 </ion-footer>
