@@ -53,6 +53,7 @@
   "FNP_EDITOR_TEST_INFO": "Sélectionnez un fichier, ou renseigner une expression",
   "FNP_EDITOR_TEST_RUN": "Lancer le test",
   "FNP_EDITOR_TEST_SELECT": "Sélectionnez un fichier",
+  "FNP_EDITOR_TEST_RESULT": "Résultat du test :",
   "FNP_EDITOR_TITLE": "Édition des fichiers analysés",
   "FNP_EDITOR_VAR_call_log_name": "Nom du correspondant : tout caractère",
   "FNP_EDITOR_VAR_caller_name": "Nom du correspondant : tout caractère",
