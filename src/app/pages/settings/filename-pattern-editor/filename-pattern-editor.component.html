@@ -108,7 +108,7 @@
 
   <!-- test result -->
   <div class="section" *ngIf="testResult">
-    <ion-label>Test result</ion-label>
+    <ion-label>{{ 'FNP_EDITOR_TEST_RESULT' | translatePipe }}</ion-label>
     <pre class="result">{{ testResult }}</pre>
   </div>
 
