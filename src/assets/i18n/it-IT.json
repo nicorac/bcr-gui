@@ -51,6 +51,7 @@
   "FNP_EDITOR_TEMPLATES": "Modelli",
   "FNP_EDITOR_TEST": "Test nome file",
   "FNP_EDITOR_TEST_INFO": "Seleziona (o inserisci) un nome file da testare…",
+  "FNP_EDITOR_TEST_RESULT": "Risultato test",
   "FNP_EDITOR_TEST_RUN": "Esegui test",
   "FNP_EDITOR_TEST_SELECT": "Seleziona file",
   "FNP_EDITOR_TITLE": "Editor formato nome file",
