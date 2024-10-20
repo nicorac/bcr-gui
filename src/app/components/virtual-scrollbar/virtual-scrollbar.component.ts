@@ -1,7 +1,7 @@
 /* eslint-disable @angular-eslint/no-input-rename */
-import { sampleTime, Subject, Subscription } from 'rxjs';
+import { debounceTime, Subject, Subscription } from 'rxjs';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
-import { ChangeDetectionStrategy, Component, ElementRef, HostListener, input, model, OnDestroy, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, input, model, OnDestroy, OnInit, signal } from '@angular/core';
 
 const MIN_CURSOR_HEIGHT = 40; // min cursor height in px
 
@@ -19,6 +19,7 @@ export class VirtualScrollbarComponent implements OnInit, OnDestroy {
 
   // protected isDragging = false;
   protected readonly cursorHeight = 48;
+  protected isVisible = signal(false);
   protected cursorYPos = signal(0);     // cursor current Y position
   private cursorYRange = 0;     // Y cursor scroll range (starting from 0)
   private topOffset = 0;        // pointer events coordinates are absolute, so we need to offset them
@@ -32,8 +33,8 @@ export class VirtualScrollbarComponent implements OnInit, OnDestroy {
   // self native element
   private ne: HTMLDivElement;
 
-  // throttled subject to manage cursor drag events
-  private throttledScrollSubj = new Subject<number>();
+  // throttled subject to manage scroll events and show/hide scrollbar
+  private scrollSubj = new Subject<void>();
   private _subs!: Subscription;
 
   // reference to CdkVirtualScrollViewport
@@ -53,13 +54,10 @@ export class VirtualScrollbarComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
 
-    // limit emission rate of pointerMove DOM event
-    this._subs = this.throttledScrollSubj
-      .pipe(sampleTime(250))
-      .subscribe((yPos: number) => {
-        // scroll the CDK virtual list to the given Y coordinate
-        this.cvsViewport().scrollToOffset(yPos, 'instant');
-      });
+    // wait 500ms from last scroll event to hide the scrollbar
+    this._subs = this.scrollSubj
+      .pipe(debounceTime(500))
+      .subscribe(() => this.isVisible.set(false));
 
     // extract vsv child elements
     const viewportNe = this.cvsViewport().elementRef.nativeElement;
@@ -73,7 +71,9 @@ export class VirtualScrollbarComponent implements OnInit, OnDestroy {
     // attach to vsv scroll event
     this.cvsViewportScrollSubscription = this.cvsViewport().elementScrolled().subscribe(e => {
       if (e.target) {
+        this.isVisible.set(true);
         this.scrollHandler(e.target as HTMLDivElement);
+        this.scrollSubj.next();
       }
     });
 
@@ -111,36 +111,6 @@ export class VirtualScrollbarComponent implements OnInit, OnDestroy {
 
   }
 
-  /**
-   * This is needed to let pointerMove event be continuously raised when moving
-   * console.warn(`[touchStart] isDragging: ${this.isDragging}`);
-   */
-  touchStart(e: TouchEvent) {
-    e.preventDefault();
-  }
-
-  @HostListener('pointerdown', ['$event'])
-  protected pointerDown(e: PointerEvent) {
-    this.isDragging.set(true);
-    // console.log(`[pointerDown] isDragging: ${this.isDragging}`);
-  }
-
-  @HostListener('pointerup', ['$event'])
-  protected pointerUp(e: PointerEvent) {
-    this.isDragging.set(false);
-    // console.log(`[pointerUp] isDragging: ${this.isDragging}`);
-  }
-
-  @HostListener('pointermove', ['$event'])
-  protected pointerMove(e: PointerEvent) {
-    if (this.isDragging()) {
-      this.setCursorYPos(e.clientY - this.topOffset - this.cursorHeight/2);
-      // emit event to throttled Subject
-      const newY = this.listTotalHeight * this.cursorYPos() / this.cursorYRange;
-      // console.log(`[pointerMove] newY: ${newY}`);
-      this.throttledScrollSubj.next(newY);
-    }
-  }
 
   /**
    * Handles virtual list scroll events and set cursor Y position

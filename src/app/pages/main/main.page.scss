@@ -5,7 +5,7 @@
     display: flex;
     flex-direction: column;
     gap: var(--item-gap);
-    padding: 2px;
+    padding: 12px 2px;
   }
 
 }
@@ -19,21 +19,31 @@
 
 .main-content {
   position: relative;
-  // make room for virtual-scrollbar
-  --padding-start: 1em;
+  --padding-start: 0;
   --padding-end: 0;
+  --padding-bottom: 0;
+  --padding-top: 0;
 }
 
 .content-wrapper {
+  position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) min-content;
-  grid-template-rows: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) min-content;
+  gap: 0;
   height: 100%;
 }
 
+.virtual-scrollbar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+}
+
 .player {
-  box-shadow: rgba(var(--ion-text-color-rgb), 0.1) 0px 10px 36px 0px,
-              rgba(var(--ion-text-color-rgb), 0.16) 0px 0px 0px 1px;
+  padding: 1em;
+  background-color: var(--player-background-color);
+  z-index: 1; // needed for the box-shadow to go over last recording
 }
 
 .details-actions {
@@ -48,9 +58,6 @@
 .title {
   font-size: 14pt;
   line-height: 16pt;
-  gap: 1em;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) min-content;
 }
 
 .title,
@@ -58,15 +65,19 @@
   color: RGB(var(--ion-text-color-rgb));
 }
 
+.subtitle {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5em;
+}
+
 .call-direction-icon {
-  height: 16pt;
-  width: 16pt;
-  min-height: 16pt;
-  min-width: 16pt;
+  height: 0.7rem;
+  width: 0.7rem;
 }
 
 .items {
-  padding: 0;
+  padding: 0 1em;
   margin: 0;
   background: var(--ion-background-color);
   height: 100%;
@@ -74,13 +85,9 @@
 
   .item {
     margin: 0;
-    height: var(--item-height);
-    display: grid;
-    grid-template-columns: min-content minmax(0, 1fr);
-    align-items: center;
-    border: 1px solid var(--item-border-color);
-    border-radius: .8em;
-    // box-shadow: 0 0 .2em var(--item-shadow-color);
+    min-height: var(--item-height);
+    border-radius: 10px;
+    box-shadow: 0 5px 7px -1px rgba(51, 51, 51, 0.23);
 
     .op-name {
       display: -webkit-box;
@@ -91,10 +98,12 @@
     }
 
     &.selected {
-      min-height: var(--item-height-selected);
       height: unset;
-      border-color: var(--item-border-color-selected);
-      box-shadow: inset 0 0 .4em var(--item-shadow-color-selected);
+      border: 2px solid var(--item-border-color-selected);
+      background-color: var(--ion-item-background-selected);
+      box-shadow: 0px 0px 4px 1px var(--item-border-color-selected);
+      border-radius: 10px;
+
       .op-name {
         -webkit-line-clamp: 4;
       }
@@ -110,20 +119,25 @@
       gap: 1em;
     }
 
-    .player {
-      border-radius: .6em;
-    }
-
     .actions {
       display: flex;
       gap: 1.25em;
       justify-content: flex-end;
+      color: var(--ion-color-step-600);
     }
 
     .action {
       font-size: 2em;
       line-height: 2em;
     }
+  }
+}
+
+// revert some customizations in multiline mode
+.multiselect .item.selected {
+  height: var(--item-height);
+  .op-name {
+    -webkit-line-clamp: 1;
   }
 }
 

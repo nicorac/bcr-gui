@@ -1,7 +1,6 @@
 import { Subscription } from 'rxjs';
 import { IonicBundleModule } from 'src/app/IonicBundle.module';
 import { Recording } from 'src/app/models/recording';
-import { DatetimePipe } from 'src/app/pipes/datetime.pipe';
 import { ToHmsPipe } from 'src/app/pipes/to-hms.pipe';
 import { MessageBoxService } from 'src/app/services/message-box.service';
 import { RecordingsService } from 'src/app/services/recordings.service';
@@ -20,8 +19,7 @@ export enum PlayerStatusEnum {
   templateUrl: './audio-player.component.html',
   styleUrls: ['./audio-player.component.scss'],
   standalone: true,
-  imports: [ DatetimePipe, IonicBundleModule, ToHmsPipe ],
-  providers: [ DatetimePipe ],
+  imports: [ IonicBundleModule, ToHmsPipe ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AudioPlayerComponent implements OnInit, OnDestroy {

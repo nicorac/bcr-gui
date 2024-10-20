@@ -1,5 +1,20 @@
 # Version history
 
+## Version 1.10.0 (2024-12-06)
+
+New features:
+
+- Rework of main page layout:
+  - player moved to page bottom
+  - list can now be scrolled (fully) while playing
+  - list vertical scrollbar now appears only when scrolling
+  - cleaned up list style
+  - improved items multiselection
+
+Bug fixes:
+
+- scrolling list causes player to stop when playing item goes out of scope
+
 ## Version 1.9.2 (2024-11-25)
 
 Bug fixes:

@@ -1,34 +1,43 @@
 <div class="progress">
-  <ion-range
-    label="{{ progress() | toHms }}"
-    labelPlacement="end"
+  <div class="progress-label">{{ progress() | toHms }}</div>
+  <ion-range class="range-bar"
     [disabled]="!ready()"
     [value]="progress()"
     [max]="duration()"
     (ionKnobMoveEnd)="onIonKnobMoveEnd($event)"
   />
+  <div class="progress-label">{{ duration() | toHms }}</div>
 </div>
 
-<div class="controls">
-  <ion-icon
-    class="buttons"
-    color="primary"
-    [class.disabled]="!ready()"
-    name="play-back"
-    (click)="onSeek(-1)"
-  />
-  <ion-icon
-    class="buttons"
-    color="primary"
-    [class.disabled]="!ready()"
-    [name]="status() !== PlayerStatusEnum.Playing ? 'play' : 'pause'"
-    (click)="toggle()"
-  />
-  <ion-icon
-    class="buttons"
-    color="primary"
-    [class.disabled]="!ready()"
-    name="play-forward"
-    (click)="onSeek(+1)"
-  />
+<div class="controls" [class.disabled]="!ready()">
+
+  <div class="button" (click)="onSeek(-1)">
+    <div class="button-in">
+      <ion-icon
+        class="icon"
+        color="primary"
+        name="play-back"
+      />
+    </div>
+  </div>
+
+  <div class="button play" (click)="toggle()">
+    <div class="button-in">
+      <ion-icon
+        class="icon"
+        [name]="status() !== PlayerStatusEnum.Playing ? 'play' : 'pause'"
+      />
+    </div>
+  </div>
+
+  <div class="button" (click)="onSeek(+1)">
+    <div class="button-in">
+      <ion-icon
+        class="icon"
+        color="primary"
+        name="play-forward"
+      />
+    </div>
+  </div>
+
 </div>

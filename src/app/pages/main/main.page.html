@@ -14,8 +14,11 @@
 
   <!-- action buttons -->
   <ion-buttons slot="end">
-    <ion-button id="context-menu-button" >
-      <ion-icon icon="ellipsis-vertical" slot="icon-only" />
+    <ion-button (click)="selectAll()">
+      <ion-icon src="/assets/icons/select-all.svg" slot="icon-only" />
+    </ion-button>
+    <ion-button (click)="deleteItems(getSelectedItems())">
+      <ion-icon name="trash" slot="icon-only" />
     </ion-button>
 
     <!-- actions context menu -->
@@ -23,7 +26,7 @@
       <ng-template>
         <ion-content>
           <ion-list lines="none" class="toolbar-menu-items">
-            <ion-item (click)="selectAll()">
+            <ion-item >
               <ion-icon src="/assets/icons/select-all.svg" />
               {{ 'LBL_SELECTALL' | translatePipe }}
             </ion-item>
@@ -64,12 +67,12 @@
 
     <ion-list class="items"
       lines="full"
+      [class.multiselect]="isMultiselect()"
       [style.--item-height]="itemHeight + 'px'"
-      [style.--item-height-selected]="itemHeightSelected + 'px'"
       [style.--item-gap]="itemGap + 'px'"
     >
 
-      @if (topIndex === 0 && !scrollbar.isDragging()) {
+      @if (topIndex === 0) {
         <ion-refresher
           slot="fixed"
           pullFactor=".5"
@@ -96,30 +99,24 @@
         <!-- recording item -->
         <ion-card *cdkVirtualFor="let item of items(); let index = index"
           class="item"
-          [class.selected]="item.selected && !isMultiselect()"
+          [class.selected]="item.selected"
         >
-          <!-- isMultiselect() checkbox -->
           <div>
-            @if (isMultiselect()) {
-              <ion-checkbox class="checkbox" [(ngModel)]="item.selected" />
-            }
-          </div>
 
-          <div
-            (click)="onItemClick(item);"
-            longPress
-            (longPress)="startMultiselection(item)"
-          >
             <!-- card content -->
-            <ion-card-header>
+            <ion-card-header
+              (click)="onItemClick(item);"
+              longPress
+              (longPress)="startMultiselection(item)"
+            >
               <ion-card-title class="title">
                 <div class="op-name">{{ item.opName }}</div>
-                <app-call-icon class="call-direction-icon" [direction]="item?.direction ?? ''" />
               </ion-card-title>
-              <ion-card-subtitle class="left-right-container subtitle">
-                <div>{{ item?.date | datetime }}</div>
+              <ion-card-subtitle class="left-container subtitle">
+                <app-call-icon class="call-direction-icon" [direction]="item?.direction ?? ''" />
+                <span>{{ item?.date | datetime }}</span>
                 @if (item.duration) {
-                  <div>{{ item.duration | toHms }}</div>
+                  • <span>{{ item.duration | toHms }}</span>
                 }
               </ion-card-subtitle>
             </ion-card-header>
@@ -163,9 +160,6 @@
 
                 </div>
 
-                <!-- audio player -->
-                <app-audio-player #audioPlayer class="player" [recording]="item" />
-
               </ion-card-content>
             }
 
@@ -175,11 +169,17 @@
 
       </cdk-virtual-scroll-viewport>
 
+      <app-virtual-scrollbar
+        class="virtual-scrollbar"
+        [virtualScrollViewport]="vsv"
+      />
+
     </ion-list>
 
-    <app-virtual-scrollbar #scrollbar class="virtual-scrollbar"
-      [virtualScrollViewport]="vsv"
-    />
+    <!-- audio player -->
+    @if (selectedItem() && !isMultiselect()) {
+      <app-audio-player #audioPlayer class="player" [recording]="selectedItem()!" />
+    }
 
   </div>
 

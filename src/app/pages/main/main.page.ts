@@ -69,6 +69,7 @@ export class MainPage implements AfterViewInit {
       onClick: () => this.toggleSearchBar(),
     },
   ];
+  selectedItem = signal<Recording | undefined>(undefined);
 
   // filtered items collection
   protected items = computed<Recording[]>(() => {
@@ -82,7 +83,6 @@ export class MainPage implements AfterViewInit {
 
   protected topIndex = 0; // index of top shown recording
   protected itemHeight = 78;
-  protected itemHeightSelected = this.itemHeight + 180;
   protected itemGap = 12;
 
   private player = viewChild(AudioPlayerComponent);
@@ -100,24 +100,23 @@ export class MainPage implements AfterViewInit {
     protected recordingsService: RecordingsService,
     protected router: Router,
     protected settings: SettingsService,
-  ) { }
+  ) {
+
+    // // DEBUG: automatically select first recording
+    // if (!environment.production) {
+    //   effect(() => {
+    //     if (this.items()?.length) {
+    //       setTimeout(() => this.onItemClick(this.items()[0]), 250);
+    //     }
+    //   });
+    // }
+
+  }
 
   async ionViewWillEnter() {
 
     // save reference to myself
     this.recordingsService.mainPageRef = this;
-
-    // set audio output
-    // await AudioPlayer.setConfiguration({ enableEarpiece: this.settings.enableEarpiece });
-
-    // // subscribe
-    // [
-    //   this.recordingsService.recordings.subscribe((res) => {
-    //     this.clearSelection();
-    //     this.itemsAll = res;
-    //     this.updateFilter();
-    //   })
-    // ].forEach(s => this._subs.add(s));
 
   }
 
@@ -194,6 +193,7 @@ export class MainPage implements AfterViewInit {
 
   clearSelection() {
     this.recordingsService.recordings().forEach(r => r.selected = false); // remove flag from itemsAll, just to stay safe...😉
+    this.selectedItem.set(undefined);
     this.isMultiselect.set(false);
   }
 
@@ -241,11 +241,12 @@ export class MainPage implements AfterViewInit {
   async onItemClick(item: Recording) {
 
     if (item.selected) {
-      if (this.isMultiselect()) {
+      this.selectedItem.set(undefined);
+      // if (this.isMultiselect()) {
         item.selected = false;
-      }
       // disable multiselection if no element is still selected
-      if (!this.getSelectedItems().length) {
+      // disable multiselection if no element is still selected
+      if (this.isMultiselect() && !this.getSelectedItems().length) {
         this.isMultiselect.set(false);
       }
     }
@@ -254,6 +255,7 @@ export class MainPage implements AfterViewInit {
         this.clearSelection();
       }
       item.selected = true;
+      this.selectedItem.set(item);
       if (!this.isMultiselect()) {
         bringIntoView('.items .selected');
       }
@@ -265,6 +267,8 @@ export class MainPage implements AfterViewInit {
    * Deletes the given recording file (and its companion JSON metadata)
    */
   async deleteItems(items: Recording[]) {
+
+    this.player()?.pause();
 
     // show confirmation alert
     await this.mbs.showConfirm({
@@ -287,7 +291,7 @@ export class MainPage implements AfterViewInit {
   async editItem(rec: Recording) {
 
     // stop player
-    await this.stopPlayer();
+    await this.player()?.pause();
 
     // show sheet modal
     const sheet = await this.asc.create({
