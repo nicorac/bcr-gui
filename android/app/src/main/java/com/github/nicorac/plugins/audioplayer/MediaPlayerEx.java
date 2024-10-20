@@ -124,16 +124,21 @@ public class MediaPlayerEx {
     try {
       player.setAudioAttributes(audioAttributes);
       player.setDataSource(context, fileUri);
-      player.prepare();
+      player.prepareAsync();
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
+
+    // attach prepareAsync completed handler
+    player.setOnPreparedListener(mp -> {
+      this.eventListener.onPlayerReady(this);
+    });
 
     // attach completion handler
     player.setOnCompletionListener(mp -> {
       stopUpdateTask();
       cancelNotification();
-      this.eventListener.onCompletion(this);
+      this.eventListener.onPlayerCompleted(this);
     });
 
   }
@@ -232,7 +237,7 @@ public class MediaPlayerEx {
   }
 
   private void doUpdate() {
-    eventListener.onUpdate(MediaPlayerEx.this);
+    eventListener.onPlayerUpdate(MediaPlayerEx.this);
     updateNotification();
   }
 

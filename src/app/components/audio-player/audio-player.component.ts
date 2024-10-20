@@ -37,8 +37,9 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
 
   // subscriptions
   private _androidEventsSubs = new Subscription();
+  private removePlayerReadyListener?: () => Promise<void>;
   private removePlayCompletedListener?: () => Promise<void>;
-  private removeUpdateListener?: () => Promise<void>;
+  private removePlayerUpdateListener?: () => Promise<void>;
 
   // inputs
   public recording = input.required<Recording>();
@@ -85,9 +86,22 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
         notificationText: this.dateTimePipe.transform(this.recording().date, this.settings.dateTimeFormat),
       });
 
+      // subscribe to player ready event
+      this.removePlayerReadyListener = await AudioPlayer.addListener('playerReady', (res) => {
+        if (res.id === this.playerRef?.id) {
+          // get audio duration
+          this.duration.set(res.duration / 1000);
+          this.status.set(PlayerStatusEnum.Paused);
+          this.progress.set(0);
+          // init complete
+          this.ready.set(true);
+          this.cdr.detectChanges(); // workaround needed to let Angular update values...
+        }
+      }).remove;
+
       // subscribe to playComplete event and
       // save reference to listener remove function
-      this.removePlayCompletedListener = await AudioPlayer.addListener('playCompleted', (res) => {
+      this.removePlayCompletedListener = await AudioPlayer.addListener('playerCompleted', (res) => {
         if (res.id === this.playerRef?.id) {
           this.status.set(PlayerStatusEnum.Paused);
           this.progress.set(0);
@@ -97,14 +111,11 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
 
       // subscribe to update event and
       // save reference to listener remove function
-      this.removeUpdateListener = await AudioPlayer.addListener('update', (res) => {
+      this.removePlayerUpdateListener = await AudioPlayer.addListener('playerUpdate', (res) => {
         if (res.id === this.playerRef?.id) {
           this.progress.set(Math.floor(res.position / 1000));
         }
       }).remove;
-
-      // get audio duration
-      this.duration.set((await AudioPlayer.getDuration(this.playerRef!)).duration / 1000);
 
       // set duration to recording item
       // (if not already set with JSON metadata file)
@@ -113,9 +124,6 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
         // forcibly save updated recordings DB
         await this.recordingsService.save();
       }
-
-      // init complete
-      this.ready.set(true);
 
       // workaround needed to let Angular update values...
       this.cdr.detectChanges();
@@ -137,7 +145,7 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
     await AudioPlayer.release(this.playerRef!);
     this.playerRef = undefined;
     await this.removePlayCompletedListener?.();
-    await this.removeUpdateListener?.();
+    await this.removePlayerUpdateListener?.();
     this.cdr.detectChanges(); // workaround needed to let Angular update values...
 
   }

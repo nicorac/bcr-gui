@@ -185,15 +185,23 @@ public class AudioPlayerService extends Service {
         public PendingIntent getNotificationClickIntent() { return bringAppToForegroundIntent; }
 
         @Override
-        public void onUpdate(MediaPlayerEx player) {
+        public void onPlayerReady(MediaPlayerEx player) {
           var res = new JSObject();
           res.put("id", id);
-          res.put("position", player.getCurrentPosition());
-          plugin.sendJSEvent("update", res);
+          res.put("duration", player.getDuration());
+          plugin.sendJSEvent("playerReady", res);
         }
 
         @Override
-        public void onCompletion(MediaPlayerEx mp) {
+        public void onPlayerUpdate(MediaPlayerEx player) {
+          var res = new JSObject();
+          res.put("id", id);
+          res.put("position", player.getCurrentPosition());
+          plugin.sendJSEvent("playerUpdate", res);
+        }
+
+        @Override
+        public void onPlayerCompleted(MediaPlayerEx mp) {
           var res = new JSObject();
           res.put("id", id);
           plugin.sendJSEvent("playCompleted", res);
