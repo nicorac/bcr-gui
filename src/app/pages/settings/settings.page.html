@@ -135,6 +135,19 @@
       </div>
     </ion-item>
 
+    <ion-item>
+      <div class="wrapper">
+        <div class="label">
+          <div>{{ 'SETTINGS_PLAYER_KEEP_AWAKE' | translatePipe }}</div>
+          <div class="help">{{ 'SETTINGS_PLAYER_KEEP_AWAKE_HELP' | translatePipe }}</div>
+        </div>
+        <ion-checkbox
+          [(ngModel)]="settings.keepAwakeWhenPlaying"
+          (ngModelChange)="save()"
+        />
+      </div>
+    </ion-item>
+
   </ion-list>
 
 </ion-content>

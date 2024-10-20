@@ -6,8 +6,8 @@ import { ToHmsPipe } from 'src/app/pipes/to-hms.pipe';
 import { MessageBoxService } from 'src/app/services/message-box.service';
 import { RecordingsService } from 'src/app/services/recordings.service';
 import { SettingsService } from 'src/app/services/settings.service';
-import { AudioPlayer, IBaseParams } from 'src/plugins/audioplayer';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, input, OnDestroy, OnInit, signal } from '@angular/core';
+import { AudioPlayer } from 'src/plugins/audioplayer';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, input, OnDestroy, OnInit, signal, untracked } from '@angular/core';
 import { RangeCustomEvent } from '@ionic/angular';
 
 export enum PlayerStatusEnum {
@@ -33,95 +33,110 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
   protected status = signal(PlayerStatusEnum.Paused);
   protected progress = signal(0);   // current play position (in integer seconds)
   protected duration = signal(0);   // audio duration in seconds
-  private playerRef?: IBaseParams;
 
   // subscriptions
   private _androidEventsSubs = new Subscription();
+  private removePlayerReadyListener?: () => Promise<void>;
+  private removePlayerUpdateListener?: () => Promise<void>;
   private removePlayCompletedListener?: () => Promise<void>;
-  private removeUpdateListener?: () => Promise<void>;
 
   // inputs
   public recording = input.required<Recording>();
 
-  // props
-  get assetId() { return this.recording().audioUri; }
-
-
   constructor(
     private cdr: ChangeDetectorRef,
-    private dateTimePipe: DatetimePipe,
     private mbs: MessageBoxService,
     private recordingsService: RecordingsService,
     private settings: SettingsService,
-  ) { }
+  ) {
+    effect(() => {
+      untracked(async () => await this.unload());
+      if (this.recording()) {
+        untracked(async () => await this.load(this.recording()));
+      }
+    });
+
+  }
 
   async ngOnInit() {
 
-    try {
-      // preload audio file
-      await this.preloadAudio();
-    } catch (error: any) {
-      this.showError(error, 'ngOnInit()');
-    }
+    // try {
+    //   // preload audio file
+    //   await this.preloadAudio();
+    // } catch (error: any) {
+    //   this.showError(error, 'ngOnInit()');
+    // }
 
   }
 
   async ngOnDestroy() {
     // release asset
-    await this.unloadAudio();
+    await this.unload();
     this._androidEventsSubs.unsubscribe();
   }
 
   /**
    * Preload audio file
    */
-  private async preloadAudio() {
+  private async load(rec: Recording) {
 
-    try {
+    // free resources
+    if (this.ready()) {
+      await this.unload();
+    }
 
-      this.playerRef = await AudioPlayer.init({
-        fileUri: this.recording().audioUri,
-        notificationTitle: this.recording().opName,
-        notificationText: this.dateTimePipe.transform(this.recording().date, this.settings.dateTimeFormat),
-      });
+    if (rec) {
 
-      // subscribe to playComplete event and
-      // save reference to listener remove function
-      this.removePlayCompletedListener = await AudioPlayer.addListener('playCompleted', (res) => {
-        if (res.id === this.playerRef?.id) {
+      try {
+
+        await AudioPlayer.load({
+          fileUri: rec.audioUri,
+          notificationTitle: rec.opName,
+          enableEarpiece: this.settings.enableEarpiece,
+          keepAwakeWhenPlaying: this.settings.keepAwakeWhenPlaying,
+          // notificationText: this.dateTimePipe.transform(r.date, this.settings.dateTimeFormat),
+        });
+
+        // subscribe to player ready event
+        this.removePlayerReadyListener = await AudioPlayer.addListener('playerReady', (res) => {
+          // get audio duration
+          this.duration.set(res.duration / 1000);
+          this.status.set(PlayerStatusEnum.Paused);
+          this.progress.set(0);
+          // init complete
+          this.ready.set(true);
+          this.cdr.detectChanges(); // workaround needed to let Angular update values...
+        }).remove;
+
+        // subscribe to playComplete event and
+        // save reference to listener remove function
+        this.removePlayCompletedListener = await AudioPlayer.addListener('playerCompleted', () => {
           this.status.set(PlayerStatusEnum.Paused);
           this.progress.set(0);
           this.cdr.detectChanges(); // workaround needed to let Angular update values...
-        }
-      }).remove;
+        }).remove;
 
-      // subscribe to update event and
-      // save reference to listener remove function
-      this.removeUpdateListener = await AudioPlayer.addListener('update', (res) => {
-        if (res.id === this.playerRef?.id) {
+        // subscribe to update event and
+        // save reference to listener remove function
+        this.removePlayerUpdateListener = await AudioPlayer.addListener('playerUpdate', (res) => {
           this.progress.set(Math.floor(res.position / 1000));
+        }).remove;
+
+        // set duration to recording item
+        // (if not already set with JSON metadata file)
+        if (!rec.duration) {
+          rec.duration = this.duration();
+          // forcibly save updated recordings DB
+          await this.recordingsService.save();
         }
-      }).remove;
 
-      // get audio duration
-      this.duration.set((await AudioPlayer.getDuration(this.playerRef!)).duration / 1000);
+        // workaround needed to let Angular update values...
+        this.cdr.detectChanges();
 
-      // set duration to recording item
-      // (if not already set with JSON metadata file)
-      if (!this.recording().duration) {
-        this.recording().duration = this.duration();
-        // forcibly save updated recordings DB
-        await this.recordingsService.save();
+      } catch (error) {
+        this.showError(error, 'initializeplayer()')
       }
 
-      // init complete
-      this.ready.set(true);
-
-      // workaround needed to let Angular update values...
-      this.cdr.detectChanges();
-
-    } catch (error) {
-      this.showError(error, 'preloadAudio()')
     }
 
   }
@@ -129,15 +144,15 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
   /**
    * Release loaded audio file
    */
-  public async unloadAudio() {
+  public async unload() {
 
     this.status.set(PlayerStatusEnum.Paused);
     this.ready.set(false);
 
-    await AudioPlayer.release(this.playerRef!);
-    this.playerRef = undefined;
+    await AudioPlayer.unload();
+    await this.removePlayerReadyListener?.();
     await this.removePlayCompletedListener?.();
-    await this.removeUpdateListener?.();
+    await this.removePlayerUpdateListener?.();
     this.cdr.detectChanges(); // workaround needed to let Angular update values...
 
   }
@@ -173,13 +188,9 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
   /**
    * Play the given record file (already loaded with load())
    */
-  async play(position?: number) {
+  async play() {
 
-    if (position === undefined) {
-      position = this.progress();
-    }
-
-    return AudioPlayer.play({ id: this.playerRef!.id, position: position * 1000 })
+    return AudioPlayer.play()
       .then(async _ => {
         this.status.set(PlayerStatusEnum.Playing);
       })
@@ -189,8 +200,15 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
   /**
    * Fast forward / rewind
    */
-  protected async seek(delta: number) {
-    this.play(this.progress() + delta * this.settings.seekTime);
+  protected async onSeek(delta: number) {
+    return this.setCurrentPosition(this.progress() + delta * this.settings.seekTime);
+  }
+
+  /**
+   * Set position
+   */
+  protected async setCurrentPosition(position: number) {
+    AudioPlayer.setCurrentPosition({ position: position * 1000 });
   }
 
   /**
@@ -203,7 +221,7 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
     }
 
     // pause audio
-    await AudioPlayer.pause(this.playerRef!)
+    await AudioPlayer.pause()
       .then(_ => {
         this.status.set(PlayerStatusEnum.Paused);
       })
@@ -214,11 +232,11 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
    * User released the position knob
    */
   protected async onIonKnobMoveEnd(ev: Event) {
-    const newProgress = (ev as RangeCustomEvent).detail.value as number;
-    this.progress.set(newProgress);
-    if (this.status() === PlayerStatusEnum.Playing) {
-      return this.play(newProgress);
-    }
+    const newPos = (ev as RangeCustomEvent).detail.value as number;
+    // this.progress.set(newPos);
+    // if (this.status() === PlayerStatusEnum.Playing) {
+      return this.setCurrentPosition(newPos);
+    // }
   }
 
 }

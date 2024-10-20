@@ -8,7 +8,6 @@ import { MessageBoxService } from 'src/app/services/message-box.service';
 import { RecordingsService } from 'src/app/services/recordings.service';
 import { SortModeEnum } from 'src/app/utils/recordings-sorter';
 import version from 'src/app/version';
-import { OutputDeviceEnum } from 'src/plugins/audioplayer';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -32,7 +31,6 @@ import { FilenamePatternEditorComponent } from './filename-pattern-editor/filena
 })
 export class SettingsPage {
 
-  protected OutputDeviceEnum = OutputDeviceEnum;
   protected SortMode = SortModeEnum;
   protected version = version;
 

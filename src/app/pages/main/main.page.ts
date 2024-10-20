@@ -19,7 +19,6 @@ import { sortRecordings } from 'src/app/utils/recordings-sorter';
 import { bringIntoView } from 'src/app/utils/scroll';
 import { untilTrue } from 'src/app/utils/waitForAsync';
 import { AndroidSAF } from 'src/plugins/androidsaf';
-import { AudioPlayer } from 'src/plugins/audioplayer';
 import { CdkVirtualScrollViewport, ScrollingModule } from '@angular/cdk/scrolling';
 import { DatePipe } from '@angular/common';
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, signal, untracked, viewChild } from '@angular/core';
@@ -109,7 +108,7 @@ export class MainPage implements AfterViewInit {
     this.recordingsService.mainPageRef = this;
 
     // set audio output
-    await AudioPlayer.setConfiguration({ enableEarpiece: this.settings.enableEarpiece });
+    // await AudioPlayer.setConfiguration({ enableEarpiece: this.settings.enableEarpiece });
 
     // // subscribe
     // [
@@ -274,7 +273,7 @@ export class MainPage implements AfterViewInit {
       confirmText: this.i18n.get('LBL_DELETE'),
       onConfirm: async () => {
         // forcibly unload audio
-        await this.player()?.unloadAudio();
+        await this.player()?.unload();
         this.recordingsService.deleteRecording(items);
         this.clearSelection();
       }
@@ -286,6 +285,9 @@ export class MainPage implements AfterViewInit {
    * Edit the given item
    */
   async editItem(rec: Recording) {
+
+    // stop player
+    await this.stopPlayer();
 
     // show sheet modal
     const sheet = await this.asc.create({

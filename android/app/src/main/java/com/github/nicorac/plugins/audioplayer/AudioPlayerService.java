@@ -1,78 +1,111 @@
 package com.github.nicorac.plugins.audioplayer;
 
+import static com.github.nicorac.plugins.audioplayer.AudioDeviceEnum.DEVICE_EARPIECE;
+import static com.github.nicorac.plugins.audioplayer.AudioDeviceEnum.DEVICE_LOUDSPEAKER;
+import static com.github.nicorac.plugins.audioplayer.AudioDeviceEnum.DEVICE_UNDEFINED;
+
+import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 
 import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
+import androidx.media3.common.C;
+import androidx.media3.common.MediaItem;
+import androidx.media3.exoplayer.ExoPlayer;
+import androidx.media3.session.MediaSession;
+import androidx.media3.session.MediaSessionService;
 
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
 import com.github.nicorac.bcrgui.MainActivity;
+import com.github.nicorac.bcrgui.R;
 
-import java.util.HashMap;
+import java.util.Objects;
 
-public class AudioPlayerService extends Service {
+public class AudioPlayerService extends MediaSessionService {
 
-  private static final String ERR_BAD_ID = "Can't find a player instance with this 'id'";
-
+  // notifications management
+  private static final int NOTIFICATION_ID = 1;
   private static final String NOTIFICATION_CHANNEL_ID = "BCR-GUI";
   private static final String NOTIFICATION_CHANNEL_NAME = "BCR-GUI - Play status";
-  private static PendingIntent bringAppToForegroundIntent;
-  private static NotificationManager notificationManager;
+  private PendingIntent bringAppToForegroundIntent;
+  private NotificationManager notificationManager;
+  private androidx.core.app.NotificationCompat.Builder notificationBuilder;
+  private boolean isNotificationVisible = false;
+  private String notificationTitle = "";
+  public Handler playerThreadHandler;
 
-  // wakelocks to keep the service alive when playing and turn off screen when in proximity
   private PowerManager.WakeLock wakeLockPlay = null;
   private PowerManager.WakeLock wakeLockProximity = null;
 
-  // players collection
-  private final HashMap<Integer, MediaPlayerEx> players = new HashMap<>();
+  // player fields
+  private ExoPlayer player = null;
+  private boolean isPreparing = false;
+  private boolean isLoaded = false;
+  private AudioManager audioManager = null;
+  @AudioDeviceEnum.AudioDeviceValue private int currentOutputDevice = DEVICE_UNDEFINED;
+  private MediaSession mediaSession;
 
   // reference to plugin
-  private IJSEventSender plugin;
-
-  // proximity sensor management
-  private SensorManager sensorManager;
-  private Sensor proximitySensor;
-  private SensorEventListener proximityListener;
-  private OutputDeviceEnum currentOutputDevice = null;
+  private AudioPlayerPlugin plugin;
 
   // Plugin <--> Service binding support
   private final IBinder binder = new AudioPlayerServiceBinder();
   public class AudioPlayerServiceBinder extends Binder {
-    public AudioPlayerService getService(IJSEventSender plugin) {
+    public AudioPlayerService getService(AudioPlayerPlugin plugin) {
       AudioPlayerService.this.plugin = plugin;
       return AudioPlayerService.this;
     }
   }
 
+  // proximity sensor management
+  private SensorManager sensorManager;
+  private Sensor proximitySensor;
+  private SensorEventListener proximityListener;
+
+  // events and update handler (in current "CapacitorPlugins" thread)
+  private static final int UPDATE_INTERVAL = 500;
+  private Runnable updateRunnable;
+
+
   @Override
   public void onCreate() {
 
     super.onCreate();
-    var powerManager = (PowerManager) getSystemService(POWER_SERVICE);
-    wakeLockPlay = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "BcrGuiAudioPlayerService::WakeLock");
-    wakeLockProximity = powerManager.newWakeLock(PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK, "BcrGuiAudioPlayerService::ProximityWakeLock");
+    audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
 
     // Create an Intent for the "bring-to-front" action to be linked in notifications
-    var customIntent = new Intent(getApplicationContext(), MainActivity.class);
+    var customIntent = new Intent(
+      getApplicationContext(),
+      MainActivity.class
+    );
     customIntent.setAction(Intent.ACTION_MAIN);
     customIntent.addCategory(Intent.CATEGORY_LAUNCHER);
 
+    // PendingIntent run when clicking on notification content
+    bringAppToForegroundIntent = PendingIntent.getActivity(
+      getApplicationContext(), 0, customIntent,
+      PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+    );
+
     // get instance of NotificationManager and create notifications channel
     if (notificationManager == null) {
-      notificationManager = (NotificationManager) getApplicationContext().getSystemService(NOTIFICATION_SERVICE);
+      notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         var channel = new NotificationChannel(
           NOTIFICATION_CHANNEL_ID,
@@ -83,163 +116,157 @@ public class AudioPlayerService extends Service {
       }
     }
 
-    // Create a PendingIntent
-    bringAppToForegroundIntent = PendingIntent.getActivity(
-      getApplicationContext(), 0, customIntent,
-      PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
-    );
+    // init a new notification builder
+    notificationBuilder = new androidx.core.app.NotificationCompat.Builder(getApplicationContext(), NOTIFICATION_CHANNEL_ID);
+  }
 
+  @Nullable
+  @Override
+  public MediaSession onGetSession(MediaSession.ControllerInfo controllerInfo) {
+    return mediaSession;
   }
 
   @Override
   public void onDestroy() {
     super.onDestroy();
-    for (MediaPlayerEx i : players.values()) {
-      release(i);
+
+    try {
+      unload();
+      player = null;
+      if (mediaSession != null) mediaSession.release();
     }
-    players.clear();
-    cleanupProximitySensor();
-    if (wakeLockPlay.isHeld()) wakeLockPlay.release();
-    if (wakeLockProximity.isHeld()) wakeLockProximity.release();
+    catch (Exception ignored) {}
 
   }
 
   @Override
   public void onTaskRemoved(Intent rootIntent) {
-    // cancel all notifications
+    onDestroy();
   }
 
   @Override
   public IBinder onBind(Intent intent) {
+    super.onBind(intent);
     return binder;
   }
 
+
+  // player methods
+
   /**
-   * Initialize a new player on the given audio file (or return the already existing one)
+   * Initialize the player on the given audio file
    */
-  public void init(PluginCall call) {
+  public void load(PluginCall call) {
+
+    if (isLoaded) {
+      unload();
+    }
+    playerThreadHandler = new Handler();
 
     // get input arguments
     var fileUriStr = call.getString("fileUri");
     if (fileUriStr == null) {
-      call.reject("Missing fileUri parameter");
+      call.reject("Missing fileUri parameter", ErrorCodes.ERR_BAD_URI);
       return;
     }
-    var notificationTitle = call.getString("notificationTitle", "");
-    var notificationText = call.getString("notificationText", "");
+    var fileUri = Uri.parse(fileUriStr);
+    notificationTitle = call.getString("notificationTitle", "");
 
-    // calculate fileUri hash
-    var id = fileUriStr.hashCode();
-
-    // initialize media player (if needed)
-    if (!players.containsKey(id)) {
-      try {
-        var fileUri = Uri.parse(fileUriStr);
-        var mpe = createPlayerInstance(id, fileUri, notificationTitle, notificationText);
-        players.put(id, mpe);
-      } catch (Exception e) {
-        call.reject("Error loading audio file: " + fileUriStr);
-        return;
-      }
-    }
-
-    // return id of the new/existing MediaPlayer instance
-    var res = new JSObject();
-    res.put("id", id);
-    call.resolve(res);
-
-  }
-
-  /**
-   * Set player configuration
-   */
-  public void setConfiguration(PluginCall call) {
-
-    var enableEarpiece = call.getBoolean("enableEarpiece", false);
-
-    // initialize proximity sensor when earpiece is enabled
-    if (enableEarpiece != null && enableEarpiece) {
-      initProximitySensor();
-    }
-    else {
-      cleanupProximitySensor();
-    }
-
-    call.resolve();
-
-  }
-
-  /**
-   * Create a new instance of MediaPlayer class
-   */
-  private MediaPlayerEx createPlayerInstance(int id, Uri fileUri, String notificationTitle, String notificationText) {
-
-    return new MediaPlayerEx(
-      getApplicationContext(),
-      fileUri,
-      notificationTitle,
-      notificationText,
-      new OnEventListener() {
-
-        @Override
-        public PendingIntent getNotificationClickIntent() { return bringAppToForegroundIntent; }
-
-        @Override
-        public void onUpdate(MediaPlayerEx player) {
-          var res = new JSObject();
-          res.put("id", id);
-          res.put("position", player.getCurrentPosition());
-          plugin.sendJSEvent("update", res);
-        }
-
-        @Override
-        public void onCompletion(MediaPlayerEx mp) {
-          var res = new JSObject();
-          res.put("id", id);
-          plugin.sendJSEvent("playCompleted", res);
-        }
-
-      },
-      currentOutputDevice
-    );
-
-  }
-
-  /**
-   * Release current audio file and free the linked MediaPlayer
-   */
-  public void release(PluginCall call) {
-
-    var id = getPlayerId(call);
-    if (id == null) {
-      call.reject(ERR_BAD_ID);
-      return;
-    }
-
-    // remove item
-    var p = players.get(id);
-    if (p == null) {
-      call.reject(ERR_BAD_ID);
-      return;
-    }
-    else {
-      release(p);
-    }
-
-    call.resolve();
-
-  }
-
-  /**
-   * Destroy a MediaPlayer instance
-   */
-  private void release(MediaPlayerEx p) {
+    // load media file
     try {
-      stop(p);
-      p.release();
-      players.remove(p.id);
+
+      // create MediaPlayer instance
+      player = new ExoPlayer.Builder(getApplicationContext()).build();
+      var mediaItem = MediaItem.fromUri(fileUri);
+      setOutputDevice(DEVICE_LOUDSPEAKER);
+      player.setMediaItem(mediaItem);
+
+      // wakelocks to keep the service alive when playing and turn off screen when in proximity
+      PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+
+      // initialize proximity
+      if (Boolean.TRUE.equals(call.getBoolean("enableEarpiece", false))) {
+        wakeLockProximity = powerManager.newWakeLock(PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK, "BcrGuiAudioPlayerService::ProximityWakeLock");
+        initProximitySensor();
+      }
+
+      if (Boolean.TRUE.equals(call.getBoolean("keepAwakeWhenPlaying", false))) {
+        wakeLockPlay = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, "BcrGuiAudioPlayerService::WakeLock");
+      }
+
+      // initialize MediaSession
+      if (mediaSession != null) {
+        mediaSession.release();
+      }
+      mediaSession = new MediaSession.Builder(this, player)
+        // .setCallback(new MediaSession.Callback() {
+        //   @Override
+        //   public void onPlay() { player.play(); }
+        //
+        //   @Override
+        //   public void onPause() { player.pause(); }
+        // })
+        .build();
+
+      // attach events listener
+      player.addListener(new ExoPlayer.Listener() {
+        @Override
+        public void onPlaybackStateChanged(int playbackState) {
+          switch (playbackState) {
+            case ExoPlayer.STATE_READY:
+              // this state is returned both after prepare and after Play/Pause changes
+              if (isPreparing) {
+                isPreparing = false;
+                var res = new JSObject();
+                res.put("duration", player.getDuration());
+                plugin.sendJSEvent("playerReady", res);
+                isLoaded = true;
+              }
+              break;
+            case ExoPlayer.STATE_ENDED:
+              stopUpdateTask();
+              cancelNotification();
+              var res = new JSObject();
+              plugin.sendJSEvent("playCompleted", res);
+              break;
+            case ExoPlayer.STATE_IDLE:
+            case ExoPlayer.STATE_BUFFERING:
+              break;
+          }
+        }
+      });
+
+      // prepare the player
+      isPreparing = true;
+      player.prepare();
+
+    } catch (Exception e) {
+      call.reject("Error initializing player for audio file: " + fileUriStr + " - " + e.getMessage());
+      return;
     }
-    catch (Exception ignored) {}
+
+    call.resolve();
+
+  }
+
+  /**
+   * Free the player
+   */
+  public void unload(PluginCall call) {
+    unload();
+    call.resolve();
+  }
+  public void unload() {
+    if (isLoaded) {
+      stop();
+      releaseProximitySensor();
+      releaseWakeLockPlay();
+      if (wakeLockPlay != null) wakeLockPlay = null;
+      player.release();
+      player = null;
+      playerThreadHandler = null;
+      isLoaded = false;
+    }
   }
 
   /**
@@ -247,19 +274,18 @@ public class AudioPlayerService extends Service {
    */
   public void play(PluginCall call) {
 
-    // get target player
-    var p = getPlayerInstance(call);
-    if (p == null) return;
+    if (!isLoaded) {
+      call.reject(ErrorCodes.ERR_NOT_LOADED);
+      return;
+    }
 
-    // test if a position has been passed
-    var position = call.getInt("position");
-    if (position != null) {
-      p.seekTo(position);
+    if (!player.isPlaying()) {
+      player.play();
+      updateWakeLockPlay();
+      createNotification();
+      startUpdateTask();
     }
-    if (!p.isPlaying()) {
-      p.start();
-      wakeLockUpdate();
-    }
+
     call.resolve();
 
   }
@@ -269,14 +295,16 @@ public class AudioPlayerService extends Service {
    */
   public void pause(PluginCall call) {
 
-    // get target player
-    var i = getPlayerInstance(call);
-    if (i == null) return;
-
-    if (i.isPlaying()) {
-      i.pause();
-      wakeLockUpdate();
+    if (!isLoaded) {
+      call.reject(ErrorCodes.ERR_NOT_LOADED);
+      return;
     }
+
+    player.pause();
+    updateWakeLockPlay();
+    stopUpdateTask();
+    cancelNotification();
+
     call.resolve();
 
   }
@@ -285,19 +313,20 @@ public class AudioPlayerService extends Service {
    * Stop playing audio file
    */
   public void stop(PluginCall call) {
-    // get target player
-    var i = getPlayerInstance(call);
-    if (i == null) return;
-    stop(i);
+    if (!isLoaded) {
+      call.reject(ErrorCodes.ERR_NOT_LOADED);
+      return;
+    }
+    stop();
     call.resolve();
   }
-  public void stop(MediaPlayerEx p) {
-
-    if (p.isPlaying()) {
-      p.stop();
-      wakeLockUpdate();
+  private void stop() {
+    if (player != null && player.isPlaying()) {
+      player.stop();
     }
-
+    updateWakeLockPlay();
+    stopUpdateTask();
+    cancelNotification();
   }
 
   /**
@@ -305,12 +334,13 @@ public class AudioPlayerService extends Service {
    */
   public void getDuration(PluginCall call) {
 
-    // get target player
-    var i = getPlayerInstance(call);
-    if (i == null) return;
+    if (!isLoaded) {
+      call.reject(ErrorCodes.ERR_NOT_LOADED);
+      return;
+    }
 
     var res = new JSObject();
-    res.put("duration", i.getDuration());
+    res.put("duration", player.getDuration());
     call.resolve(res);
 
   }
@@ -318,101 +348,90 @@ public class AudioPlayerService extends Service {
   /**
    * Get current play position (in milliseconds)
    */
-  public void getCurrentTime(PluginCall call) {
+  public void getCurrentPosition(PluginCall call) {
 
-    // get target player
-    var i = getPlayerInstance(call);
-    if (i == null) return;
+    if (!isLoaded) {
+      call.reject(ErrorCodes.ERR_NOT_LOADED);
+      return;
+    }
 
     var res = new JSObject();
-    res.put("currentTime", i.getCurrentPosition());
+    res.put("position", player.getCurrentPosition());
     call.resolve(res);
 
   }
 
   /**
-   * Update the status of wakelock:
-   * enabled if at least one of the media player instances is playing
+   * Set current play position (in milliseconds)
    */
-  private void wakeLockUpdate() {
+  public void setCurrentPosition(PluginCall call) {
 
-    // shall we enable or disable wakelock?
-    var toBeEnabled = false;
+    if (!isLoaded) {
+      call.reject(ErrorCodes.ERR_NOT_LOADED);
+      return;
+    }
+
+    long pos = -1;
     try {
-      for (var i : players.values()) {
-        if (i.isPlaying()) {
-          toBeEnabled = true;
-          break;
-        }
-      }
+      pos = Objects.requireNonNull(call.getDouble("position", -1.0)).longValue();
     }
-    catch (Exception ignored) {}
+    catch (Exception ex) { }
 
-    if (toBeEnabled && !wakeLockPlay.isHeld()) {
-      wakeLockPlay.acquire(4 * 60 * 60 * 1000L /* 4 hours */);
+    if (pos < 0) {
+      call.reject("Missing or invalid 'position' parameter", ErrorCodes.ERR_BAD_ARGUMENT);
     }
-    else if (!toBeEnabled && wakeLockPlay.isHeld()) {
-      wakeLockPlay.release();
-    }
+
+    player.seekTo(pos);
+    doUpdate();
+    call.resolve();
 
   }
 
-  @Nullable
-  private Integer getPlayerId(PluginCall call) {
-    var id = call.getInt("id");
-    if (id == null) {
-      call.reject("Missing 'id' parameter");
-    }
-    return id;
-  }
-
-  /**
-   * Return the existing media player instance from id
-   */
-  @Nullable
-  private MediaPlayerEx getPlayerInstance(PluginCall call) {
-
-    var id = getPlayerId(call);
-    if (id == null) return null;
-
-    var i = players.get(id);
-    if (i == null) {
-      call.reject(ERR_BAD_ID);
-    }
-
-    return i;
-
-  }
+  // output device
 
   /**
    * Change output device for all players
-   * @param newDevice Can be "ear" or "loud"
    */
-  protected void changeOutputDevice(OutputDeviceEnum newDevice) {
+  private void setOutputDevice(@AudioDeviceEnum.AudioDeviceValue int newDevice) {
 
+    // set new output device
     currentOutputDevice = newDevice;
 
-    // change device (will reinitialize the players)
-    // and test if any player is playing?
-    var isPlaying = false;
-    for (MediaPlayerEx p : players.values()) {
-      isPlaying |= p.isPlaying();
-      p.setOutputDevice(newDevice);
+    if (currentOutputDevice == DEVICE_EARPIECE) {
+      var audioAttributes = new androidx.media3.common.AudioAttributes.Builder()
+        .setUsage(C.USAGE_VOICE_COMMUNICATION)
+        .setContentType(C.AUDIO_CONTENT_TYPE_SPEECH)
+        .build();
+      player.setAudioAttributes(audioAttributes, false);
+      audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+      audioManager.setSpeakerphoneOn(false);
+    }
+    else {
+      var audioAttributes = new androidx.media3.common.AudioAttributes.Builder()
+        .setUsage(C.USAGE_MEDIA)
+        .setContentType(C.AUDIO_CONTENT_TYPE_SPEECH)
+        .build();
+      player.setAudioAttributes(audioAttributes, true);
+      audioManager.setMode(AudioManager.MODE_NORMAL);
+      audioManager.setSpeakerphoneOn(true);
     }
 
     // turn screen off when earpiece active
-    if (currentOutputDevice == OutputDeviceEnum.Earpiece) {
-      if (isPlaying && !wakeLockProximity.isHeld()) {
-        wakeLockProximity.acquire(4 * 60 * 60 * 1000L); /* 4 hours */
-      }
-    }
-    else {
-      if (wakeLockProximity.isHeld()) {
-        wakeLockProximity.release();
+    if (wakeLockProximity != null) {
+      if (currentOutputDevice == DEVICE_EARPIECE) {
+        if (player.isPlaying() && !wakeLockProximity.isHeld()) {
+          wakeLockProximity.acquire(4 * 60 * 60 * 1000L); /* 4 hours */
+        }
+      } else {
+        if (wakeLockProximity.isHeld()) {
+          wakeLockProximity.release();
+        }
       }
     }
 
   }
+
+  // proximity sensor management
 
   /**
    * Initialize proximity sensor management
@@ -420,23 +439,25 @@ public class AudioPlayerService extends Service {
   private void initProximitySensor() {
 
     if (sensorManager != null) {
-      cleanupProximitySensor();
+      releaseProximitySensor();
     }
 
-    // audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
-    sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+    sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
     proximitySensor = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
 
     // listen to sensor events and call setOutputDevice() on changes
     proximityListener = new SensorEventListener() {
 
+      final float sensorMaxRange = proximitySensor.getMaximumRange();
+
       @Override
       public void onSensorChanged(SensorEvent event) {
-        var newDevice = event.values[0] < proximitySensor.getMaximumRange()
-          ? OutputDeviceEnum.Earpiece
-          : OutputDeviceEnum.Loudspeaker;
-        if (!newDevice.equals(currentOutputDevice)) {
-          changeOutputDevice(newDevice);
+        var newDevice = event.values[0] < sensorMaxRange
+          ? DEVICE_EARPIECE
+          : DEVICE_LOUDSPEAKER;
+        // sensor will continuously stream its value, so we'll need to avoid useless changes
+        if (newDevice != currentOutputDevice) {
+          setOutputDevice(newDevice);
         }
       }
 
@@ -447,19 +468,167 @@ public class AudioPlayerService extends Service {
 
     };
 
-    // Register the proximity sensor listener
-    sensorManager.registerListener(proximityListener, proximitySensor, SensorManager.SENSOR_DELAY_NORMAL);
+    // Register the proximity sensor listener (in current "CapacitorPlugins" thread)
+    sensorManager.registerListener(
+      proximityListener,
+      proximitySensor,
+      SensorManager.SENSOR_DELAY_NORMAL,
+      playerThreadHandler
+    );
 
   }
 
   /**
    * Cleanup proximity sensor management
    */
-  private void cleanupProximitySensor() {
+  private void releaseProximitySensor() {
     if (sensorManager != null && proximityListener != null) {
       sensorManager.unregisterListener(proximityListener);
       sensorManager = null;
       proximityListener = null;
+    }
+    if (wakeLockProximity != null) {
+      if (wakeLockProximity.isHeld()) {
+        wakeLockProximity.release();
+      }
+      wakeLockProximity = null;
+    }
+  }
+
+  // wakelock management
+
+  /**
+   * Update the status of wakeLockPlay, enabled if the player is playing
+   */
+  private void updateWakeLockPlay() {
+
+    if (wakeLockPlay != null) {
+      if (isLoaded && player.isPlaying() && !wakeLockPlay.isHeld()) {
+        wakeLockPlay.acquire(4 * 60 * 60 * 1000L /* 4 hours */);
+      } else if (wakeLockPlay.isHeld()) {
+        wakeLockPlay.release();
+      }
+    }
+
+  }
+
+  /**
+   * Release wakeLockPlay
+   */
+  private void releaseWakeLockPlay() {
+
+    if (wakeLockPlay != null) {
+      if (wakeLockPlay.isHeld()) {
+        wakeLockPlay.release();
+      }
+      wakeLockPlay = null;
+    }
+
+  }
+
+  // update management
+
+  /**
+   * Start an update task (each UPDATE_INTERVAL ms) to update notification text
+   */
+  private void startUpdateTask() {
+    if (updateRunnable == null) {
+      updateRunnable = new Runnable() {
+        @Override
+        public void run() {
+          doUpdate();
+          // Post the same runnable again after UPDATE_INTERVAL ms
+          playerThreadHandler.postDelayed(this, UPDATE_INTERVAL);
+        }
+      };
+      // first trigger
+      doUpdate();
+      playerThreadHandler.postDelayed(updateRunnable, UPDATE_INTERVAL);
+    }
+  }
+
+  /**
+   * Stop the existing update task
+   */
+  private void stopUpdateTask() {
+    if (updateRunnable != null) {
+      playerThreadHandler.removeCallbacks(updateRunnable);
+      updateRunnable = null;
+    }
+  }
+
+  /**
+   * Raise the JS update event and update notification
+   */
+  private void doUpdate() {
+    if (player != null) {
+      var res = new JSObject();
+      res.put("position", player.getCurrentPosition());
+      plugin.sendJSEvent("playerUpdate", res);
+      updateNotification();
+    }
+  }
+
+  // notification management
+
+  @SuppressLint("DefaultLocale")
+  private String toHMS(long milliseconds) {
+    long hours = milliseconds / (1000 * 60 * 60);
+    milliseconds %= (1000 * 60 * 60);
+    long minutes = milliseconds / (1000 * 60);
+    milliseconds %= (1000 * 60);
+    long seconds = milliseconds / 1000;
+    if (hours > 0) {
+      return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+    }
+    else {
+      return String.format("%02d:%02d", minutes, seconds);
+    }
+  }
+
+  /**
+   * Create notification
+   */
+  private void createNotification() {
+
+    if (isNotificationVisible) {
+      cancelNotification();
+    }
+
+    assert notificationBuilder != null;
+    notificationBuilder
+      .setContentTitle(notificationTitle)
+      .setSmallIcon(R.drawable.ic_notification)
+      .setPriority(NotificationCompat.PRIORITY_LOW) // needed to reduce "flickering" on notification updates
+      .setContentIntent(bringAppToForegroundIntent)
+      .setVibrate(new long[]{0L})
+      // Set as "persistent"
+      //.setOngoing(true)
+    ;
+
+    isNotificationVisible = true;
+    updateNotification();
+  }
+
+  /**
+   * Update existing notification
+   */
+  private void updateNotification() {
+    if (isNotificationVisible) {
+      assert notificationBuilder != null;
+      notificationBuilder.setContentText(toHMS(player.getCurrentPosition()) + " / " + toHMS(player.getDuration()));
+      // set/update the notification
+      notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
+    }
+  }
+
+  /**
+   * Cancel existing notification
+   */
+  public void cancelNotification() {
+    if (isNotificationVisible) {
+      notificationManager.cancel(NOTIFICATION_ID);
+      isNotificationVisible = false;
     }
   }
 

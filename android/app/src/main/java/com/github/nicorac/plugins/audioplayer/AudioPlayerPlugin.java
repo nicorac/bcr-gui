@@ -4,7 +4,10 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.net.Uri;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
@@ -16,7 +19,7 @@ import com.getcapacitor.annotation.CapacitorPlugin;
 public class AudioPlayerPlugin extends Plugin implements IJSEventSender {
 
   private AudioPlayerService apsvc;
-  private boolean isServiceBound = false;
+  private Intent svcIntent;
 
   /**
    * ServiceConnection used to talk with service
@@ -27,58 +30,49 @@ public class AudioPlayerPlugin extends Plugin implements IJSEventSender {
     public void onServiceConnected(ComponentName name, IBinder service) {
       var binder = (AudioPlayerService.AudioPlayerServiceBinder) service;
       apsvc = binder.getService(AudioPlayerPlugin.this);
-      isServiceBound = true;
     }
 
     @Override
     public void onServiceDisconnected(ComponentName name) {
-      isServiceBound = false;
+      apsvc = null;
     }
 
   };
 
   /**
-   * Start an instance of AudioService and bind to it
+   * Plugin start
    */
   @Override
   public void load() {
-    var context = getContext();
-    var intent = new Intent(context, AudioPlayerService.class);
+    super.load();
+    svcIntent = new Intent(getContext(), AudioPlayerService.class);
     // ask Android to start the service; a reference to it will be get by serviceConnection.onServiceConnected()
-    var res = context.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+    var res = getContext().bindService(svcIntent, serviceConnection, Context.BIND_AUTO_CREATE);
     if (!res) {
-      throw new RuntimeException("AudioPlayerPlugin failed to initialize successfully: error initializing AudioService");
+      throw new RuntimeException("Error initializing AudioPlayerService");
     }
   }
 
   /**
-   * Cleanup everything
+   * Plugin destroy
    */
   @Override
   public void handleOnDestroy() {
-    // unbind the service
-    getContext().unbindService(serviceConnection);
+    super.handleOnDestroy();
+    getContext().stopService(svcIntent);
   }
 
-  // reflect plugin methods to service
-  @PluginMethod() public void setConfiguration(PluginCall call)
-  { apsvc.setConfiguration(call); }
-  @PluginMethod() public void init(PluginCall call)
-  { apsvc.init(call); }
-  @PluginMethod() public void release(PluginCall call)
-  { apsvc.release(call); }
-  @PluginMethod() public void play(PluginCall call)
-  { apsvc.play(call); }
-  @PluginMethod() public void pause(PluginCall call)
-  { apsvc.pause(call); }
-  @PluginMethod() public void stop(PluginCall call)
-  { apsvc.stop(call); }
-  @PluginMethod() public void getDuration(PluginCall call)
-  { apsvc.getDuration(call); }
-  @PluginMethod() public void getCurrentTime(PluginCall call)
-  { apsvc.getCurrentTime(call); }
+  // plugin player methods
+  @PluginMethod() public void load(PluginCall call) { apsvc.load(call); }
+  @PluginMethod() public void unload(PluginCall call) { apsvc.unload(call); }
+  @PluginMethod() public void play(PluginCall call) { apsvc.play(call); }
+  @PluginMethod() public void pause(PluginCall call) { apsvc.pause(call); }
+  @PluginMethod() public void stop(PluginCall call) { apsvc.stop(call); }
+  @PluginMethod() public void getDuration(PluginCall call) { apsvc.getDuration(call); }
+  @PluginMethod() public void getCurrentPosition(PluginCall call) { apsvc.getCurrentPosition(call); }
+  @PluginMethod() public void setCurrentPosition(PluginCall call) { apsvc.setCurrentPosition(call); }
 
-  // send events
+  // send JS events (called by service)
   public void sendJSEvent(String eventName, JSObject data) { this.notifyListeners(eventName, data); }
 
 }

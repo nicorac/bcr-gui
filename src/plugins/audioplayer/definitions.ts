@@ -3,46 +3,45 @@ import { PluginListenerHandle } from '@capacitor/core';
 
 export interface AudioPlayer extends EventManagerPlugin {
 
-  // Set configuration
-  setConfiguration(config: { enableEarpiece: boolean }): Promise<void>;
+  // Load the given file URI into the player
+  load(data: {
+    fileUri: string,
+    notificationTitle?: string,
+    enableEarpiece?: boolean,           // automatically switch device using proximity sensor, default = false
+    keepAwakeWhenPlaying?: boolean,    // keep the screen on while playing
+  }): Promise<void>;
 
-  // Initialize a new MediaPlayer instance on the given file URI
-  init(options: { fileUri: string, notificationTitle?: string, notificationText?: string }): Promise<IBaseParams>;
-
-  // Release MediaPlayer instance
-  release(options: IBaseParams): Promise<void>;
+  // free the loaded file
+  unload(): Promise<void>;
 
   // Play controls
-  play(options: IPlayParams): Promise<void>;
-  pause(options: IBaseParams): Promise<void>;
-  stop(options: IBaseParams): Promise<void>;
+  play(): Promise<void>;
+  pause(): Promise<void>;
+  stop(): Promise<void>;
 
   // Get audio file duration (in ms)
-  getDuration(options: IBaseParams): Promise<{ duration: number }>;
+  getDuration(): Promise<{ duration: number }>;
 
-  // Get current play position (in ms)
-  getCurrentTime(options: IBaseParams): Promise<{ currentTime: number }>;
+  // Get/set current play position (in ms)
+  getCurrentPosition(): Promise<{ position: number }>;
+  setCurrentPosition(options: ISetCurrentPositionParams): Promise<void>;
 
   // events
-  addListener(eventName: 'playCompleted', listenerFunc: (data: IBaseParams) => void): Promise<PluginListenerHandle> & PluginListenerHandle;
-  addListener(eventName: 'update', listenerFunc: (data: IUpdateData) => void): Promise<PluginListenerHandle> & PluginListenerHandle;
+  addListener(eventName: 'playerReady', listenerFunc: (data: IReadyData) => void): Promise<PluginListenerHandle> & PluginListenerHandle;
+  addListener(eventName: 'playerUpdate', listenerFunc: (data: IUpdateData) => void): Promise<PluginListenerHandle> & PluginListenerHandle;
+  addListener(eventName: 'playerCompleted', listenerFunc: () => void): Promise<PluginListenerHandle> & PluginListenerHandle;
 
 }
 
-export interface IBaseParams {
-  id: number; // id of the media player instance
+export interface ISetCurrentPositionParams {
+  position?: number;  // seek position to set (in ms)
 }
 
-export interface IPlayParams extends IBaseParams {
-  position?: number;  // seek position to start play from (in ms)
+export interface IReadyData {
+  duration: number;  // media duration (in ms)
 }
 
-export interface IUpdateData extends IBaseParams {
+export interface IUpdateData {
   position: number;  // current play position (in ms)
 }
 
-export enum OutputDeviceEnum {
-  Auto = 0,
-  Earpiece = 1,
-  Loudspeaker = 2,
-}

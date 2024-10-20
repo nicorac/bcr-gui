@@ -15,7 +15,7 @@
     color="primary"
     [class.disabled]="!ready()"
     name="play-back"
-    (click)="seek(-1)"
+    (click)="onSeek(-1)"
   />
   <ion-icon
     class="buttons"
@@ -29,6 +29,6 @@
     color="primary"
     [class.disabled]="!ready()"
     name="play-forward"
-    (click)="seek(+1)"
+    (click)="onSeek(+1)"
   />
 </div>

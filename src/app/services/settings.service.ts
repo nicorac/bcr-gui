@@ -160,6 +160,12 @@ export class SettingsService {
   @JsonProperty()
   public enableEarpiece = true;
 
+  /**
+   * Keep the screen awake when playing
+   */
+  @JsonProperty()
+  public keepAwakeWhenPlaying = true;
+
   constructor(
     private mbs: MessageBoxService,
   ) { }
