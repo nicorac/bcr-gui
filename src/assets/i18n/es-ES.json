@@ -51,6 +51,7 @@
   "FNP_EDITOR_TEMPLATES": "Plantillas",
   "FNP_EDITOR_TEST": "Nombre del archivo de prueba",
   "FNP_EDITOR_TEST_INFO": "Seleccione (o inserte) un nombre para el archivo de prueba…",
+  "FNP_EDITOR_TEST_RESULT": "Resultado de la prueba",
   "FNP_EDITOR_TEST_RUN": "Ejecutar la prueba",
   "FNP_EDITOR_TEST_SELECT": "Seleccionar nombre de archivo",
   "FNP_EDITOR_TITLE": "Editor de los patrones del nombre del archivo",
@@ -108,6 +109,7 @@
   "SETTINGS_APPEARANCE_LIGHT": "Claro",
   "SETTINGS_COUNTRY_PREFIX": "Prefijo del país por defecto",
   "SETTINGS_COUNTRY_PREFIX_HELP": "El prefijo del país (por ejemplo, +1 para EE.UU.) que se utilizará con los números que no lo tengan",
+  "SETTINGS_DATETIME_EMPTY": "Vacío",
   "SETTINGS_DATETIME_FORMAT": "Formato de la fecha y la hora",
   "SETTINGS_FILENAME_PATTERN": "Formato del nombre del archivo",
   "SETTINGS_GENERAL_SECTION": "General",
@@ -128,5 +130,7 @@
   "SETTINGS_RECORDINGS_SORT_DURATION_DESC": "Duración (decreciente)",
   "SETTINGS_RESCAN_TEXT": "¿Desea volver a escanear todos sus archivos (sin archivo JSON de metadatos) utilizando el nuevo formato del nombre del archivo?",
   "SETTINGS_RESCAN_TITLE": "Volver a escanear",
+  "SETTINGS_SELECT_DIRECTORY_MESSAGE": "Esta aplicación necesita acceso a la carpeta de las grabaciones.\n\nSi pulsa OK, Android le mostrará un selector de carpetas.\n\nSeleccione la carpeta de grabaciones y permita el acceso a su contenido...",
+  "SETTINGS_SELECT_DIRECTORY_TITLE": "Acceso a la carpeta de grabaciones",
   "SETTINGS_SYSTEM_DEFAULT": "Predeterminado del sistema"
 }
