@@ -20,7 +20,9 @@
       [(ngModel)]="pattern"
       (ngModelChange)="validatePattern()"
     />
-    <div class="error" *ngIf="patternError">{{ patternError }}</div>
+    @if (patternError) {
+      <div class="error">{{ patternError }}</div>
+    }
     <div class="right-container">
 
       <!-- placeholders button -->
@@ -41,12 +43,14 @@
           </ion-toolbar>
           <ion-content>
             <ion-list>
-              <ion-item *ngFor="let item of placeholders" (click)="insertPlaceholder(item.text);">
-                <ion-label>
-                  <h2>{{ item.text }}</h2>
-                  <p class="description">{{ item.description }}</p>
-                </ion-label>
-              </ion-item>
+              @for (item of placeholders; track item) {
+                <ion-item (click)="insertPlaceholder(item.text);">
+                  <ion-label>
+                    <h2>{{ item.text }}</h2>
+                    <p class="description">{{ item.description }}</p>
+                  </ion-label>
+                </ion-item>
+              }
             </ion-list>
           </ion-content>
         </ng-template>
@@ -70,12 +74,14 @@
           </ion-toolbar>
           <ion-content>
             <ion-list>
-              <ion-item *ngFor="let item of FILENAME_PATTERN_TEMPLATES" (click)="loadTemplate(item.pattern);">
-                <ion-label>
-                  <h2>{{ item.name }}</h2>
-                  <p class="description">{{ item.pattern }}</p>
-                </ion-label>
-              </ion-item>
+              @for (item of FILENAME_PATTERN_TEMPLATES; track item) {
+                <ion-item (click)="loadTemplate(item.pattern);">
+                  <ion-label>
+                    <h2>{{ item.name }}</h2>
+                    <p class="description">{{ item.pattern }}</p>
+                  </ion-label>
+                </ion-item>
+              }
             </ion-list>
           </ion-content>
         </ng-template>
@@ -107,10 +113,12 @@
   </div>
 
   <!-- test result -->
-  <div class="section" *ngIf="testResult">
-    <ion-label>{{ 'FNP_EDITOR_TEST_RESULT' | translatePipe }}</ion-label>
-    <pre class="result">{{ testResult }}</pre>
-  </div>
+  @if (testResult) {
+    <div class="section">
+      <ion-label>{{ 'FNP_EDITOR_TEST_RESULT' | translatePipe }}</ion-label>
+      <pre class="result">{{ testResult }}</pre>
+    </div>
+  }
 
 </ion-content>
 
