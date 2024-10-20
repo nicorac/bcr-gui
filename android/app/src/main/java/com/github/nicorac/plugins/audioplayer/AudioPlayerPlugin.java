@@ -16,7 +16,6 @@ import com.getcapacitor.annotation.CapacitorPlugin;
 public class AudioPlayerPlugin extends Plugin implements IJSEventSender {
 
   private AudioPlayerService apsvc;
-  private boolean isServiceBound = false;
 
   /**
    * ServiceConnection used to talk with service
@@ -27,13 +26,10 @@ public class AudioPlayerPlugin extends Plugin implements IJSEventSender {
     public void onServiceConnected(ComponentName name, IBinder service) {
       var binder = (AudioPlayerService.AudioPlayerServiceBinder) service;
       apsvc = binder.getService(AudioPlayerPlugin.this);
-      isServiceBound = true;
     }
 
     @Override
-    public void onServiceDisconnected(ComponentName name) {
-      isServiceBound = false;
-    }
+    public void onServiceDisconnected(ComponentName name) { }
 
   };
 

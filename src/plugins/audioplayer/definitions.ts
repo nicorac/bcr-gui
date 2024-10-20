@@ -24,8 +24,9 @@ export interface AudioPlayer extends EventManagerPlugin {
   getCurrentTime(options: IBaseParams): Promise<{ currentTime: number }>;
 
   // events
-  addListener(eventName: 'playCompleted', listenerFunc: (data: IBaseParams) => void): Promise<PluginListenerHandle> & PluginListenerHandle;
-  addListener(eventName: 'update', listenerFunc: (data: IUpdateData) => void): Promise<PluginListenerHandle> & PluginListenerHandle;
+  addListener(eventName: 'playerReady', listenerFunc: (data: IReadyData) => void): Promise<PluginListenerHandle> & PluginListenerHandle;
+  addListener(eventName: 'playerUpdate', listenerFunc: (data: IUpdateData) => void): Promise<PluginListenerHandle> & PluginListenerHandle;
+  addListener(eventName: 'playerCompleted', listenerFunc: (data: IBaseParams) => void): Promise<PluginListenerHandle> & PluginListenerHandle;
 
 }
 
@@ -39,6 +40,10 @@ export interface IPlayParams extends IBaseParams {
 
 export interface IUpdateData extends IBaseParams {
   position: number;  // current play position (in ms)
+}
+
+export interface IReadyData extends IBaseParams {
+  duration: number;  // media duration (in ms)
 }
 
 export enum OutputDeviceEnum {

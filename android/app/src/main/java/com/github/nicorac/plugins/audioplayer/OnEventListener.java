@@ -5,14 +5,19 @@ import android.app.PendingIntent;
 public interface OnEventListener {
 
   /**
+   * Called when player is initialized
+   */
+  void onPlayerReady(MediaPlayerEx mp);
+
+  /**
    * Called during play to update status
    */
-  void onUpdate(MediaPlayerEx mp);
+  void onPlayerUpdate(MediaPlayerEx mp, long position);
 
   /*
    * Called when the end of a media source is reached during playback.
    */
-  void onCompletion(MediaPlayerEx mp);
+  void onPlayerCompleted(MediaPlayerEx mp);
 
   /*
    * Intent called when user clicks on notification

@@ -12,6 +12,7 @@ import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 
@@ -83,7 +84,7 @@ public class AudioPlayerService extends Service {
       }
     }
 
-    // Create a PendingIntent
+    // PendingIntent run when clicking on notification content
     bringAppToForegroundIntent = PendingIntent.getActivity(
       getApplicationContext(), 0, customIntent,
       PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
@@ -185,15 +186,23 @@ public class AudioPlayerService extends Service {
         public PendingIntent getNotificationClickIntent() { return bringAppToForegroundIntent; }
 
         @Override
-        public void onUpdate(MediaPlayerEx player) {
+        public void onPlayerReady(MediaPlayerEx player) {
           var res = new JSObject();
           res.put("id", id);
-          res.put("position", player.getCurrentPosition());
-          plugin.sendJSEvent("update", res);
+          res.put("duration", player.getDuration());
+          plugin.sendJSEvent("playerReady", res);
         }
 
         @Override
-        public void onCompletion(MediaPlayerEx mp) {
+        public void onPlayerUpdate(MediaPlayerEx player, long position) {
+          var res = new JSObject();
+          res.put("id", id);
+          res.put("position", position);
+          plugin.sendJSEvent("playerUpdate", res);
+        }
+
+        @Override
+        public void onPlayerCompleted(MediaPlayerEx mp) {
           var res = new JSObject();
           res.put("id", id);
           plugin.sendJSEvent("playCompleted", res);
@@ -447,8 +456,9 @@ public class AudioPlayerService extends Service {
 
     };
 
-    // Register the proximity sensor listener
-    sensorManager.registerListener(proximityListener, proximitySensor, SensorManager.SENSOR_DELAY_NORMAL);
+    // Register the proximity sensor listener (in current "CapacitorPlugins" thread)
+    var handler = new Handler();
+    sensorManager.registerListener(proximityListener, proximitySensor, SensorManager.SENSOR_DELAY_NORMAL, handler);
 
   }
 

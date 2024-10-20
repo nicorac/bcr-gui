@@ -6,26 +6,27 @@ import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
-import android.media.AudioAttributes;
+import androidx.media3.common.AudioAttributes;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
-import android.os.Looper;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+import androidx.media3.common.C;
+import androidx.media3.common.MediaItem;
+import androidx.media3.common.Player;
+import androidx.media3.exoplayer.ExoPlayer;
 
 import com.github.nicorac.bcrgui.R;
-
-import java.io.IOException;
 
 /**
  * Wrapper class to keep data of each media player instance together
  */
 public class MediaPlayerEx {
 
-  private static final int UPDATE_INTERVAL = 300;
+  private static final int UPDATE_INTERVAL = 500;
   private static final String NOTIFICATION_CHANNEL_ID = "BCR-GUI";
   private static final String NOTIFICATION_CHANNEL_NAME = "BCR-GUI - Play status";
 
@@ -35,13 +36,14 @@ public class MediaPlayerEx {
   public final String title;
   public final String text;
   private OutputDeviceEnum device;
-  private android.media.MediaPlayer player;
+  private ExoPlayer player;
+  private boolean isPreparing = false;
   private final AudioManager audioManager;
   @Nullable
   public androidx.core.app.NotificationCompat.Builder notificationBuilder;
 
-  // events and update handler
-  private final Handler handler = new Handler(Looper.getMainLooper());
+  // events and update handler (in current "CapacitorPlugins" thread)
+  private final Handler handler = new Handler();
   private Runnable updateRunnable;
   private final OnEventListener eventListener;
 
@@ -96,8 +98,8 @@ public class MediaPlayerEx {
       player = null;
     }
 
-    player = new android.media.MediaPlayer();
-    AudioAttributes audioAttributes = null;
+    player = new ExoPlayer.Builder(context).build();
+    AudioAttributes audioAttributes;
 
     // change device
     switch (device) {
@@ -106,34 +108,52 @@ public class MediaPlayerEx {
         // Switch to earpiece
         audioManager.setSpeakerphoneOn(false);
         audioAttributes = new AudioAttributes.Builder()
-          .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
-          .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+          .setUsage(C.USAGE_VOICE_COMMUNICATION)
+          .setContentType(C.AUDIO_CONTENT_TYPE_SPEECH)
           .build();
         break;
 
-      case Loudspeaker:
+      default: // it means ==> Loudspeaker
         // Switch to loudspeaker
         audioManager.setSpeakerphoneOn(true);
         audioAttributes = new AudioAttributes.Builder()
-          .setUsage(AudioAttributes.USAGE_MEDIA)
-          .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+          .setUsage(C.USAGE_MEDIA)
+          .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
           .build();
         break;
     }
 
     try {
-      player.setAudioAttributes(audioAttributes);
-      player.setDataSource(context, fileUri);
+      player.setAudioAttributes(audioAttributes, false);
+      var mediaItem = MediaItem.fromUri(fileUri);
+      player.setMediaItem(mediaItem);
+      isPreparing = true;
       player.prepare();
-    } catch (IOException e) {
+    } catch (Exception e) {
       throw new RuntimeException(e);
     }
 
-    // attach completion handler
-    player.setOnCompletionListener(mp -> {
-      stopUpdateTask();
-      cancelNotification();
-      this.eventListener.onCompletion(this);
+    player.addListener(new Player.Listener() {
+      @Override
+      public void onPlaybackStateChanged(int playbackState) {
+        switch (playbackState) {
+          case Player.STATE_READY:
+            // this state is returned both after prepare and after Play/Pause changes
+            if (isPreparing) {
+              isPreparing = false;
+              eventListener.onPlayerReady(MediaPlayerEx.this);
+            }
+            break;
+          case Player.STATE_ENDED:
+            stopUpdateTask();
+            cancelNotification();
+            eventListener.onPlayerCompleted(MediaPlayerEx.this);
+            break;
+          case Player.STATE_IDLE:
+          case Player.STATE_BUFFERING:
+            break;
+        }
+      }
     });
 
   }
@@ -152,7 +172,7 @@ public class MediaPlayerEx {
     this.device = newDevice;
 
     // save current position and pause
-    var curPos = 0;
+    var curPos = 0L;
     var wasPlaying = isPlaying();
     if (wasPlaying) {
       stop();
@@ -175,7 +195,7 @@ public class MediaPlayerEx {
   public void start() {
     startUpdateTask();
     createNotification();
-    player.start();
+    player.play();
   }
 
   public void pause() {
@@ -196,10 +216,10 @@ public class MediaPlayerEx {
   }
 
   public boolean isPlaying() { return player.isPlaying(); }
-  public void seekTo(int position) { player.seekTo(position); }
-  public int getDuration() { return player.getDuration(); }
+  public void seekTo(long position) { player.seekTo(position); }
+  public long getDuration() { return player.getDuration(); }
   public String getDurationHMS() { return toHMS(player.getDuration()); }
-  public int getCurrentPosition() { return player.getCurrentPosition(); }
+  public long getCurrentPosition() { return player.getCurrentPosition(); }
   public String getCurrentPositionHMS() { return toHMS(player.getCurrentPosition()); }
 
   /**
@@ -232,12 +252,12 @@ public class MediaPlayerEx {
   }
 
   private void doUpdate() {
-    eventListener.onUpdate(MediaPlayerEx.this);
+    eventListener.onPlayerUpdate(MediaPlayerEx.this, MediaPlayerEx.this.getCurrentPosition());
     updateNotification();
   }
 
   @SuppressLint("DefaultLocale")
-  private String toHMS(int milliseconds) {
+  private String toHMS(long milliseconds) {
     long hours = milliseconds / (1000 * 60 * 60);
     milliseconds %= (1000 * 60 * 60);
     long minutes = milliseconds / (1000 * 60);
@@ -264,11 +284,11 @@ public class MediaPlayerEx {
     notificationBuilder
       .setContentTitle(title)
       .setSmallIcon(R.drawable.ic_notification)
-      .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+      .setPriority(NotificationCompat.PRIORITY_LOW) // needed to reduce "flickering" on notification updates
       .setContentIntent(this.eventListener.getNotificationClickIntent())
       .setVibrate(new long[]{0L})
-      // Set as "persistent"
-      //.setOngoing(true)
+    // Set as "persistent"
+    //.setOngoing(true)
     ;
 
     updateNotification();
