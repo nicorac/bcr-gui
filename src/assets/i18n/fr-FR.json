@@ -130,7 +130,7 @@
   "SETTINGS_RECORDINGS_SORT_DURATION_DESC": "Durée (décroissant)",
   "SETTINGS_RESCAN_TEXT": "Voulez-vous rescanner tous les fichiers (sans métadonnées JSON) avec le nouveau modèle de nom de fichier ?",
   "SETTINGS_RESCAN_TITLE": "Rescanner",
-  "SETTINGS_SELECT_DIRECTORY_TITLE": "Accès au dossier d'enregistrement",
   "SETTINGS_SELECT_DIRECTORY_MESSAGE": "Cette application nécessite l'accès au dossier des enregistrements\n\nEn choisissant Valider, Android vous permettra d'accéder à un explorateur de fichier.\n\nSélectionnez le dossier où sont situés les enregistrements et autorisez l'accès à son contenu.",
+  "SETTINGS_SELECT_DIRECTORY_TITLE": "Accès au dossier d'enregistrement",
   "SETTINGS_SYSTEM_DEFAULT": "Par défaut"
 }

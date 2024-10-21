@@ -130,7 +130,7 @@
   "SETTINGS_RECORDINGS_SORT_DURATION_DESC": "Duration (descending)",
   "SETTINGS_RESCAN_TEXT": "Do you want to rescan all of your files (without metadata JSON file) using the new filename pattern?",
   "SETTINGS_RESCAN_TITLE": "Rescan",
-  "SETTINGS_SELECT_DIRECTORY_TITLE": "Recordings directory access",
   "SETTINGS_SELECT_DIRECTORY_MESSAGE": "This app needs access to recordings directory.\n\nIf you click OK, Android will show you a directory selector.\n\nSelect the recordings directory and allow access to its content...",
+  "SETTINGS_SELECT_DIRECTORY_TITLE": "Recordings directory access",
   "SETTINGS_SYSTEM_DEFAULT": "System default"
 }
