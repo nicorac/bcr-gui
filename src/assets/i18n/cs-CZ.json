@@ -51,6 +51,7 @@
   "FNP_EDITOR_TEMPLATES": "Šablony",
   "FNP_EDITOR_TEST": "Test názvu souboru",
   "FNP_EDITOR_TEST_INFO": "Zvolte soubor nebo vložte jeho název pro ověření šablony…",
+  "FNP_EDITOR_TEST_RESULT": "Výsledek testu",
   "FNP_EDITOR_TEST_RUN": "Spustit test",
   "FNP_EDITOR_TEST_SELECT": "Vybrat soubor",
   "FNP_EDITOR_TITLE": "Editor zástupných znaků",
@@ -108,6 +109,7 @@
   "SETTINGS_APPEARANCE_LIGHT": "Světlý",
   "SETTINGS_COUNTRY_PREFIX": "Výchozí předčíslí země",
   "SETTINGS_COUNTRY_PREFIX_HELP": "Použité předčíslí země (např. +420 pro ČR), bude-li scházet",
+  "SETTINGS_DATETIME_EMPTY": "Prázdné",
   "SETTINGS_DATETIME_FORMAT": "Formát data/času",
   "SETTINGS_FILENAME_PATTERN": "Šablona názvu souboru",
   "SETTINGS_GENERAL_SECTION": "Obecné",
@@ -128,5 +130,7 @@
   "SETTINGS_RECORDINGS_SORT_DURATION_DESC": "Délka (sestupně)",
   "SETTINGS_RESCAN_TEXT": "Přejete si přeskenovat všechny soubory (vyjma JSON metadata souboru) s použitím nové šablony názvu souboru?",
   "SETTINGS_RESCAN_TITLE": "Přeskenovat",
+  "SETTINGS_SELECT_DIRECTORY_MESSAGE": "Tato aplikace potřebuje přístup ke složce s nahrávkami.\n\nPo klepnutí na OK zobrazí Android seznam složek.\n\nVyberte složku s nahrávkami a umožněte aplikaci přístup k jejímu obsahu...",
+  "SETTINGS_SELECT_DIRECTORY_TITLE": "Přístup ke složce s nahrávkami",
   "SETTINGS_SYSTEM_DEFAULT": "Dle systému"
 }
