@@ -9,6 +9,7 @@
   { "id": "it-IT", "name": "Italiano" },
   { "id": "ro-RO", "name": "Română" },
   { "id": "ru-RU", "name": "Русский" },
+  { "id": "uk-UA", "name": "Українська мова"},
   { "id": "vi-VN", "name": "Tiếng Việt" },
   { "id": "zh-Hans", "name": "中文（简体）" }
 ]
