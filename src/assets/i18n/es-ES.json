@@ -119,6 +119,8 @@
   "SETTINGS_MAKE_SELECTION": "Seleccione una opción",
   "SETTINGS_PLAYER_ENABLE_EARPIECE": "Activar auricular",
   "SETTINGS_PLAYER_ENABLE_EARPIECE_HELP": "Utilice el sensor de proximidad para cambiar al auricular mientras juega",
+  "SETTINGS_PLAYER_KEEP_AWAKE": "Mantener la pantalla encendida",
+  "SETTINGS_PLAYER_KEEP_AWAKE_HELP": "Mantener la pantalla activa mientras se reproduce el audio",
   "SETTINGS_PLAYER_SECTION": "Reproducir",
   "SETTINGS_PLAYER_SEEK_TIME": "Intervalo de búsqueda",
   "SETTINGS_RECORDINGS_DIRECTORY": "Carpeta de grabaciones",
