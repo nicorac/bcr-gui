@@ -106,8 +106,8 @@ export class MessageBoxService {
       message: this.formatMessage(options.message),
       inputs: options.inputs,
       buttons: [
-        { text: options.cancelText!, handler: () => options.onCancel?.() },
-        { text: options.confirmText!, handler: (data: {}) => options.onConfirm?.(data) },
+        { text: options.cancelText ?? this.i18n.get('LBL_CANCEL'), handler: () => options.onCancel?.() },
+        { text: options.confirmText ?? this.i18n.get('LBL_OK'), handler: (data: {}) => options.onConfirm?.(data) },
       ],
     });
     await mb.present();
@@ -221,7 +221,7 @@ export class MessageBoxOptionsError extends mbOptionsBase {
  */
 export class InputBoxOptions extends MessageBoxOptions {
   inputs: AlertInput[] = [];
-  confirmText?: string = 'Ok';
+  confirmText?: string;
   onConfirm?: (inputs: any) => void;
   cancelText?: string;
   onCancel?: () => void;
