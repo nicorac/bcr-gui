@@ -1,5 +1,21 @@
 # Version history
 
+## Version 1.9.0 (2024-11-03)
+
+New features:
+
+- Replaced MediaPlayer with media3 player (ExoPlayer), which should perform better with OGG files (#162) (#130) (#28)
+
+- Added support for MediaService and MediaSession (better integrates in Android media management)
+
+- Improved Android player notification handling
+
+Bug fixes:
+
+- Fixed missing Ukrainian language configuration (language available but not selectable)
+
+- Translated modal dialogs OK/Cancel buttons, "Test result" filename pattern, "None" date/time format option (#164)
+
 ## Version 1.8.0 (2024-10-15)
 
 New features:
