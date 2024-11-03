@@ -44,8 +44,8 @@
     "filesize": "^10.1.6",
     "ionicons": "^7.4.0",
     "rxjs": "^7.8.1",
-    "tslib": "^2.7.0",
-    "zone.js": "^0.14.10"
+    "tslib": "^2.8.1",
+    "zone.js": "^0.15.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^18.2.11",
@@ -60,14 +60,14 @@
     "@capacitor/cli": "^6.1.2",
     "@ionic/angular-toolkit": "^12.1.1",
     "@types/jasmine": "^5.1.4",
-    "@types/node": "^22.7.5",
-    "@typescript-eslint/eslint-plugin": "^8.9.0",
-    "@typescript-eslint/parser": "^8.9.0",
-    "eslint": "^9.12.0",
+    "@types/node": "^22.8.7",
+    "@typescript-eslint/eslint-plugin": "^8.12.2",
+    "@typescript-eslint/parser": "^8.12.2",
+    "eslint": "^9.14.0",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-jsdoc": "^50.4.3",
     "ts-node": "^10.9.2",
-    "typescript": "^5.5.4"
+    "typescript": "^5.6.3"
   },
   "engines": {
     "npm": ">= 10.9.0",
