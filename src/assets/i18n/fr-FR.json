@@ -119,6 +119,8 @@
   "SETTINGS_MAKE_SELECTION": "Sélectionner",
   "SETTINGS_PLAYER_ENABLE_EARPIECE": "Activer l'écouteur",
   "SETTINGS_PLAYER_ENABLE_EARPIECE_HELP": "Basculer entre le haut-parleur et l'écouteur pendant la lecture, à l'aide du capteur de proximité",
+  "SETTINGS_PLAYER_KEEP_AWAKE": "Garder l'écran allumé",
+  "SETTINGS_PLAYER_KEEP_AWAKE_HELP": "Garder l'écran actif pendant la lecture des enregistrements",
   "SETTINGS_PLAYER_SECTION": "Lecteur",
   "SETTINGS_PLAYER_SEEK_TIME": "Temps de recherche",
   "SETTINGS_RECORDINGS_DIRECTORY": "Dossier des enregistrements",
