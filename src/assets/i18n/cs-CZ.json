@@ -119,6 +119,8 @@
   "SETTINGS_MAKE_SELECTION": "Zvolte",
   "SETTINGS_PLAYER_ENABLE_EARPIECE": "Povolit sluchátko",
   "SETTINGS_PLAYER_ENABLE_EARPIECE_HELP": "Použít senzor přiblížení pro přepnutí na poslech pomocí sluchátka",
+  "SETTINGS_PLAYER_KEEP_AWAKE": "Ponechat obrazovku zapnutou",
+  "SETTINGS_PLAYER_KEEP_AWAKE_HELP": "Ponechat obrazovku aktivní při přehrávání záznamu",
   "SETTINGS_PLAYER_SECTION": "Přehrávač",
   "SETTINGS_PLAYER_SEEK_TIME": "Čas prohledávání",
   "SETTINGS_RECORDINGS_DIRECTORY": "Složka nahrávek",
