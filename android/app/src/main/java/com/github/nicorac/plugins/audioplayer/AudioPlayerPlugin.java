@@ -20,6 +20,7 @@ public class AudioPlayerPlugin extends Plugin implements IJSEventSender {
 
   private AudioPlayerService apsvc;
   private Intent svcIntent;
+  private Handler mainHandler = new Handler(Looper.getMainLooper());
 
   /**
    * ServiceConnection used to talk with service
@@ -63,14 +64,14 @@ public class AudioPlayerPlugin extends Plugin implements IJSEventSender {
   }
 
   // plugin player methods
-  @PluginMethod() public void load(PluginCall call) { apsvc.load(call); }
-  @PluginMethod() public void unload(PluginCall call) { apsvc.unload(call); }
-  @PluginMethod() public void play(PluginCall call) { apsvc.play(call); }
-  @PluginMethod() public void pause(PluginCall call) { apsvc.pause(call); }
-  @PluginMethod() public void stop(PluginCall call) { apsvc.stop(call); }
-  @PluginMethod() public void getDuration(PluginCall call) { apsvc.getDuration(call); }
-  @PluginMethod() public void getCurrentPosition(PluginCall call) { apsvc.getCurrentPosition(call); }
-  @PluginMethod() public void setCurrentPosition(PluginCall call) { apsvc.setCurrentPosition(call); }
+  @PluginMethod() public void load(PluginCall call) { mainHandler.post(() -> apsvc.load(call)); }
+  @PluginMethod() public void unload(PluginCall call) { mainHandler.post(() -> apsvc.unload(call)); }
+  @PluginMethod() public void play(PluginCall call) { mainHandler.post(() -> apsvc.play(call)); }
+  @PluginMethod() public void pause(PluginCall call) { mainHandler.post(() -> apsvc.pause(call)); }
+  @PluginMethod() public void stop(PluginCall call) { mainHandler.post(() -> apsvc.stop(call)); }
+  @PluginMethod() public void getDuration(PluginCall call) { mainHandler.post(() -> apsvc.getDuration(call)); }
+  @PluginMethod() public void getCurrentPosition(PluginCall call) { mainHandler.post(() -> apsvc.getCurrentPosition(call)); }
+  @PluginMethod() public void setCurrentPosition(PluginCall call) { mainHandler.post(() -> apsvc.setCurrentPosition(call)); }
 
   // send JS events (called by service)
   public void sendJSEvent(String eventName, JSObject data) { this.notifyListeners(eventName, data); }

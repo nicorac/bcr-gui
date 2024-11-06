@@ -5,6 +5,7 @@ import static com.github.nicorac.plugins.audioplayer.AudioDeviceEnum.DEVICE_LOUD
 import static com.github.nicorac.plugins.audioplayer.AudioDeviceEnum.DEVICE_UNDEFINED;
 
 import android.annotation.SuppressLint;
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -20,6 +21,7 @@ import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.PowerManager;
 
 import androidx.annotation.Nullable;
@@ -46,9 +48,7 @@ public class AudioPlayerService extends MediaSessionService {
   private PendingIntent bringAppToForegroundIntent;
   private NotificationManager notificationManager;
   private androidx.core.app.NotificationCompat.Builder notificationBuilder;
-  private boolean isNotificationVisible = false;
   private String notificationTitle = "";
-  public Handler playerThreadHandler;
 
   private PowerManager.WakeLock wakeLockPlay = null;
   private PowerManager.WakeLock wakeLockProximity = null;
@@ -60,6 +60,10 @@ public class AudioPlayerService extends MediaSessionService {
   private AudioManager audioManager = null;
   @AudioDeviceEnum.AudioDeviceValue private int currentOutputDevice = DEVICE_UNDEFINED;
   private MediaSession mediaSession;
+  private Handler updateHandler;
+
+  // wakelocks to keep the service alive when playing and turn off screen when in proximity
+  private PowerManager powerManager;
 
   // reference to plugin
   private AudioPlayerPlugin plugin;
@@ -88,12 +92,10 @@ public class AudioPlayerService extends MediaSessionService {
 
     super.onCreate();
     audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+    powerManager = (PowerManager) getSystemService(POWER_SERVICE);
 
-    // Create an Intent for the "bring-to-front" action to be linked in notifications
-    var customIntent = new Intent(
-      getApplicationContext(),
-      MainActivity.class
-    );
+    // create an Intent for the "bring-to-front" action to be linked in notifications
+    var customIntent = new Intent(getApplicationContext(), MainActivity.class);
     customIntent.setAction(Intent.ACTION_MAIN);
     customIntent.addCategory(Intent.CATEGORY_LAUNCHER);
 
@@ -103,21 +105,20 @@ public class AudioPlayerService extends MediaSessionService {
       PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
     );
 
-    // get instance of NotificationManager and create notifications channel
-    if (notificationManager == null) {
-      notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        var channel = new NotificationChannel(
-          NOTIFICATION_CHANNEL_ID,
-          NOTIFICATION_CHANNEL_NAME,
-          NotificationManager.IMPORTANCE_DEFAULT
-        );
-        notificationManager.createNotificationChannel(channel);
-      }
+    // init notifications channel
+    notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      NotificationChannel channel = new NotificationChannel(
+        NOTIFICATION_CHANNEL_ID,
+        NOTIFICATION_CHANNEL_NAME,
+        NotificationManager.IMPORTANCE_LOW
+      );
+      notificationManager.createNotificationChannel(channel);
     }
 
-    // init a new notification builder
-    notificationBuilder = new androidx.core.app.NotificationCompat.Builder(getApplicationContext(), NOTIFICATION_CHANNEL_ID);
+    // notifications builder
+    notificationBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID);
+
   }
 
   @Nullable
@@ -129,20 +130,17 @@ public class AudioPlayerService extends MediaSessionService {
   @Override
   public void onDestroy() {
     super.onDestroy();
-
-    try {
-      unload();
-      player = null;
-      if (mediaSession != null) mediaSession.release();
-    }
-    catch (Exception ignored) {}
-
+    // execute cleanup
+    unload();
+    stopSelf();
   }
 
   @Override
   public void onTaskRemoved(Intent rootIntent) {
+    super.onTaskRemoved(rootIntent);
     onDestroy();
   }
+
 
   @Override
   public IBinder onBind(Intent intent) {
@@ -161,7 +159,6 @@ public class AudioPlayerService extends MediaSessionService {
     if (isLoaded) {
       unload();
     }
-    playerThreadHandler = new Handler();
 
     // get input arguments
     var fileUriStr = call.getString("fileUri");
@@ -181,33 +178,6 @@ public class AudioPlayerService extends MediaSessionService {
       setOutputDevice(DEVICE_LOUDSPEAKER);
       player.setMediaItem(mediaItem);
 
-      // wakelocks to keep the service alive when playing and turn off screen when in proximity
-      PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
-
-      // initialize proximity
-      if (Boolean.TRUE.equals(call.getBoolean("enableEarpiece", false))) {
-        wakeLockProximity = powerManager.newWakeLock(PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK, "BcrGuiAudioPlayerService::ProximityWakeLock");
-        initProximitySensor();
-      }
-
-      if (Boolean.TRUE.equals(call.getBoolean("keepAwakeWhenPlaying", false))) {
-        wakeLockPlay = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, "BcrGuiAudioPlayerService::WakeLock");
-      }
-
-      // initialize MediaSession
-      if (mediaSession != null) {
-        mediaSession.release();
-      }
-      mediaSession = new MediaSession.Builder(this, player)
-        // .setCallback(new MediaSession.Callback() {
-        //   @Override
-        //   public void onPlay() { player.play(); }
-        //
-        //   @Override
-        //   public void onPause() { player.pause(); }
-        // })
-        .build();
-
       // attach events listener
       player.addListener(new ExoPlayer.Listener() {
         @Override
@@ -224,17 +194,58 @@ public class AudioPlayerService extends MediaSessionService {
               }
               break;
             case ExoPlayer.STATE_ENDED:
-              stopUpdateTask();
-              cancelNotification();
+              pause();            // avoid player restarting after the seekTo() call below
+              player.seekTo(0);   // reset position to start
+              // inform JS that play has completed
               var res = new JSObject();
-              plugin.sendJSEvent("playCompleted", res);
+              plugin.sendJSEvent("playerCompleted", res);
               break;
             case ExoPlayer.STATE_IDLE:
             case ExoPlayer.STATE_BUFFERING:
               break;
           }
         }
+
+        @Override
+        public void onIsPlayingChanged(boolean isPlaying) {
+          if (isPlaying) {
+            // acquire wakelock (if enabled)
+            if (wakeLockPlay != null && !wakeLockPlay.isHeld()) {
+              wakeLockPlay.acquire(4 * 60 * 60 * 1000L /* 4 hours */);
+            }
+            // set service as foreground
+            startForeground(NOTIFICATION_ID, createNotification());
+            startUpdateTask();
+          } else {
+            // release wakelock (if enabled)
+            if (wakeLockPlay != null && wakeLockPlay.isHeld()) {
+              wakeLockPlay.release();
+            }
+            stopUpdateTask();
+            // remove service from foreground
+            stopForeground(false);
+            // delete notification (call above with "true" doesn't always work)
+            cancelNotification();
+          }
+        }
       });
+
+      // initialize proximity (if required)
+      if (Boolean.TRUE.equals(call.getBoolean("enableEarpiece", false))) {
+        wakeLockProximity = powerManager.newWakeLock(PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK, "BcrGuiAudioPlayerService::ProximityWakeLock");
+        initProximitySensor();
+      }
+
+      // initialize wakelock (if required)
+      if (Boolean.TRUE.equals(call.getBoolean("keepAwakeWhenPlaying", false))) {
+        wakeLockPlay = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "BcrGuiAudioPlayerService::WakeLock");
+      }
+
+      // initialize MediaSession
+      if (mediaSession != null) {
+        mediaSession.release();
+      }
+      mediaSession = new MediaSession.Builder(this, player).build();
 
       // prepare the player
       isPreparing = true;
@@ -259,12 +270,9 @@ public class AudioPlayerService extends MediaSessionService {
   public void unload() {
     if (isLoaded) {
       stop();
-      releaseProximitySensor();
-      releaseWakeLockPlay();
-      if (wakeLockPlay != null) wakeLockPlay = null;
       player.release();
+      mediaSession.release();
       player = null;
-      playerThreadHandler = null;
       isLoaded = false;
     }
   }
@@ -281,9 +289,6 @@ public class AudioPlayerService extends MediaSessionService {
 
     if (!player.isPlaying()) {
       player.play();
-      updateWakeLockPlay();
-      createNotification();
-      startUpdateTask();
     }
 
     call.resolve();
@@ -294,19 +299,16 @@ public class AudioPlayerService extends MediaSessionService {
    * Pause currently playing audio
    */
   public void pause(PluginCall call) {
-
     if (!isLoaded) {
       call.reject(ErrorCodes.ERR_NOT_LOADED);
       return;
     }
-
-    player.pause();
-    updateWakeLockPlay();
-    stopUpdateTask();
-    cancelNotification();
-
+    pause();
     call.resolve();
-
+  }
+  private void pause() {
+    player.pause();
+    stopUpdateTask();
   }
 
   /**
@@ -324,9 +326,6 @@ public class AudioPlayerService extends MediaSessionService {
     if (player != null && player.isPlaying()) {
       player.stop();
     }
-    updateWakeLockPlay();
-    stopUpdateTask();
-    cancelNotification();
   }
 
   /**
@@ -472,8 +471,7 @@ public class AudioPlayerService extends MediaSessionService {
     sensorManager.registerListener(
       proximityListener,
       proximitySensor,
-      SensorManager.SENSOR_DELAY_NORMAL,
-      playerThreadHandler
+      SensorManager.SENSOR_DELAY_NORMAL
     );
 
   }
@@ -495,64 +493,32 @@ public class AudioPlayerService extends MediaSessionService {
     }
   }
 
-  // wakelock management
-
-  /**
-   * Update the status of wakeLockPlay, enabled if the player is playing
-   */
-  private void updateWakeLockPlay() {
-
-    if (wakeLockPlay != null) {
-      if (isLoaded && player.isPlaying() && !wakeLockPlay.isHeld()) {
-        wakeLockPlay.acquire(4 * 60 * 60 * 1000L /* 4 hours */);
-      } else if (wakeLockPlay.isHeld()) {
-        wakeLockPlay.release();
-      }
-    }
-
-  }
-
-  /**
-   * Release wakeLockPlay
-   */
-  private void releaseWakeLockPlay() {
-
-    if (wakeLockPlay != null) {
-      if (wakeLockPlay.isHeld()) {
-        wakeLockPlay.release();
-      }
-      wakeLockPlay = null;
-    }
-
-  }
-
   // update management
 
   /**
    * Start an update task (each UPDATE_INTERVAL ms) to update notification text
    */
   private void startUpdateTask() {
-    if (updateRunnable == null) {
-      updateRunnable = new Runnable() {
-        @Override
-        public void run() {
-          doUpdate();
-          // Post the same runnable again after UPDATE_INTERVAL ms
-          playerThreadHandler.postDelayed(this, UPDATE_INTERVAL);
-        }
-      };
-      // first trigger
-      doUpdate();
-      playerThreadHandler.postDelayed(updateRunnable, UPDATE_INTERVAL);
-    }
+    updateHandler = new Handler();
+    updateRunnable = new Runnable() {
+      @Override
+      public void run() {
+        doUpdate();
+        // Post the same runnable again after UPDATE_INTERVAL ms
+        updateHandler.postDelayed(this, UPDATE_INTERVAL);
+      }
+    };
+    // first trigger
+    updateHandler.post(updateRunnable);
   }
 
   /**
    * Stop the existing update task
    */
   private void stopUpdateTask() {
-    if (updateRunnable != null) {
-      playerThreadHandler.removeCallbacks(updateRunnable);
+    if (updateHandler != null) {
+      updateHandler.removeCallbacks(updateRunnable);
+      updateHandler = null;
       updateRunnable = null;
     }
   }
@@ -589,47 +555,33 @@ public class AudioPlayerService extends MediaSessionService {
   /**
    * Create notification
    */
-  private void createNotification() {
-
-    if (isNotificationVisible) {
-      cancelNotification();
-    }
-
-    assert notificationBuilder != null;
-    notificationBuilder
+  private Notification createNotification() {
+    return notificationBuilder
       .setContentTitle(notificationTitle)
+      .setContentText("")
       .setSmallIcon(R.drawable.ic_notification)
-      .setPriority(NotificationCompat.PRIORITY_LOW) // needed to reduce "flickering" on notification updates
       .setContentIntent(bringAppToForegroundIntent)
+      .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+      .setProgress(0, 0, false)
       .setVibrate(new long[]{0L})
-      // Set as "persistent"
-      //.setOngoing(true)
-    ;
-
-    isNotificationVisible = true;
-    updateNotification();
+      .setOngoing(true)
+      .build();
   }
 
   /**
-   * Update existing notification
+   * Update service notification
    */
   private void updateNotification() {
-    if (isNotificationVisible) {
-      assert notificationBuilder != null;
-      notificationBuilder.setContentText(toHMS(player.getCurrentPosition()) + " / " + toHMS(player.getDuration()));
-      // set/update the notification
-      notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
-    }
+    notificationBuilder.setContentText(toHMS(player.getCurrentPosition()) + " / " + toHMS(player.getDuration()));
+    notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
   }
 
   /**
-   * Cancel existing notification
+   * Clear service notification (stopForeground(true) not working...)
    */
-  public void cancelNotification() {
-    if (isNotificationVisible) {
-      notificationManager.cancel(NOTIFICATION_ID);
-      isNotificationVisible = false;
-    }
+  private void cancelNotification() {
+    notificationBuilder.setContentText(toHMS(player.getCurrentPosition()) + " / " + toHMS(player.getDuration()));
+    notificationManager.cancel(NOTIFICATION_ID);
   }
 
 }
