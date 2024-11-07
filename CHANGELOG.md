@@ -1,5 +1,13 @@
 # Version history
 
+## Version 1.9.1 (2024-11-07)
+
+Bug fixes:
+
+- Improved audio play in background, now the app stays alive and resumes correctly clicking on the notification
+
+- Fixed issue preventing the screen to turn off pressing the power button while playing (#171)
+
 ## Version 1.9.0 (2024-11-03)
 
 New features:
