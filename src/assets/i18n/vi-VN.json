@@ -119,6 +119,8 @@
   "SETTINGS_MAKE_SELECTION": "Tạo một lựa chọn",
   "SETTINGS_PLAYER_ENABLE_EARPIECE": "Bật tai nghe",
   "SETTINGS_PLAYER_ENABLE_EARPIECE_HELP": "Sử dụng cảm biến tiệm cận để chuyển sang tai nghe khi đang phát",
+  "SETTINGS_PLAYER_KEEP_AWAKE": "Giữ màn hình bật",
+  "SETTINGS_PLAYER_KEEP_AWAKE_HELP": "Giữ màn hình hoạt động trong khi phát âm thanh",
   "SETTINGS_PLAYER_SECTION": "Trình phát",
   "SETTINGS_PLAYER_SEEK_TIME": "Thời gian tua",
   "SETTINGS_RECORDINGS_DIRECTORY": "Thư mục ghi âm",
