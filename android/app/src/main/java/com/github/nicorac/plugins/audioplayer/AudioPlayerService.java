@@ -276,6 +276,7 @@ public class AudioPlayerService extends MediaSessionService {
       stop();
       player.release();
       mediaSession.release();
+      releaseProximitySensor();
       player = null;
       isLoaded = false;
     }
