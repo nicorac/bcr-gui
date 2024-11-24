@@ -49,6 +49,7 @@ public class AudioPlayerService extends MediaSessionService {
   private NotificationManager notificationManager;
   private androidx.core.app.NotificationCompat.Builder notificationBuilder;
   private String notificationTitle = "";
+  private boolean isNotificationVisible = false;
 
   private PowerManager.WakeLock wakeLockPlay = null;
   private PowerManager.WakeLock wakeLockProximity = null;
@@ -58,7 +59,8 @@ public class AudioPlayerService extends MediaSessionService {
   private boolean isPreparing = false;
   private boolean isLoaded = false;
   private AudioManager audioManager = null;
-  @AudioDeviceEnum.AudioDeviceValue private int currentOutputDevice = DEVICE_UNDEFINED;
+  @AudioDeviceEnum.AudioDeviceValue
+  private int currentOutputDevice = DEVICE_UNDEFINED;
   private MediaSession mediaSession;
   private Handler updateHandler;
 
@@ -70,6 +72,7 @@ public class AudioPlayerService extends MediaSessionService {
 
   // Plugin <--> Service binding support
   private final IBinder binder = new AudioPlayerServiceBinder();
+
   public class AudioPlayerServiceBinder extends Binder {
     public AudioPlayerService getService(AudioPlayerPlugin plugin) {
       AudioPlayerService.this.plugin = plugin;
@@ -267,6 +270,7 @@ public class AudioPlayerService extends MediaSessionService {
     unload();
     call.resolve();
   }
+
   public void unload() {
     if (isLoaded) {
       stop();
@@ -306,6 +310,7 @@ public class AudioPlayerService extends MediaSessionService {
     pause();
     call.resolve();
   }
+
   private void pause() {
     player.pause();
     stopUpdateTask();
@@ -322,6 +327,7 @@ public class AudioPlayerService extends MediaSessionService {
     stop();
     call.resolve();
   }
+
   private void stop() {
     if (player != null && player.isPlaying()) {
       player.stop();
@@ -373,8 +379,8 @@ public class AudioPlayerService extends MediaSessionService {
     long pos = -1;
     try {
       pos = Objects.requireNonNull(call.getDouble("position", -1.0)).longValue();
+    } catch (Exception ex) {
     }
-    catch (Exception ex) { }
 
     if (pos < 0) {
       call.reject("Missing or invalid 'position' parameter", ErrorCodes.ERR_BAD_ARGUMENT);
@@ -404,8 +410,7 @@ public class AudioPlayerService extends MediaSessionService {
       player.setAudioAttributes(audioAttributes, false);
       audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
       audioManager.setSpeakerphoneOn(false);
-    }
-    else {
+    } else {
       var audioAttributes = new androidx.media3.common.AudioAttributes.Builder()
         .setUsage(C.USAGE_MEDIA)
         .setContentType(C.AUDIO_CONTENT_TYPE_SPEECH)
@@ -546,8 +551,7 @@ public class AudioPlayerService extends MediaSessionService {
     long seconds = milliseconds / 1000;
     if (hours > 0) {
       return String.format("%02d:%02d:%02d", hours, minutes, seconds);
-    }
-    else {
+    } else {
       return String.format("%02d:%02d", minutes, seconds);
     }
   }
@@ -556,7 +560,7 @@ public class AudioPlayerService extends MediaSessionService {
    * Create notification
    */
   private Notification createNotification() {
-    return notificationBuilder
+    var builder = notificationBuilder
       .setContentTitle(notificationTitle)
       .setContentText("")
       .setSmallIcon(R.drawable.ic_notification)
@@ -566,6 +570,8 @@ public class AudioPlayerService extends MediaSessionService {
       .setVibrate(new long[]{0L})
       .setOngoing(true)
       .build();
+    isNotificationVisible = true;
+    return builder;
   }
 
   /**
@@ -573,16 +579,18 @@ public class AudioPlayerService extends MediaSessionService {
    */
   private void updateNotification() {
     notificationBuilder.setContentText(toHMS(player.getCurrentPosition()) + " / " + toHMS(player.getDuration()));
-    notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
+    if (isNotificationVisible) {
+      notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
+    }
   }
 
   /**
    * Clear service notification (stopForeground(true) not working...)
    */
   private void cancelNotification() {
-    notificationBuilder.setContentText(toHMS(player.getCurrentPosition()) + " / " + toHMS(player.getDuration()));
-    notificationManager.cancel(NOTIFICATION_ID);
+    if (isNotificationVisible) {
+      notificationManager.cancel(NOTIFICATION_ID);
+    }
   }
 
 }
-
