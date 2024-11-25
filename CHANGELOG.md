@@ -1,5 +1,13 @@
 # Version history
 
+## Version 1.9.2 (2024-11-25)
+
+Bug fixes:
+
+- App crash when moving audio scrollbar before play
+
+- App crash when activating proximity sensor with no selected recording
+
 ## Version 1.9.1 (2024-11-07)
 
 Bug fixes:
