@@ -12,13 +12,45 @@ apply plugin: 'com.android.application'
  * keyPassword=<password for the key>
  * -----------------------------------------------------------------------------------------
  */
-System.print("Loading Android keystore config from: ")
-System.println(System.getenv("ANDROID_KEYSTORE_PROPS"))
-def keystoreProperties = new Properties()
-def keystorePropertiesFile = file(System.getenv("ANDROID_KEYSTORE_PROPS"))
-if (keystorePropertiesFile.exists()) {
-  keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+def _keyAlias = ""
+def _keyPassword = ""
+def _storeFile = ""
+def _storePassword = ""
+
+// try to get keystore data from a keystore props file
+def keystorePropsFilename = System.getenv("ANDROID_KEYSTORE_PROPS")
+if (keystorePropsFilename) {
+  System.out.println("Loading Android keystore config from file: " + keystorePropsFilename)
+  def keystorePropertiesFile = file(keystorePropsFilename)
+  if (keystorePropertiesFile.exists()) {
+    def keystoreProperties = new Properties()
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+    _keyAlias = keystoreProperties['keyAlias']
+    _keyPassword = keystoreProperties['keyPassword']
+    _storeFile = keystoreProperties['storeFile']
+    _storePassword = keystoreProperties['storePassword']
+  } else {
+    System.err.println("File not found!");
+  }
 }
+// fallback to env variables (used in CI builds)
+else {
+  System.out.println("Loading Android keystore config from environment variables")
+  _keyAlias = System.getenv("ANDROID_KEYSTORE_KEYALIAS")
+  _keyPassword = System.getenv("ANDROID_KEYSTORE_KEYPASSWORD")
+  _storeFile = System.getenv("ANDROID_KEYSTORE_STOREFILE")
+  _storePassword = System.getenv("ANDROID_KEYSTORE_STOREPASSWORD")
+}
+
+// load keystore file
+if (!keystorePropsFilename && (!_keyAlias || !_keyPassword || !_storeFile || !_storePassword)) {
+  throw new GradleException("Missing required ANDROID_KEYSTORE_* environment variables or ANDROID_KEYSTORE_PROPS filename");
+}
+def keystoreFileContent = file(_storeFile)
+if (!keystoreFileContent.exists()) {
+  throw new GradleException("Specified Android keystore file cannot be found: " + keystoreProperties['storeFile']);
+}
+
 
 android {
   compileSdkVersion rootProject.ext.compileSdkVersion
@@ -42,10 +74,10 @@ android {
   // signature config (release only)
   signingConfigs {
     release {
-      keyAlias keystoreProperties['keyAlias']
-      keyPassword keystoreProperties['keyPassword']
-      storeFile file(keystoreProperties['storeFile'])
-      storePassword keystoreProperties['storePassword']
+      keyAlias _keyAlias
+      keyPassword _keyPassword
+      storeFile keystoreFileContent
+      storePassword _storePassword
     }
   }
   buildTypes {

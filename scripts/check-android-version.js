@@ -1,5 +1,5 @@
 /**
- * Create a bunch of test  files
+ * Check if Android version is correctly set
  */
 const fs = require('fs');
 const process = require('process');
