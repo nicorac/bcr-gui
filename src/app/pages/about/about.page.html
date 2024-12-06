@@ -15,9 +15,14 @@
   </div>
 
   <div class="item">
-    <ion-label class="ion-text-wrap">
+    <ion-label class="ion-text-wrap" (click)="versionClick()">
       <h2>{{ 'ABOUT_VERSION' | translatePipe }}</h2>
-      <p>{{ version.version }}</p>
+      <p>
+        {{ version.version }}
+        @if (settings.developerMode) {
+          <i>({{ 'ABOUT_DEV_MODE_ENABLED' | translatePipe }})</i>
+        }
+      </p>
     </ion-label>
   </div>
 

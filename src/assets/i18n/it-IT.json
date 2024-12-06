@@ -1,6 +1,8 @@
 {
   "ABOUT_COPYRIGHT": "Copyright",
   "ABOUT_DESCRIPTION": "%appName% è una app che permette di gestire con facilità le registrazioni di %bcrLink% (Basic Call Recorder) e di altri registratori di chiamata",
+  "ABOUT_DEV_MODE_DISABLED": "Modalità sviluppatore disattivata",
+  "ABOUT_DEV_MODE_ENABLED": "Modalità sviluppatore attivata",
   "ABOUT_DONATIONS": "Donazioni",
   "ABOUT_DONATIONS_TEXT": "Questa app è gratuita e libera. Se apprezzi il mio lavoro e vuoi supportarlo con una donazione, usa uno dei link qui sotto.",
   "ABOUT_HOMEPAGE": "Homepage",

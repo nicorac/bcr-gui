@@ -1,6 +1,8 @@
 {
   "ABOUT_COPYRIGHT": "Copyright",
   "ABOUT_DESCRIPTION": "%appName% is a companion app for %bcrLink% (Basic Call Recorder), to ease management of its recordings database",
+  "ABOUT_DEV_MODE_DISABLED": "Developer mode disabled",
+  "ABOUT_DEV_MODE_ENABLED": "Developer mode enabled",
   "ABOUT_DONATIONS": "Donations",
   "ABOUT_DONATIONS_TEXT": "This app is free as in beer and as in speech, nothing to pay, no ads. If you appreciate my work and want to support it, feel free to use one the links below.",
   "ABOUT_HOMEPAGE": "Homepage",
@@ -115,6 +117,7 @@
   "SETTINGS_GENERAL_SECTION": "General",
   "SETTINGS_LANGUAGE": "Language",
   "SETTINGS_LANGUAGE_ADD": "add new language",
+  "SETTINGS_LANGUAGE_IMPORT_FILE": "Import translation file",
   "SETTINGS_LANGUAGE_TEXT": "Application language",
   "SETTINGS_MAKE_SELECTION": "Make a selection",
   "SETTINGS_PLAYER_ENABLE_EARPIECE": "Enable earpiece",

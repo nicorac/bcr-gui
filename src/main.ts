@@ -63,7 +63,7 @@ function initializeApp(i18n: I18nService, settings: SettingsService, platform: P
     await settings.initialize();
 
     // initialize i18n & load culture
-    await i18n.initialize();
+    await i18n.initialize(settings);
     await i18n.load(settings.culture ? settings.culture : settings.defaultCulture);
 
     // intercept unmanaged errors

@@ -34,6 +34,7 @@ export class MessageBoxService {
     buttons?: (AlertButton | string)[],
     inputs?: AlertInput[],
     cssClass?: string,
+    backdropDismiss?: boolean,
   }) {
 
     // prepend custom class (if not already there)
@@ -75,19 +76,23 @@ export class MessageBoxService {
     // merge defaults
     options = { ...new MessageBoxOptionsConfirm(), ...options };
 
+    const buttons = [];
+    if (options.showCancelButton) {
+      buttons.push({ text: options.cancelText ?? this.i18n.get('LBL_CANCEL'), handler: () => options.onCancel?.() });
+    }
+    buttons.push({
+      text: options.confirmText ?? this.i18n.get('LBL_OK'),
+      handler: () => {
+        options.onConfirm?.();
+      },
+    });
+
     const mb = await this.getAlert({
       header: options.header,
       message: this.formatMessage(options.message),
-      buttons: [
-        { text: options.cancelText ?? this.i18n.get('LBL_CANCEL'), handler: () => options.onCancel?.() },
-        {
-          text: options.confirmText ?? this.i18n.get('LBL_OK'),
-          handler: () => {
-            options.onConfirm?.();
-          },
-        }
-      ],
+      buttons,
       cssClass: 'msgbox-confirm',
+      backdropDismiss: options.backdropDismiss,
     });
     await mb.present();
 
@@ -187,6 +192,7 @@ export class mbOptionsBase {
   header?: string;
   message?: MessageType = '';
   confirmText?: string = 'Ok';
+  backdropDismiss? = true;
   onConfirm?: () => void;
 }
 
@@ -203,6 +209,7 @@ export class MessageBoxOptions {
  * Options for an error messagebox
  */
 export class MessageBoxOptionsConfirm extends mbOptionsBase {
+  showCancelButton? = true;
   cancelText?: string;
   onCancel?: () => void;
 }

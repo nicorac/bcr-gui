@@ -42,23 +42,26 @@
 
     <ion-item>
       <div class="wrapper">
+
         <div class="label">
           {{ 'SETTINGS_LANGUAGE' | translatePipe }}
           <div class="help">{{ 'SETTINGS_LANGUAGE_TEXT' | translatePipe }}<br/>
           (<a href="{{ version.addLanguageUri }}">{{ 'SETTINGS_LANGUAGE_ADD' | translatePipe }}</a>)
           </div>
         </div>
-        <ion-select
-          [(ngModel)]="settings.culture"
-          (ngModelChange)="clearPipesCache()"
-        >
-          <ion-select-option [value]="''">
-            {{ 'SETTINGS_SYSTEM_DEFAULT' | translatePipe }} ({{ settings.defaultCulture }})
-          </ion-select-option>
-          @for (c of i18n.getDefinedCultures(); track c) {
-            <ion-select-option [value]="c.id">{{ c.name }} ({{ c.id }})</ion-select-option>
-          }
-        </ion-select>
+        <div>
+          <ion-select
+            [(ngModel)]="settings.culture"
+            (ngModelChange)="clearPipesCache()"
+          >
+            <ion-select-option [value]="''">
+              {{ 'SETTINGS_SYSTEM_DEFAULT' | translatePipe }} ({{ settings.defaultCulture }})
+            </ion-select-option>
+            @for (c of i18n.getDefinedCultures(); track c) {
+              <ion-select-option [value]="c.id">{{ c.name }} ({{ c.id }})</ion-select-option>
+            }
+          </ion-select>
+        </div>
       </div>
     </ion-item>
 

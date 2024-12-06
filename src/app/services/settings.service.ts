@@ -166,6 +166,12 @@ export class SettingsService {
   @JsonProperty()
   public keepAwakeWhenPlaying = true;
 
+  /**
+   * Developer mode is enabled
+   */
+  @JsonProperty()
+  public developerMode = false;
+
   constructor(
     private mbs: MessageBoxService,
   ) { }

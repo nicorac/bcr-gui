@@ -1,4 +1,6 @@
+import { AndroidSAF, Encoding } from 'src/plugins/androidsaf';
 import { Injectable } from '@angular/core';
+import { SettingsService } from './settings.service';
 
 export type I18nKey = Uppercase<string>;
 export type TranslationArgs = number | { [key:string]:(string|number) };
@@ -29,10 +31,17 @@ export class I18nService {
 
   private _cultureDefs: Culture[] = [];
   private _currentCulture = FALLBACK_CULTURE;
+  
+  // CAN'T use DI because of circular dependency, set in initialize() function
+  private settings!: SettingsService;
 
-  constructor() { }
+  constructor(
+  ) { }
 
-  async initialize() {
+  async initialize(settings: SettingsService) {
+
+    // store settings instance
+    this.settings = settings;
 
     // cleanup local storage
     let keys = [];
@@ -93,6 +102,24 @@ export class I18nService {
       ...await this.getJsonContent(`${LANG_BASE_URL}/${culture}.json`),
     }
 
+    // try to load x file
+    if (this.settings.developerMode) {
+      // get URI of developer lang file
+      const { uri: devLangFileUri } = await AndroidSAF.getFileUri({
+        directoryUri: this.settings.recordingsDirectoryUri,
+        name: `i18n.json`,
+      });
+      if (devLangFileUri) {
+        const { content: devLangFileContent } = await AndroidSAF.readFile({ fileUri: devLangFileUri, encoding: Encoding.UTF8 });
+        if (devLangFileContent) {
+          content = {
+            ...content,
+            ...await JSON.parse(devLangFileContent),
+          }
+        }
+      }
+    }
+
     // store content
     Object.entries(content).forEach(([key, value]) => {
       localStorage.setItem(TRANSLATION_KEY_PREFIX + key, value);
@@ -101,7 +128,13 @@ export class I18nService {
   }
 
   private async getJsonContent<T>(filename: string): Promise<T> {
-    return await (await fetch(filename)).json();
+    const content = await fetch(filename);
+    if (content.status !== 404) {
+      return await content.json();
+    }
+    else {
+      return <T>{};
+    }
   }
 
   /**
