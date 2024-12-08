@@ -1,6 +1,8 @@
 {
   "ABOUT_COPYRIGHT": "Autorská práva",
   "ABOUT_DESCRIPTION": "%appName% je doprovodná aplikace k %bcrLink% (Basic Call Recorder) sloužící ke zjednodušení správy databáze nahrávek",
+  "ABOUT_DEV_MODE_DISABLED": "Vývojářský režim zakázán",
+  "ABOUT_DEV_MODE_ENABLED": "Vývojářský režim povolen",
   "ABOUT_DONATIONS": "Dary",
   "ABOUT_DONATIONS_TEXT": "Tato aplikace je zdarma, jako pivo zdarma, a svobodná, jako svoboda projevu; nic k placení, žádné reklamy. Pokud si ceníte mé práce a rádi byste ji podpořili, klepněte na odkazy níže.",
   "ABOUT_HOMEPAGE": "Domovská stránka",
@@ -115,6 +117,7 @@
   "SETTINGS_GENERAL_SECTION": "Obecné",
   "SETTINGS_LANGUAGE": "Jazyk",
   "SETTINGS_LANGUAGE_ADD": "přidat nový jazyk",
+  "SETTINGS_LANGUAGE_IMPORT_FILE": "Importovat soubor s překladem",
   "SETTINGS_LANGUAGE_TEXT": "Jazyk aplikace",
   "SETTINGS_MAKE_SELECTION": "Zvolte",
   "SETTINGS_PLAYER_ENABLE_EARPIECE": "Povolit sluchátko",
