@@ -1,6 +1,8 @@
 {
   "ABOUT_COPYRIGHT": "Copyright",
   "ABOUT_DESCRIPTION": "%appName% es una aplicación complementaria para %bcrLink% (Basic Call Recorder), para facilitar la gestión de su base de datos de grabaciones",
+  "ABOUT_DEV_MODE_DISABLED": "Modo desarrollador deshabilitado",
+  "ABOUT_DEV_MODE_ENABLED": "Modo desarrollador habilitado",
   "ABOUT_DONATIONS": "Donaciones",
   "ABOUT_DONATIONS_TEXT": "Esta aplicación es libre como en la cerveza y como en el discurso, nada que pagar, sin anuncios. Si usted aprecia mi trabajo y quiere apoyarlo, no dude en utilizar uno de los enlaces de abajo.",
   "ABOUT_HOMEPAGE": "Página de inicio",
@@ -115,6 +117,7 @@
   "SETTINGS_GENERAL_SECTION": "General",
   "SETTINGS_LANGUAGE": "Idioma",
   "SETTINGS_LANGUAGE_ADD": "añadir un nuevo idioma",
+  "SETTINGS_LANGUAGE_IMPORT_FILE": "Importar archivo de traducción",
   "SETTINGS_LANGUAGE_TEXT": "Idioma de la aplicación",
   "SETTINGS_MAKE_SELECTION": "Seleccione una opción",
   "SETTINGS_PLAYER_ENABLE_EARPIECE": "Activar auricular",
