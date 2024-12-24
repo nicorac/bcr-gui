@@ -1,5 +1,11 @@
 # Version history
 
+## Version 1.10.1 (2024-12-24)
+
+Bug fixes:
+
+- Player not shown when opening the app by clicking on BCR notification (#154)
+
 ## Version 1.10.0 (2024-12-06)
 
 New features:
