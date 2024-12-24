@@ -148,6 +148,7 @@ export class MainPage implements AfterViewInit {
 
       // select & play it (need to wait for player initialization)
       playItem.selected = true;
+      this.selectedItem.set(playItem);
       this.cdr.detectChanges(); // forcibly detect the .selected change above
       await untilTrue(() => this.player()?.recording() === playItem && this.player()!.isReady());
       this.player()?.play();
