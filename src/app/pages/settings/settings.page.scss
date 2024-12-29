@@ -1,8 +1,8 @@
 .wrapper {
   padding: .35em 0;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) max-content;
-  gap: 1em;
+  grid-template-columns: minmax(30%, 1fr) min-content;
+  gap: 1.5em;
   align-items: center;
   min-width: 100%;
 }
