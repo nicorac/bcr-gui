@@ -45,6 +45,7 @@
   "ERR_OS003": "Fehler beim Teilen der Aufnahme",
   "ERR_OS004": "Fehler beim Löschen der Datei: %filename%",
   "ERR_OS005": "Fehler beim Auswählen des Aufnahmen-Verzeichnisses",
+  "ERR_OS006": "Die angeforderte Aufnahmedatei kann nicht geöffnet werden: %filename%.\n\n%appname% kann nur auf Dateien im konfigurierten Aufnahmeverzeichnis zugreifen.",
   "ERR_PLAYER": "Audioplayer-Fehler: %context%",
   "FNP_EDITOR_PATTERN": "Dateinamensmuster",
   "FNP_EDITOR_PATTERN_TEXT": "Muster zum Erkennen der Aufnahme-Dateinamen, die keine zugehörige .json Metadatendatei haben. Es muss ein gültiger, Javascript-konformer, regulärer Ausdruck mit eigenen Platzhaltern sein.",
@@ -118,7 +119,10 @@
   "SETTINGS_LANGUAGE_IMPORT_FILE": "Übersetzungsdatei importieren",
   "SETTINGS_LANGUAGE_TEXT": "Programmsprache",
   "SETTINGS_MAKE_SELECTION": "Wähle aus",
+  "SETTINGS_PLAYER_ENABLE_EARPIECE": "Ohrhörer aktivieren",
+  "SETTINGS_PLAYER_ENABLE_EARPIECE_HELP": "Näherungssensor verwenden, um während der Wiedergabe auf den Ohrhörer umzuschalten",
   "SETTINGS_PLAYER_KEEP_AWAKE": "Bildschirm eingeschaltet lassen",
+  "SETTINGS_PLAYER_KEEP_AWAKE_HELP": "Bildschirm während der Audiowiedergabe eingeschaltet lassen",
   "SETTINGS_PLAYER_SECTION": "Player",
   "SETTINGS_PLAYER_SEEK_TIME": "Suchzeit",
   "SETTINGS_RECORDINGS_DIRECTORY": "Verzeichnis der Aufnahmen",
@@ -130,5 +134,7 @@
   "SETTINGS_RECORDINGS_SORT_DURATION_DESC": "Laufzeit (absteigend)",
   "SETTINGS_RESCAN_TEXT": "Möchtest du alle deine Dateien (ohne Metadaten-JSON-Datei) unter Verwendung des neuen Dateinamensmusters neu einlesen?",
   "SETTINGS_RESCAN_TITLE": "Neu einlesen",
+  "SETTINGS_SELECT_DIRECTORY_MESSAGE": "Diese App benötigt Zugriff auf das Aufnahmeverzeichnis.\n\nWenn du auf OK klickst, zeigt dir Android eine Verzeichnisauswahl an.\n\nWähle das Aufnahmeverzeichnis aus und erlaube den Zugriff auf dessen Inhalt...",
+  "SETTINGS_SELECT_DIRECTORY_TITLE": "Aufnahmeverzeichniszugriff",
   "SETTINGS_SYSTEM_DEFAULT": "Systemstandard"
 }
