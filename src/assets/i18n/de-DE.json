@@ -111,6 +111,7 @@
   "SETTINGS_APPEARANCE_LIGHT": "Hell",
   "SETTINGS_COUNTRY_PREFIX": "Standard-Ländervorwahl",
   "SETTINGS_COUNTRY_PREFIX_HELP": "Die Ländervorwahl (bspw. +49 für Deutschland), die für Nummern genutzt werden soll, bei denen sie fehlt",
+  "SETTINGS_DATETIME_EMPTY": "Leer",
   "SETTINGS_DATETIME_FORMAT": "Datums-/Zeitformat",
   "SETTINGS_FILENAME_PATTERN": "Dateinamensmuster",
   "SETTINGS_GENERAL_SECTION": "Allgemein",
