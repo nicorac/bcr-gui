@@ -1,6 +1,8 @@
 {
   "ABOUT_COPYRIGHT": "Авторские права",
   "ABOUT_DESCRIPTION": "%appName% - приложение-компаньон для %bcrLink% (Basic Call Recorder), для упрощения управления базой данных записей",
+  "ABOUT_DEV_MODE_DISABLED": "Режим разработчека выключен",
+  "ABOUT_DEV_MODE_ENABLED": "Режим разработчика включен",
   "ABOUT_DONATIONS": "Пожертвования",
   "ABOUT_DONATIONS_TEXT": "Это приложение бесплатное и свободное, не нужно платить, рекламы нет. Если вам нравится моя работа и вы хотите ее поддержать, можете использовать ссылки ниже.",
   "ABOUT_HOMEPAGE": "Домашняя страница",
@@ -115,6 +117,7 @@
   "SETTINGS_GENERAL_SECTION": "Основные",
   "SETTINGS_LANGUAGE": "Язык",
   "SETTINGS_LANGUAGE_ADD": "Добавить новый язык",
+  "SETTINGS_LANGUAGE_IMPORT_FILE": "Импортировать файл перевода",
   "SETTINGS_LANGUAGE_TEXT": "Язык приложения",
   "SETTINGS_MAKE_SELECTION": "Выберите",
   "SETTINGS_PLAYER_ENABLE_EARPIECE": "Включить поддержку слухового динамика",
