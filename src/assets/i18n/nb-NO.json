@@ -1,1 +1,5 @@
-{}
+{
+  "ABOUT_COPYRIGHT": "Opphavsrett",
+  "ABOUT_DESCRIPTION": "%appName% er en tilhørende app for %bcrLink% (Basic Call Recorder), for å forenkle administrasjonen av opptaksdatabasen",
+  "ABOUT_DEV_MODE_DISABLED": "Utviklermodus deaktivert"
+}
