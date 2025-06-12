@@ -178,7 +178,13 @@
 
     <!-- audio player -->
     @if (selectedItem() && !isMultiselect()) {
-      <app-audio-player #audioPlayer class="player" [recording]="selectedItem()!" />
+      <app-audio-player #audioPlayer
+        class="player"
+        [recording]="selectedItem()!"
+        [previousEnabled]="items() && selectedItemIndex() > 0"
+        [nextEnabled]="items() && selectedItemIndex() < items().length - 1"
+        (onSkip)="onSkip($event)"
+      />
     }
 
   </div>

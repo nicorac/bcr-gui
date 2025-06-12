@@ -6,13 +6,15 @@ import { MessageBoxService } from 'src/app/services/message-box.service';
 import { RecordingsService } from 'src/app/services/recordings.service';
 import { SettingsService } from 'src/app/services/settings.service';
 import { AudioPlayer } from 'src/plugins/audioplayer';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, input, OnDestroy, OnInit, signal, untracked } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, input, OnDestroy, OnInit, output, signal, untracked } from '@angular/core';
 import { RangeCustomEvent } from '@ionic/angular';
 
 export enum PlayerStatusEnum {
   Paused = 0,
   Playing = 10,
 }
+
+export type SkipDirection = 'prev' | 'next';
 
 @Component({
   selector: 'app-audio-player',
@@ -40,6 +42,11 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
 
   // inputs
   public recording = input.required<Recording>();
+
+  // prev/next buttons
+  public previousEnabled = input(false);
+  public nextEnabled = input(false);
+  public onSkip = output<SkipDirection>();
 
   constructor(
     private cdr: ChangeDetectorRef,

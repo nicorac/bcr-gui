@@ -11,6 +11,16 @@
 
 <div class="controls" [class.disabled]="!ready()">
 
+  <div class="button" (click)="onSkip.emit('prev')" [class.disabled]="!previousEnabled()">
+    <div class="button-in">
+      <ion-icon
+        class="icon"
+        color="primary"
+        name="play-skip-back"
+      />
+    </div>
+  </div>
+
   <div class="button" (click)="onSeek(-1)">
     <div class="button-in">
       <ion-icon
@@ -36,6 +46,16 @@
         class="icon"
         color="primary"
         name="play-forward"
+      />
+    </div>
+  </div>
+
+  <div class="button" (click)="onSkip.emit('next')" [class.disabled]="!nextEnabled()">
+    <div class="button-in">
+      <ion-icon
+        class="icon"
+        color="primary"
+        name="play-skip-forward"
       />
     </div>
   </div>

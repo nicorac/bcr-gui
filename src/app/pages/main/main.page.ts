@@ -1,4 +1,4 @@
-import { AudioPlayerComponent } from 'src/app/components/audio-player/audio-player.component';
+import { AudioPlayerComponent, SkipDirection } from 'src/app/components/audio-player/audio-player.component';
 import { CallIconComponent } from 'src/app/components/call-icon/call-icon.component';
 import { ActionButton, HeaderComponent } from 'src/app/components/header/header.component';
 import { VirtualScrollbarComponent } from 'src/app/components/virtual-scrollbar/virtual-scrollbar.component';
@@ -70,6 +70,10 @@ export class MainPage implements AfterViewInit {
     },
   ];
   selectedItem = signal<Recording | undefined>(undefined);
+  selectedItemIndex = computed<number>(() => {
+    const item = this.selectedItem();
+    return this.items()?.findIndex(i => i === item) ?? -1;
+  });
 
   // filtered items collection
   protected items = computed<Recording[]>(() => {
@@ -544,12 +548,25 @@ Duration: ${this.toHms.transform(item.duration)}
     this.topIndex = index;
   }
 
-
   /**
    * Stop player (if it exists)
    */
   private async stopPlayer() {
     await this.player()?.pause();
+  }
+
+  /**
+   * Skip to previous/next item
+   */
+  protected onSkip(direction: SkipDirection) {
+    // find first selected item index
+    const selectedItemIndex = this.items().findIndex(i => i.selected);
+    if (selectedItemIndex >= 0) {
+      const newSelectedItem = this.items()[selectedItemIndex + (direction === 'next' ? +1 : -1)];
+      if (newSelectedItem) {
+        this.onItemClick(newSelectedItem);
+      }
+    }
   }
 
 }

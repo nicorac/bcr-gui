@@ -21,7 +21,7 @@ $buttonSize: 2.5em;
 .controls {
   display: flex;
   align-items: center;
-  gap: 1.5em;
+  gap: 1em;
 }
 
 .button,
@@ -86,6 +86,9 @@ $buttonSize: 2.5em;
     height: calc($buttonSize * .7);
   }
 
+  &.disabled {
+    opacity: 0.4;
+  }
 }
 
 .progress {

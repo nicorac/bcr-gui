@@ -1,5 +1,11 @@
 # Version history
 
+## Version 1.11.0 (2025-xx-xx)
+
+New features:
+
+- Added Previous/Next buttons to player to ease moving between recordings
+
 ## Version 1.10.1 (2024-12-24)
 
 Bug fixes:
