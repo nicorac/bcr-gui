@@ -1,6 +1,8 @@
 {
   "ABOUT_COPYRIGHT": "Bản quyền",
   "ABOUT_DESCRIPTION": "%appName% là ứng dụng đồng hành dành cho %bcrLink% (Ghi âm Cuộc gọi Cơ bản), để dễ dàng quản lý cơ sở dữ liệu ghi âm của nó",
+  "ABOUT_DEV_MODE_DISABLED": "Chế độ nhà phát triển đã bị tắt",
+  "ABOUT_DEV_MODE_ENABLED": "Chế độ nhà phát triển được bật",
   "ABOUT_DONATIONS": "Quyên góp",
   "ABOUT_DONATIONS_TEXT": "Ứng dụng này miễn phí như trong bia và tự do trong phát biểu, không phải trả tiền, không có quảng cáo. Nếu bạn đánh giá cao công việc của tôi và muốn hỗ trợ nó, vui lòng sử dụng một trong các liên kết bên dưới.",
   "ABOUT_HOMEPAGE": "Trang chủ",
@@ -115,6 +117,7 @@
   "SETTINGS_GENERAL_SECTION": "Tổng quan",
   "SETTINGS_LANGUAGE": "Ngôn ngữ",
   "SETTINGS_LANGUAGE_ADD": "thêm ngôn ngữ mới",
+  "SETTINGS_LANGUAGE_IMPORT_FILE": "Nhập tệp bản dịch",
   "SETTINGS_LANGUAGE_TEXT": "Ngôn ngữ ứng dụng",
   "SETTINGS_MAKE_SELECTION": "Tạo một lựa chọn",
   "SETTINGS_PLAYER_ENABLE_EARPIECE": "Bật tai nghe",
