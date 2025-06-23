@@ -26,6 +26,9 @@ export interface AudioPlayer extends EventManagerPlugin {
   getCurrentPosition(): Promise<{ position: number }>;
   setCurrentPosition(options: ISetCurrentPositionParams): Promise<void>;
 
+  // Playback speed
+  setPlaybackSpeed(data: { playbackSpeed: number }): Promise<void>;
+
   // events
   addListener(eventName: 'playerReady', listenerFunc: (data: IReadyData) => void): Promise<PluginListenerHandle> & PluginListenerHandle;
   addListener(eventName: 'playerUpdate', listenerFunc: (data: IUpdateData) => void): Promise<PluginListenerHandle> & PluginListenerHandle;

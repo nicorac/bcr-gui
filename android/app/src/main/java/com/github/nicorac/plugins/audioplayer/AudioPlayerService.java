@@ -21,7 +21,6 @@ import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
 import android.os.PowerManager;
 
 import androidx.annotation.Nullable;
@@ -61,6 +60,7 @@ public class AudioPlayerService extends MediaSessionService {
   private AudioManager audioManager = null;
   @AudioDeviceEnum.AudioDeviceValue
   private int currentOutputDevice = DEVICE_UNDEFINED;
+  private float playbackSpeed = 1.0f;
   private MediaSession mediaSession;
   private Handler updateHandler;
 
@@ -194,6 +194,8 @@ public class AudioPlayerService extends MediaSessionService {
                 res.put("duration", player.getDuration());
                 plugin.sendJSEvent("playerReady", res);
                 isLoaded = true;
+                // reset playback speed
+                setPlaybackSpeed();
               }
               break;
             case ExoPlayer.STATE_ENDED:
@@ -391,6 +393,36 @@ public class AudioPlayerService extends MediaSessionService {
     doUpdate();
     call.resolve();
 
+  }
+
+  /**
+   * Set playback speed (0.5 => 50%, 1.0 => 100%, 1.5 => 150%...)
+   */
+  public void setPlaybackSpeed(PluginCall call) {
+    try {
+      float playbackSpeed = Objects.requireNonNull(call.getFloat("playbackSpeed", 1.0f));
+      setPlaybackSpeed(playbackSpeed);
+    } catch (Exception ex) {
+      call.reject(ErrorCodes.ERR_BAD_ARGUMENT);
+      return;
+    }
+    call.resolve();
+  }
+
+  private void setPlaybackSpeed() {
+    setPlaybackSpeed(this.playbackSpeed);
+  }
+  private void setPlaybackSpeed(float playbackSpeed) {
+    // store value
+    this.playbackSpeed = playbackSpeed;
+    // change speed on the running player, if any
+    if (player != null && isLoaded) {
+      try {
+        player.setPlaybackSpeed(playbackSpeed);
+      }
+      catch (Exception ex) {
+      }
+    }
   }
 
   // output device

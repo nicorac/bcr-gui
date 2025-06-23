@@ -4,7 +4,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.net.Uri;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -72,6 +71,7 @@ public class AudioPlayerPlugin extends Plugin implements IJSEventSender {
   @PluginMethod() public void getDuration(PluginCall call) { mainHandler.post(() -> apsvc.getDuration(call)); }
   @PluginMethod() public void getCurrentPosition(PluginCall call) { mainHandler.post(() -> apsvc.getCurrentPosition(call)); }
   @PluginMethod() public void setCurrentPosition(PluginCall call) { mainHandler.post(() -> apsvc.setCurrentPosition(call)); }
+  @PluginMethod() public void setPlaybackSpeed(PluginCall call) { mainHandler.post(() -> apsvc.setPlaybackSpeed(call)); }
 
   // send JS events (called by service)
   public void sendJSEvent(String eventName, JSObject data) { this.notifyListeners(eventName, data); }

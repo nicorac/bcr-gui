@@ -5,6 +5,7 @@
 New features:
 
 - Added Previous/Next buttons to player to ease moving between recordings
+- Added playback speed feature (1x / 1.5x / 2x) (#198)
 
 ## Version 1.10.1 (2024-12-24)
 

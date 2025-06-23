@@ -9,55 +9,68 @@
   <div class="progress-label">{{ duration() | toHms }}</div>
 </div>
 
-<div class="controls" [class.disabled]="!ready()">
+<div class="controls">
 
-  <div class="button" (click)="onSkip.emit('prev')" [class.disabled]="!previousEnabled()">
-    <div class="button-in">
-      <ion-icon
-        class="icon"
-        color="primary"
-        name="play-skip-back"
-      />
+  <!-- left -->
+  <div></div>
+
+  <!-- central -->
+  <div class="buttons buttons-center" [class.disabled]="!ready()">
+
+    <div class="button" (click)="onSkip.emit('prev')" [class.disabled]="!previousEnabled()">
+      <div class="button-in">
+        <ion-icon
+          class="icon"
+          color="primary"
+          name="play-skip-back"
+        />
+      </div>
     </div>
+
+    <div class="button" (click)="onSeek(-1)">
+      <div class="button-in">
+        <ion-icon
+          class="icon"
+          color="primary"
+          name="play-back"
+        />
+      </div>
+    </div>
+
+    <div class="button play" (click)="togglePlayPause()">
+      <div class="button-in">
+        <ion-icon
+          class="icon"
+          [name]="status() !== PlayerStatusEnum.Playing ? 'play' : 'pause'"
+        />
+      </div>
+    </div>
+
+    <div class="button" (click)="onSeek(+1)">
+      <div class="button-in">
+        <ion-icon
+          class="icon"
+          color="primary"
+          name="play-forward"
+        />
+      </div>
+    </div>
+
+    <div class="button" (click)="onSkip.emit('next')" [class.disabled]="!nextEnabled()">
+      <div class="button-in">
+        <ion-icon
+          class="icon"
+          color="primary"
+          name="play-skip-forward"
+        />
+      </div>
+    </div>
+
   </div>
 
-  <div class="button" (click)="onSeek(-1)">
-    <div class="button-in">
-      <ion-icon
-        class="icon"
-        color="primary"
-        name="play-back"
-      />
-    </div>
-  </div>
-
-  <div class="button play" (click)="toggle()">
-    <div class="button-in">
-      <ion-icon
-        class="icon"
-        [name]="status() !== PlayerStatusEnum.Playing ? 'play' : 'pause'"
-      />
-    </div>
-  </div>
-
-  <div class="button" (click)="onSeek(+1)">
-    <div class="button-in">
-      <ion-icon
-        class="icon"
-        color="primary"
-        name="play-forward"
-      />
-    </div>
-  </div>
-
-  <div class="button" (click)="onSkip.emit('next')" [class.disabled]="!nextEnabled()">
-    <div class="button-in">
-      <ion-icon
-        class="icon"
-        color="primary"
-        name="play-skip-forward"
-      />
-    </div>
+  <!-- right -->
+  <div class="buttons buttons-right" (click)="toggleSpeed()">
+    <div class="button button-rect button-text">{{ this.playbackSpeed() }}x</div>
   </div>
 
 </div>

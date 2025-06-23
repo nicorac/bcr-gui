@@ -31,8 +31,9 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
   // player status
   protected ready = signal(false);
   protected status = signal(PlayerStatusEnum.Paused);
-  protected progress = signal(0);   // current play position (in integer seconds)
-  protected duration = signal(0);   // audio duration in seconds
+  protected progress = signal(0);       // current play position (in integer seconds)
+  protected duration = signal(0);       // audio duration in seconds
+  protected playbackSpeed = signal(1);  // audio playback speed (1 => 100%)
 
   // subscriptions
   private _androidEventsSubs = new Subscription();
@@ -181,7 +182,7 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
   /**
    * Toggle between play and pause
    */
-  protected async toggle() {
+  protected async togglePlayPause() {
     if (this.status() === PlayerStatusEnum.Paused) {
       return this.play();
     }
@@ -207,6 +208,24 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
    */
   protected async onSeek(delta: number) {
     return this.setCurrentPosition(this.progress() + delta * this.settings.seekTime);
+  }
+
+  /**
+   * Toggle player speed
+   */
+  protected async toggleSpeed() {
+    switch (this.playbackSpeed()) {
+      case 1:
+        this.playbackSpeed.set(1.5);
+        break;
+      case 1.5:
+        this.playbackSpeed.set(2);
+        break;
+      case 2:
+        this.playbackSpeed.set(1);
+        break;
+    }
+    await AudioPlayer.setPlaybackSpeed({ playbackSpeed: this.playbackSpeed() });
   }
 
   /**
