@@ -60,6 +60,12 @@ export class SettingsService {
   public seekTime: number = 10;
 
   /**
+   * Playback speed (only used by player, not shown in settings)
+   */
+  @JsonProperty()
+  public playbackSpeed = 1;  // audio playback speed (1 => 100%)
+
+  /**
    * Default country phone prefix
    */
   @JsonProperty()

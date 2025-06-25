@@ -33,7 +33,6 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
   protected status = signal(PlayerStatusEnum.Paused);
   protected progress = signal(0);       // current play position (in integer seconds)
   protected duration = signal(0);       // audio duration in seconds
-  protected playbackSpeed = signal(1);  // audio playback speed (1 => 100%)
 
   // subscriptions
   private _androidEventsSubs = new Subscription();
@@ -53,7 +52,7 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private mbs: MessageBoxService,
     private recordingsService: RecordingsService,
-    private settings: SettingsService,
+    protected settings: SettingsService,
   ) {
     effect(() => {
       untracked(async () => await this.unload());
@@ -214,18 +213,19 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
    * Toggle player speed
    */
   protected async toggleSpeed() {
-    switch (this.playbackSpeed()) {
+    switch (this.settings.playbackSpeed) {
       case 1:
-        this.playbackSpeed.set(1.5);
+        this.settings.playbackSpeed = 1.5;
         break;
       case 1.5:
-        this.playbackSpeed.set(2);
+        this.settings.playbackSpeed = 2;
         break;
       case 2:
-        this.playbackSpeed.set(1);
+        this.settings.playbackSpeed = 1;
         break;
     }
-    await AudioPlayer.setPlaybackSpeed({ playbackSpeed: this.playbackSpeed() });
+    await AudioPlayer.setPlaybackSpeed({ playbackSpeed: this.settings.playbackSpeed });
+    await this.settings.save();
   }
 
   /**
