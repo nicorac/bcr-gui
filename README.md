@@ -10,7 +10,7 @@ BCR-GUI is a call recordings manager app, started as _companion app_ for the gre
 - Huawei Call Recorder (see [here](https://github.com/nicorac/bcr-gui/issues/44))
 - [LineageOS](https://lineageos.org/) Call Recorder (see [here](https://github.com/nicorac/bcr-gui/issues/121))
 
-<img src="docs/images/screenshot-main.jpg?ver=1.10.0">
+<img src="docs/images/screenshot-main.jpg?ver=1.11.0">
 
 To manage BCR (and other call recorders) recordings, you need to use a file manager... and that's not so user-friendly 😉.
 It's hard to "extract" call informations from audio filename, and it's even harder to search them when the list grows.
@@ -24,12 +24,12 @@ If used with BCR, BCR-GUI needs **BCR v.1.49** (or newer) to work at its best; t
 ## Permissions
 
 - **BCR-GUI does not need root access** to work. \
-  It only needs **READ** access to the directory used by BCR to save recordings. At the first start, it asks you to select your recordings directory (using the well-known [Android SAF](https://developer.android.com/training/data-storage/shared/documents-files) dialogs) and allow read access to it.
+  It only needs access to the directory used by BCR to save recordings. At the first start, it asks you to select your recordings directory (using the well-known [Android SAF](https://developer.android.com/training/data-storage/shared/documents-files) dialogs) and allow access to it.
 
 - It **does not need Internet access** at all. \
   _NOTE:_ this may change in the future if an auto-update feature will be added, but actually the app can't send/receive anything to/from internet.
 
-- _(optional)_ It needs **Contacts** permission to update recordings names with contacts or create new contacts for recordings from unknown callers. Feel free to **deny** the permission: app will remember you how to enable it the next time you use a feature requiring it.
+- _(optional)_ It needs **Contacts** permission to update recordings names with contacts or create new contacts for recordings from unknown callers. Feel free to **deny** the permission: app will remind you how to enable it the next time you use a feature that requires it.
 
 ## What's working/missing?
 
@@ -66,8 +66,8 @@ Latest version is [available here](https://github.com/nicorac/bcr-gui/releases/)
 ## Libraries
 
 - Ionic 7
-- Capacitor 5 (with custom AndroidSAF plugin)
-- Angular 17
+- Capacitor 6 (with custom AndroidSAF and AudioPlayer plugins)
+- Angular 18
 - Icons from [Ionicons](https://ionic.io/ionicons/v4) and [FreeSVG (public domain icons)](https://freesvg.org/1547046949)
 
 ## License

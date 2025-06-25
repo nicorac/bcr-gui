@@ -1,6 +1,6 @@
 # Version history
 
-## Version 1.11.0 (2025-xx-xx)
+## Version 1.11.0 (2025-06-25)
 
 New features:
 
