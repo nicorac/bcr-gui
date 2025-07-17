@@ -125,7 +125,7 @@ export class Recording {
     // parse other fields from real (or "filename extracted") metadata
     this.direction = metadata.direction ?? '';
     this.simSlot = metadata.sim_slot ?? 0;
-    this.duration = Math.ceil(metadata.output?.recording?.duration_secs_total ?? 0);
+    this.duration = Math.round(metadata.output?.recording?.duration_secs_total ?? 0);
     if (metadata.timestamp_unix_ms) {
       this.date = metadata.timestamp_unix_ms;
     }
