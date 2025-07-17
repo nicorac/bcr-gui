@@ -1,5 +1,12 @@
 # Version history
 
+## Version 1.x.x (2025-xx-xx)
+
+Bug fixes:
+
+- Fixed different audio length (±1s) between recording list and audio player
+- Fixed race condition when player load completes and the audio duration is set
+
 ## Version 1.11.0 (2025-06-25)
 
 New features:
