@@ -59,7 +59,7 @@ function getRandomName() {
 (async () => {
 
   var count = await readLineAsync('How many files must be generated? ');
-  console.log(`Generating ${count} files...`);
+  console.log(`Generating ${count} files in directory ${outDir}...`);
 
   // create dir (if needed)
   if (!fs.existsSync(outDir)) {
@@ -97,8 +97,8 @@ function getRandomName() {
         },
         recording: {
           channel_count: 1,
-          duration_secs_total: 3,
-          duration_secs_encoded: 3,
+          duration_secs_total: 2.064,
+          duration_secs_encoded: 2.064,
         }
       }
     };
