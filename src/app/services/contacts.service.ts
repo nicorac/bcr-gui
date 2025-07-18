@@ -3,6 +3,7 @@ import { BcrGui } from 'src/plugins/bcrgui';
 import { Injectable } from '@angular/core';
 import { ContactPayload, Contacts } from '@capacitor-community/contacts';
 import { PermissionState } from '@capacitor/core';
+import { cleanupPhoneNumber, isPhoneNumber } from '../utils/phoneNumbers';
 import { I18nService } from './i18n.service';
 import { MessageBoxService } from './message-box.service';
 import { SettingsService } from './settings.service';
@@ -16,20 +17,6 @@ export class ContactsService {
     private settings: SettingsService,
   ) {}
 
-  /**
-   * test if the given string contains a phone number
-   */
-  isPhoneNumber(phoneNumber?: string): boolean {
-    phoneNumber = phoneNumber?.trim() ?? '';
-    return phoneNumber.length !== 0 && !/[^\d\.\-\+ ]/g.test(phoneNumber);
-  }
-
-  /**
-   * Cleanup the given phone number by keeping only "+" and digits.
-   */
-  cleanupPhoneNumber(phoneNumber: string): string {
-    return phoneNumber.replace(/[^\d\+]/g, '');
-  }
 
   /**
    * Search contacts for the one with the given phone number (returns only the first match)
@@ -37,7 +24,7 @@ export class ContactsService {
   async getContactFromPhoneNumber(phoneNumber: string): Promise<ContactPayload|undefined> {
 
     // cleanup phonenumber
-    phoneNumber = this.cleanupPhoneNumber(phoneNumber);
+    phoneNumber = cleanupPhoneNumber(phoneNumber);
 
     // get contacts numbers
     const res = await Contacts.getContacts({
@@ -51,7 +38,7 @@ export class ContactsService {
     for (const contact of res.contacts) {
 
       // get defined and cleaned contact numbers
-      const numbers = contact.phones?.filter(n => n).map(p => this.cleanupPhoneNumber(p!.number!));
+      const numbers = contact.phones?.filter(n => n).map(p => cleanupPhoneNumber(p!.number!));
       if (numbers?.length) {
 
         // search first the plain number...
@@ -78,7 +65,7 @@ export class ContactsService {
   public createOrEditContact(data: { displayName?: string, phoneNumber: string }) {
 
     return BcrGui.createOrEditContact({
-      displayName: (data.displayName && !this.isPhoneNumber(data.displayName)) ? data.displayName : undefined,
+      displayName: (data.displayName && !isPhoneNumber(data.displayName)) ? data.displayName : undefined,
       phoneNumber: data.phoneNumber
     });
 

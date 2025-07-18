@@ -102,7 +102,7 @@ export class Recording {
     res.opNumber = file.displayName;
 
     // try to extract metadata from companion JSON file
-    //props are not available, try to extract them from filename
+    // if props are not available, try to extract them from filename
     let metadata: Partial<BcrRecordingMetadata>|undefined = undefined;
     if (metadataFile) {
       metadata = await Recording.loadJSONMetadata(metadataFile);
