@@ -86,7 +86,7 @@
   "HOME_EDIT_SEARCHCONTACT_FOUND_TITLE": "Đã tìm thấy liên hệ",
   "HOME_EDIT_SEARCHCONTACT_NOT_FOUND_TEXT": "Không tìm thấy liên hệ nào với số điện thoại này.\n\nBạn có muốn tạo một cái mới?",
   "HOME_EDIT_SEARCHCONTACT_NOT_FOUND_TITLE": "Không tìm thấy liên hệ",
-  "HOME_EDIT_SEARCHCONTACT_SET_TO_ALL": "Bạn có muốn đặt '%displayName% cho tất cả các bản ghi có số này không?",
+  "HOME_EDIT_SEARCHCONTACT_SET_TO_ALL": "Bạn có muốn đặt \"%displayName%\" cho tất cả các bản ghi có số này không?",
   "HOME_EDIT_TITLE": "Chỉnh sửa bản ghi",
   "HOME_PULL_TO_REFRESH": "Kéo để làm mới",
   "HOME_REC_PHONE_NUMBER": "Số",

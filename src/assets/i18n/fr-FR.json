@@ -86,7 +86,7 @@
   "HOME_EDIT_SEARCHCONTACT_FOUND_TITLE": "Contact trouvé",
   "HOME_EDIT_SEARCHCONTACT_NOT_FOUND_TEXT": "Aucun contact n'a été trouvé avec ce numéro de téléphone.\n\nVoulez vous en créer un nouveau ?",
   "HOME_EDIT_SEARCHCONTACT_NOT_FOUND_TITLE": "Contact non trouvé",
-  "HOME_EDIT_SEARCHCONTACT_SET_TO_ALL": "Voulez-vous définir '%displayName% à tous les enregistrements avec ce numéro ?",
+  "HOME_EDIT_SEARCHCONTACT_SET_TO_ALL": "Voulez-vous définir \"%displayName%\" à tous les enregistrements avec ce numéro ?",
   "HOME_EDIT_TITLE": "Modifier l'enregistrement",
   "HOME_PULL_TO_REFRESH": "Tirer pour rafraîchir",
   "HOME_REC_PHONE_NUMBER": "Numéro",

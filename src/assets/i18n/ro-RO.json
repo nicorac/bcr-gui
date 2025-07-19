@@ -83,7 +83,7 @@
   "HOME_EDIT_SEARCHCONTACT_FOUND_TITLE": "Contact găsit",
   "HOME_EDIT_SEARCHCONTACT_NOT_FOUND_TEXT": "Nu a fost găsit niciun contact cu acest număr de telefon.\n\nDoriți să creați unul nou?",
   "HOME_EDIT_SEARCHCONTACT_NOT_FOUND_TITLE": "Contactul nu a fost găsit",
-  "HOME_EDIT_SEARCHCONTACT_SET_TO_ALL": "Doriți să setați '%displayName% la toate înregistrările cu acest număr?",
+  "HOME_EDIT_SEARCHCONTACT_SET_TO_ALL": "Doriți să setați \"%displayName%\" la toate înregistrările cu acest număr?",
   "HOME_EDIT_TITLE": "Editați înregistrarea",
   "HOME_PULL_TO_REFRESH": "Trageți pentru a reîmprospăta",
   "HOME_REC_PHONE_NUMBER": "Număr",

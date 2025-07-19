@@ -366,7 +366,7 @@ export class MainPage implements AfterViewInit {
       // show confirm
       await this.mbs.showConfirm({
         header: this.i18n.get('HOME_EDIT_SEARCHCONTACT_FOUND_TITLE'),
-        message: this.i18n.get('HOME_EDIT_SEARCHCONTACT_SET_TO_ALL', { displayName: displayName }),
+        message: this.i18n.get('HOME_EDIT_SEARCHCONTACT_SET_TO_ALL', { displayName: `<strong>${displayName}</strong>` }),
         onConfirm: async () => {
           await this.recordingsService.setNameByNumber(rec.opNumber, displayName);
         }

@@ -86,7 +86,7 @@
   "HOME_EDIT_SEARCHCONTACT_FOUND_TITLE": "Kontakt nalezen",
   "HOME_EDIT_SEARCHCONTACT_NOT_FOUND_TEXT": "Žádný kontakt s tímto telefonním číslem nebyl nalezen.\n\nPřejete si vytvořit nový kontakt?",
   "HOME_EDIT_SEARCHCONTACT_NOT_FOUND_TITLE": "Kontakt nenalezen",
-  "HOME_EDIT_SEARCHCONTACT_SET_TO_ALL": "Přejete si nastavit název '%displayName% ke všem nahrávkám s tímto číslem?",
+  "HOME_EDIT_SEARCHCONTACT_SET_TO_ALL": "Přejete si nastavit název \"%displayName%\" ke všem nahrávkám s tímto číslem?",
   "HOME_EDIT_TITLE": "Upravit nahrávku",
   "HOME_PULL_TO_REFRESH": "Obnovit tažením",
   "HOME_REC_PHONE_NUMBER": "Číslo",
