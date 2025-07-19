@@ -3,6 +3,7 @@ import { BcrGui } from 'src/plugins/bcrgui';
 import { Injectable } from '@angular/core';
 import { ContactPayload, Contacts } from '@capacitor-community/contacts';
 import { PermissionState } from '@capacitor/core';
+import { NumberDisplayNameMap } from '../models/NumberDisplayNameMap';
 import { cleanupPhoneNumber, isPhoneNumber } from '../utils/phoneNumbers';
 import { I18nService } from './i18n.service';
 import { MessageBoxService } from './message-box.service';
@@ -17,8 +18,8 @@ export class ContactsService {
     private settings: SettingsService,
   ) {}
 
-
   /**
+   * @deprecated
    * Search contacts for the one with the given phone number (returns only the first match)
    */
   async getContactFromPhoneNumber(phoneNumber: string): Promise<ContactPayload|undefined> {
@@ -60,22 +61,39 @@ export class ContactsService {
   }
 
   /**
+   * Returns a map between contact phone numbers and associated display name.
+   *
+   * <phone_number> => <display_name>
+   *
+   * If a contact has more than one number, multiple entries will be added.
+   * If the same number is shared between more than one contact, then the last display name found is returned.
+   *
+   * NOTE: phone numbers are cleaned with cleanupPhoneNumber() function
+   */
+  async getPhoneNumbersMap(): Promise<NumberDisplayNameMap> {
+
+    // read Android contacts
+    const contacts = (await Contacts.getContacts({
+      projection: {
+        name: true,
+        phones: true,
+      }
+    }))?.contacts ?? [];
+
+    return new NumberDisplayNameMap(contacts, this.settings);
+
+  }
+
+  /**
    * Show default Android create/edit contact dialog
    */
   public createOrEditContact(data: { displayName?: string, phoneNumber: string }) {
 
     return BcrGui.createOrEditContact({
       displayName: (data.displayName && !isPhoneNumber(data.displayName)) ? data.displayName : undefined,
-      phoneNumber: data.phoneNumber
+      phoneNumber: data.phoneNumber,
     });
 
-  }
-
-  /**
-   * Extract the display name from the given contact
-   */
-  getContactDisplayName(contact: ContactPayload, defaultValue = '<none>'): string {
-    return contact?.name?.display ?? defaultValue;
   }
 
   /**

@@ -357,12 +357,12 @@ export class MainPage implements AfterViewInit {
     // check Contacts permission
     if (await this.contactsService.checkPermission() !== 'granted') return;
 
-    // find contact
-    const contact = await this.contactsService.getContactFromPhoneNumber(rec.opNumber);
+    // find contact with that phone number
+    const pnm = await this.contactsService.getPhoneNumbersMap();
+    const displayName = pnm.getDisplayName(rec.opNumber);
 
     // contact found?
-    if (contact) {
-      const displayName = this.contactsService.getContactDisplayName(contact);
+    if (displayName) {
       // show confirm
       await this.mbs.showConfirm({
         header: this.i18n.get('HOME_EDIT_SEARCHCONTACT_FOUND_TITLE'),
