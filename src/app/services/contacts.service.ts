@@ -9,7 +9,9 @@ import { I18nService } from './i18n.service';
 import { MessageBoxService } from './message-box.service';
 import { SettingsService } from './settings.service';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class ContactsService {
 
   constructor(

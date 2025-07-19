@@ -2,10 +2,14 @@
 
 ## Version 1.x.x (2025-xx-xx)
 
+New features:
+
+- Contact display name (if found) is now automatically associated to each recording during file refresh (#202)
+
 Bug fixes:
 
-- Fixed different audio length (±1s) between recording list and audio player
-- Fixed race condition when player load completes and the audio duration is set
+- Fixed different audio length (±1s) between recording list and audio player (#203)
+- Fixed race condition between "player load complete" and "set recording duration" tasks (#203)
 
 ## Version 1.11.0 (2025-06-25)
 

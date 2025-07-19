@@ -7,6 +7,8 @@ import { Recording } from '../models/recording';
 import { MainPage } from '../pages/main/main.page';
 import { replaceExtension } from '../utils/filesystem';
 import { deserializeObject, serializeObject } from '../utils/json-serializer';
+import { isPhoneNumber } from '../utils/phoneNumbers';
+import { ContactsService } from './contacts.service';
 import { I18nService } from './i18n.service';
 import { MessageBoxService } from './message-box.service';
 import { SettingsService } from './settings.service';
@@ -36,6 +38,7 @@ export class RecordingsService {
 
   constructor(
     private i18n: I18nService,
+    private contactsService: ContactsService,
     private mbs: MessageBoxService,
     private platform: Platform,
     protected settings: SettingsService,
@@ -88,10 +91,14 @@ export class RecordingsService {
     this.refreshProgress.set(0.001);
     console.log("Reading files in folder:");
 
+    // get a phone numbers map
+    // find contact with that phone number
+    const pnm = await this.contactsService.getPhoneNumbersMap();
+
     // filename RegExp parser instance
     const filenameRegExp = Recording.getFilenameRegExp(this.settings.filenamePattern);
 
-    // save current DB in object structure keyed by display name (to speedup search)
+    // save current DB in an object structure keyed by filename/audioDisplayName (to speedup search)
     let currentDbObj = Object.fromEntries(this.recordings().map(i => [ i.audioDisplayName, i ]));
 
     try {
@@ -112,13 +119,14 @@ export class RecordingsService {
         }
       );
 
-      // parse each audio file and its corresponding (optional) metadata file
-      const count = Object.keys(audioFilesObj).length;
+      // parse each audio file and its (optional) corresponding metadata file
+      const files = Object.values(audioFilesObj);
+      const count = files.length;
 
-      // no files?
+      // any file?
       if (count > 0) {
         let i = 0;
-        for (const file of Object.values(audioFilesObj)) {
+        for (const file of files) {
 
           // send progress update
           this.refreshProgress.set(++i / count);
@@ -128,7 +136,7 @@ export class RecordingsService {
           const metadataFile = metadataFilesObj[metadataFileName];
 
           // check if current audio file already exists in current DB (compare display names)
-          const dbRecord = currentDbObj[file.displayName];
+          let dbRecord = currentDbObj[file.displayName];
           if (dbRecord) {
             // file already exists, update Uris (selected dir could have changed...)
             dbRecord.audioUri = file.uri;
@@ -141,7 +149,16 @@ export class RecordingsService {
           }
           else {
             // add new element to DB
-            currentDbObj[file.displayName] = await Recording.createInstance(file, metadataFile, filenameRegExp);
+            dbRecord = await Recording.createInstance(file, metadataFile, filenameRegExp);
+            currentDbObj[file.displayName] = dbRecord;
+          }
+
+          // update record opName, if needed
+          if (isPhoneNumber(dbRecord.opName)) {
+            const displayName = pnm.getDisplayName(dbRecord.opNumber);
+            if (displayName) {
+              dbRecord.opName = displayName;
+            }
           }
 
         }
