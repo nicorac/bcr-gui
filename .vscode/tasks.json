@@ -16,6 +16,19 @@
         "echo": true,
         "panel": "shared",
       },
+      "dependsOn": "Android fix permissions",
+    },
+    {
+      "label": "Android fix permissions",
+      "type": "shell",
+      "command": "adb",
+      "args": [ "shell", "su", "-c", "'chmod +r /proc/net/unix'" ],
+      "presentation": {
+        "focus": true,
+        "close": true,
+        "reveal": "never",
+        "revealProblems": "onProblem"
+      }
     },
     {
       "label": "Ionic serve (localhost)",

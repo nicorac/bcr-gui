@@ -6,6 +6,7 @@
   "homepage": "https://github.com/nicorac/bcr-gui",
   "scripts": {
     "ng": "ng",
+    "prestart": "adb shell \"su -c 'chmod +r /proc/net/unix'\"",
     "start": "ionic serve",
     "build": "ng build",
     "fix-android-permissions": "adb shell su -c chmod a+rw /proc/net/unix",
