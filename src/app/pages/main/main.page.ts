@@ -78,11 +78,18 @@ export class MainPage implements AfterViewInit {
   // filtered items collection
   protected items = computed<Recording[]>(() => {
     // filter
-    const res = filterList(this.recordingsService.recordings(), this.searchValue(), r => `${r.opName} ${r.opNumber}`);
+    let filteredItems = filterList(this.recordingsService.recordings(), this.searchValue(), r => `${r.opName} ${r.opNumber}`);
     // close any open player to let the list update without leaving "orphaned" player IDs
-    untracked(() => this.clearSelection());
+    let selItem: Recording|undefined;
+    untracked(() => selItem = this.selectedItem());
     // sort
-    return sortRecordings(res, this.settings.recordingsSortMode);
+    filteredItems = sortRecordings(filteredItems, this.settings.recordingsSortMode);
+    // reset selection if item is now missing
+    if (selItem && !filteredItems.includes(selItem)) {
+      this.clearSelection();
+    }
+    // return sorted
+    return filteredItems;
   });
 
   protected topIndex = 0; // index of top shown recording
@@ -222,24 +229,6 @@ export class MainPage implements AfterViewInit {
     // this.updateFilter();
   }
 
-  // /**
-  //  * Sort & filter recordings
-  //  */
-  // updateFilter() {
-
-  //   let res = this.itemsAll;
-
-  //   // filter
-  //   if (this.searchValue) {
-  //     res = filterList(res, this.searchValue(), r => `${r.opName} ${r.opNumber}`);
-  //     // close any open player to let the list update without leaving "orphaned" player IDs
-  //     this.clearSelection();
-  //   }
-
-  //   // sort
-  //   this.items = sortRecordings(res, this.settings.recordingsSortMode);
-  // }
-
   /**
    * Change selected status
    */
@@ -249,7 +238,6 @@ export class MainPage implements AfterViewInit {
       this.selectedItem.set(undefined);
       // if (this.isMultiselect()) {
         item.selected = false;
-      // disable multiselection if no element is still selected
       // disable multiselection if no element is still selected
       if (this.isMultiselect() && !this.getSelectedItems().length) {
         this.isMultiselect.set(false);

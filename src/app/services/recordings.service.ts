@@ -1,9 +1,10 @@
+import { environment } from 'src/environments/environment';
 import { AndroidSAF, AndroidSAFUtils, ErrorCode, GetFileUriOptions, ReadFileOptions } from 'src/plugins/androidsaf';
-import { Injectable, signal } from '@angular/core';
+import { effect, Injectable, signal } from '@angular/core';
 import { Encoding } from '@capacitor/filesystem';
 import { Platform } from '@ionic/angular';
 import { DB_FILENAME, DB_SCHEMA_VERSION, DbContent } from '../models/dbContent';
-import { Recording } from '../models/recording';
+import { Recording, UNKNOWN_NAME_OR_NUMBER } from '../models/recording';
 import { MainPage } from '../pages/main/main.page';
 import { replaceExtension } from '../utils/filesystem';
 import { deserializeObject, serializeObject } from '../utils/json-serializer';
@@ -153,7 +154,10 @@ export class RecordingsService {
           }
 
           // update record opName, if needed
-          if (!dbRecord.opName || isPhoneNumber(dbRecord.opName)) {
+          if (!dbRecord.opName
+              || (dbRecord.opName === UNKNOWN_NAME_OR_NUMBER && dbRecord.opNumber !== UNKNOWN_NAME_OR_NUMBER)
+              || isPhoneNumber(dbRecord.opName)
+          ) {
             const displayName = pnm.getDisplayName(dbRecord.opNumber);
             if (displayName) {
               dbRecord.opName = displayName;
@@ -166,7 +170,7 @@ export class RecordingsService {
       // update collection & cache
       this.lastUpdate = new Date().getTime();
       this.recordings.set(Object.values(currentDbObj));
-      await this.save();
+      await this.save(false);
 
     }
     catch(error: any) {
@@ -236,7 +240,7 @@ export class RecordingsService {
 
     // send update event & save DB
     this.recordings.set(tmpDb);
-    await this.save();
+    await this.save(false);
 
   }
 
@@ -335,10 +339,19 @@ export class RecordingsService {
 
   /**
    * Save the recordings database to storage
+   *
+   * @param doSignalUpdate
+   *   By default an update to recordings() signal is done.
+   *   Set to false if the caller has already done it by itself.
    */
-  public async save() {
+  public async save(doSignalUpdate = true) {
 
     try {
+      // force a recordings() signal update by rebuilding the array
+      if (doSignalUpdate) {
+        this.recordings.update(r => [...r]);
+      }
+
       // serialize data
       const dbContent = new DbContent(this.recordings(), this.lastUpdate);
       const jsonObj = serializeObject(dbContent);
@@ -384,10 +397,7 @@ export class RecordingsService {
       .filter(i => i.opNumber === phoneNumber)
       .forEach(i => i.opName = name);
 
-    // notify update
-    this.recordings.set(this.recordings());
-
-    // save DB
+    // save DB (with update notification)
     await this.save();
 
   }

@@ -3,6 +3,8 @@ import { replaceExtension, stripExtension } from '../utils/filesystem';
 import { JsonProperty } from '../utils/json-serializer';
 import { BcrRecordingMetadata, CallDirection } from './BcrRecordingMetadata';
 
+export const UNKNOWN_NAME_OR_NUMBER = '<unknown>';
+
 export const FILENAME_PATTERN_SUPPORTED_VARS = [
   'date',
   'date:year',
@@ -133,7 +135,7 @@ export class Recording {
     // extract "other party" data
     const calls0 = metadata.calls?.[0];
     if (calls0) {
-      this.opNumber = calls0.phone_number_formatted ?? calls0.phone_number ?? '<unknown>';
+      this.opNumber = calls0.phone_number_formatted ?? calls0.phone_number ?? UNKNOWN_NAME_OR_NUMBER;
       this.opName = calls0.contact_name ?? this.opNumber;
     }
 
