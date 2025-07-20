@@ -145,7 +145,6 @@ export class RecordingsService {
             if (!dbRecord.metadataUri && options?.forceFilenameParse) {
               dbRecord.reparseFilename(file.displayName, filenameRegExp);
             }
-            continue;
           }
           else {
             // add new element to DB
@@ -154,7 +153,7 @@ export class RecordingsService {
           }
 
           // update record opName, if needed
-          if (isPhoneNumber(dbRecord.opName)) {
+          if (!dbRecord.opName || isPhoneNumber(dbRecord.opName)) {
             const displayName = pnm.getDisplayName(dbRecord.opNumber);
             if (displayName) {
               dbRecord.opName = displayName;
