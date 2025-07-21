@@ -73,7 +73,7 @@ export class SettingsPage {
       component: FilenamePatternEditorComponent,
       backdropDismiss: false,
       componentProps: <FilenamePatternEditorComponent> {
-        pattern: this.settings.filenamePattern,
+        initialPattern: this.settings.filenamePattern,
         onConfirm: async (pattern: string) => {
           this.settings.filenamePattern = pattern;
           await this.save();

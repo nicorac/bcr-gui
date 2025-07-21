@@ -20,8 +20,8 @@
       [(ngModel)]="pattern"
       (ngModelChange)="validatePattern()"
     />
-    @if (patternError) {
-      <div class="error">{{ patternError }}</div>
+    @if (patternError()) {
+      <div class="error">{{ patternError() }}</div>
     }
     <div class="right-container">
 
@@ -106,17 +106,17 @@
       <ion-button fill="clear" (click)="selectTestFile()">
         {{ 'FNP_EDITOR_TEST_SELECT' | translatePipe }}
       </ion-button>
-      <ion-button fill="clear" (click)="testPattern()" [disabled]="!testFilename">
+      <ion-button fill="clear" (click)="testPattern()" [disabled]="!testFilename()">
         {{ 'FNP_EDITOR_TEST_RUN' | translatePipe }}
       </ion-button>
     </div>
   </div>
 
   <!-- test result -->
-  @if (testResult) {
+  @if (testResult()) {
     <div class="section">
       <ion-label>{{ 'FNP_EDITOR_TEST_RESULT' | translatePipe }}</ion-label>
-      <pre class="result">{{ testResult }}</pre>
+      <pre class="result">{{ testResult() }}</pre>
     </div>
   }
 
