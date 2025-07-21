@@ -11,10 +11,11 @@ class versionClass {
   get version(): string { return this._version };
 
   // static values
-  readonly copyright = "Claudio Nicora (nicorac) 2024";
+  readonly copyright = "Claudio Nicora (@nicorac) 2025";
   readonly websiteUri = "https://coolsoft.altervista.org";
   readonly sourcesUri = "https://github.com/nicorac/bcr-gui";
   readonly addLanguageUri = "https://github.com/nicorac/bcr-gui/issues/99";
+  readonly bcrAppName = "BCR";
   readonly bcrUri = "https://github.com/chenxiaolong/BCR";
 
   // read version

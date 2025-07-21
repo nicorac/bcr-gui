@@ -2,7 +2,9 @@
 
 ## What is BCR-GUI
 
-BCR-GUI is a call recordings manager app, started as _companion app_ for the great [BCR](https://github.com/chenxiaolong/BCR) (Basic Call Recorder) Android application and grown up to support many other call recorders:
+BCR-GUI makes it easy to manage, organize, and play back your call recordings collection, all in one place.
+
+It started as _companion app_ for the great [BCR](https://github.com/chenxiaolong/BCR) (Basic Call Recorder) Android application and grown up to support many other call recorders:
 
 - [BCR - Basic Call Recorder](https://github.com/chenxiaolong/BCR)
 - [GrapheneOS](https://grapheneos.org/) Call Recorder (see [here](https://github.com/nicorac/bcr-gui/issues/30))

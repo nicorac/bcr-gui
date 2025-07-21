@@ -1,10 +1,11 @@
 # Version history
 
-## Version 1.x.x (2025-xx-xx)
+## Version 1.12.0 (2025-xx-xx)
 
 New features:
 
 - Contact display name (if found) is now automatically associated to each recording during file refresh (#202)
+- Fixed refreshing issues all over the app pages (#204)
 
 Bug fixes:
 

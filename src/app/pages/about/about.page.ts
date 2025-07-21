@@ -30,7 +30,7 @@ export class AboutPage {
 
   protected readonly descData = {
     appName: version.appName,
-    bcrLink: version.bcrUri,
+    bcrLink: `<a href="${version.bcrUri}">${version.bcrAppName}</a>`,
   };
 
   constructor(
