@@ -1,6 +1,6 @@
 {
   "ABOUT_COPYRIGHT": "Авторське право",
-  "ABOUT_DESCRIPTION": "%appName% - це додаток для %bcrLink% (Basic Call Recorder), який полегшує керування базою даних записів розмови",
+  "ABOUT_DESCRIPTION": "%appName% спрощує керування, упорядкування та відтворення колекції записів дзвінків в одному місці. Окрім %bcrLink% (Basic Call Recorder), він також підтримує кілька інших програм для запису дзвінків.",
   "ABOUT_DEV_MODE_DISABLED": "Режим розробника вимкнено",
   "ABOUT_DEV_MODE_ENABLED": "Режим розробника ввімкнено",
   "ABOUT_DONATIONS": "Донати",
@@ -86,7 +86,7 @@
   "HOME_EDIT_SEARCHCONTACT_FOUND_TITLE": "Контакт знайдено",
   "HOME_EDIT_SEARCHCONTACT_NOT_FOUND_TEXT": "За цим номером телефону не знайдено жодного контакту.\n\nБажаєте створити новий?",
   "HOME_EDIT_SEARCHCONTACT_NOT_FOUND_TITLE": "Контакт не знайдено",
-  "HOME_EDIT_SEARCHCONTACT_SET_TO_ALL": "Чи бажаєте ви встановити «%displayName%» для всіх записів із цим номером?",
+  "HOME_EDIT_SEARCHCONTACT_SET_TO_ALL": "Ви хочете встановити \"%displayName%\" для всіх записів із цим номером?",
   "HOME_EDIT_TITLE": "Редагувати запис",
   "HOME_PULL_TO_REFRESH": "Потягніть, щоб оновити",
   "HOME_REC_PHONE_NUMBER": "Номер",
@@ -135,7 +135,7 @@
   "SETTINGS_RECORDINGS_SORT_DURATION_DESC": "Тривалість (по спадаючій)",
   "SETTINGS_RESCAN_TEXT": "Бажаєте повторно відсканувати всі файли (без файлу метаданих JSON) за допомогою нового шаблону імені файлу?",
   "SETTINGS_RESCAN_TITLE": "Сканувати повторно",
-  "SETTINGS_SELECT_DIRECTORY_MESSAGE": "Цій програмі потрібен доступ до каталогу записів.\n\nЯкщо ви натиснете OK, Android покаже вам селектор каталогу.\n\nВиберіть каталог записів і дозвольте доступ до його вмісту...",
+  "SETTINGS_SELECT_DIRECTORY_MESSAGE": "Цьому додатку потрібен доступ до каталогу записів.\n\nЯкщо ви натиснете «ОК», Android покаже вам селектор каталогів.\n\nВиберіть каталог записів і дозвольте доступ до його вмісту…",
   "SETTINGS_SELECT_DIRECTORY_TITLE": "Доступ до каталогу записів",
   "SETTINGS_SYSTEM_DEFAULT": "Як усталено"
 }
