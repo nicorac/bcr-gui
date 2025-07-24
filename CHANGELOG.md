@@ -1,16 +1,16 @@
 # Version history
 
-## Version 1.12.0 (2025-xx-xx)
+## Version 1.12.0 (2025-07-24)
 
 New features:
 
-- Contact display name (if found) is now automatically associated to each recording during file refresh (#202)
+- Contact display name (if found) is now automatically associated to new/existing recordings during file refresh (#202)
 - Fixed refreshing issues all over the app pages (#204)
 
 Bug fixes:
 
 - Fixed different audio length (±1s) between recording list and audio player (#203)
-- Fixed race condition between "player load complete" and "set recording duration" tasks (#203)
+- Fixed race condition between "player load complete" and "set recording duration" tasks causing the wrong recording length to be set (#203)
 
 ## Version 1.11.0 (2025-06-25)
 
