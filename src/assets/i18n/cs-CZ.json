@@ -1,6 +1,6 @@
 {
   "ABOUT_COPYRIGHT": "Autorská práva",
-  "ABOUT_DESCRIPTION": "%appName% je doprovodná aplikace k %bcrLink% (Basic Call Recorder) sloužící ke zjednodušení správy databáze nahrávek",
+  "ABOUT_DESCRIPTION": "%appName% zjednodušuje správu, organizaci a přehrávání souboru nahrávek, to vše na jednom místě. Mimo %bcrLink% (Basic Call Recorder) aplikace podporuje několik dalších nahrávačů.",
   "ABOUT_DEV_MODE_DISABLED": "Vývojářský režim zakázán",
   "ABOUT_DEV_MODE_ENABLED": "Vývojářský režim povolen",
   "ABOUT_DONATIONS": "Dary",
@@ -135,7 +135,7 @@
   "SETTINGS_RECORDINGS_SORT_DURATION_DESC": "Délka (sestupně)",
   "SETTINGS_RESCAN_TEXT": "Přejete si přeskenovat všechny soubory (vyjma JSON metadata souboru) s použitím nové šablony názvu souboru?",
   "SETTINGS_RESCAN_TITLE": "Přeskenovat",
-  "SETTINGS_SELECT_DIRECTORY_MESSAGE": "Tato aplikace potřebuje přístup ke složce s nahrávkami.\n\nPo klepnutí na OK zobrazí Android seznam složek.\n\nVyberte složku s nahrávkami a umožněte aplikaci přístup k jejímu obsahu...",
+  "SETTINGS_SELECT_DIRECTORY_MESSAGE": "Tato aplikace potřebuje přístup ke složce s nahrávkami.\n\nPo klepnutí na OK zobrazí Android seznam složek.\n\nVyberte složku s nahrávkami a umožněte aplikaci přístup k jejímu obsahu…",
   "SETTINGS_SELECT_DIRECTORY_TITLE": "Přístup ke složce s nahrávkami",
   "SETTINGS_SYSTEM_DEFAULT": "Dle systému"
 }
