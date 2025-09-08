@@ -146,7 +146,9 @@ export class SettingsService {
    */
   public readonly supportedTypes: string[] = [
     'audio/flac',
-    'audio/mpeg',
+    'audio/mp4',    // .m4a (preferred)
+    'audio/m4a',    // .m4a (deprecated but still used on some ROMs)
+    'audio/mpeg',   // .m4a (deprecated but still used on some ROMs)
     'audio/ogg',
     'audio/x-wav',
     'audio/amr',
