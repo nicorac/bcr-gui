@@ -1,5 +1,15 @@
 # Version history
 
+## Version 1.12.1 (2025-09-08)
+
+New features:
+
+- Updated Chinese and Czech translations
+
+Bug fixes:
+
+- Fixed handling of `.m4a` audio files (#207)
+
 ## Version 1.12.0 (2025-07-24)
 
 New features:
