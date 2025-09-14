@@ -66,6 +66,16 @@ export interface AndroidSAFPlugin {
    */
   deleteFile(options: DeleteFileOptions): Promise<void>;
 
+  /**
+   * Open Android share dialog to share a file
+   *
+   * @param options
+   */
+  shareFile(options?: {
+    uri: string,    // URI of file to be shared
+    text?: string   // (optional) template text to be added to message/email/container holding the file
+  }): Promise<void>;
+
 }
 
 export class AndroidSAFUtils {

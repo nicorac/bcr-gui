@@ -22,8 +22,5 @@
         </activity>
         <service android:name="com.github.nicorac.plugins.audioplayer.AudioPlayerService">
         </service>
-        <provider android:authorities="${applicationId}.fileprovider" android:exported="false" android:grantUriPermissions="true" android:name="androidx.core.content.FileProvider">
-            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_paths" />
-        </provider>
     </application>
 </manifest>

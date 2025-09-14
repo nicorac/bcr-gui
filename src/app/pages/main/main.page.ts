@@ -25,8 +25,6 @@ import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, c
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Clipboard } from '@capacitor/clipboard';
-import { Directory, Filesystem } from '@capacitor/filesystem';
-import { Share } from '@capacitor/share';
 import { ActionSheetController, IonSearchbar, RefresherCustomEvent } from '@ionic/angular';
 import version from '../../version';
 
@@ -414,91 +412,22 @@ export class MainPage implements AfterViewInit {
    */
   async shareRecording(item: Recording, event: MouseEvent) {
 
-    // disable button (operation could take some time if file is bigger)
-    const iconButtonElem = (event.target as HTMLElement);
-    iconButtonElem.classList.add('icon-button-waiting');
-
     // stop player
     await this.stopPlayer();
 
-    // we need to create a temp copy of audio file in a "share accessible" location"
-    // create parent dir
-    const tempDir = 'shareDir';
-    try {
-      await Filesystem.mkdir({
-        directory: Directory.Cache,
-        path: tempDir,
-      });
-    }
-    catch (error: any) {
-      if (error.message == 'Directory exists') {
-        // no error...
-      }
-      else {
-        this.mbs.showError({
-          appErrorCode: 'ERR_OS001',
-          appErrorArgs: { dirname: tempDir },
-          error: error,
-        });
-      }
-    }
-
-    // temp local file
-    const tempFile = {
-      directory: Directory.Cache,
-      path: `${tempDir}/${item.audioDisplayName}`,
-    };
-
-    // read audio file content
-    let base64Content: string = '';
-    try {
-      ({ content: base64Content } = await AndroidSAF.readFile({ fileUri: item.audioUri }));
-    } catch (error) {
-      this.mbs.showError({
-        appErrorCode: 'ERR_OS002',
-        appErrorArgs: { filename: item.audioUri },
-        error: error,
-      });
-      return;
-    }
-
-    // write local temp file
-    await Filesystem.writeFile({
-      ...tempFile,
-      data: base64Content,
-    });
-
-    // get full tempfile path
-    const { uri:tempFileUri } = await Filesystem.getUri(tempFile);
-
     // open default Android share dialog
     try {
-      await Share.share({
-        dialogTitle: 'Share call recording...',
-        title: 'Call recording',
+      await AndroidSAF.shareFile({
+        uri: item.audioUri,
         text: this.getShareText(item),
-        url: tempFileUri,
       });
       console.log("Completed");
     }
     catch (error: any) {
-      if (error?.message === 'Share canceled') {
-        console.warn('File share canceled');
-        // not a real error...
-      }
-      else {
-        this.mbs.showError({
-          appErrorCode: 'ERR_OS003',
-          error: error,
-        });
-      }
-    }
-    finally {
-      // delete temp file
-      await Filesystem.deleteFile(tempFile);
-      console.log('Deleted temp file:', tempFile.path);
-      // re-enable button
-      iconButtonElem.classList.remove('icon-button-waiting');
+      this.mbs.showError({
+        appErrorCode: 'ERR_OS003',
+        error: error,
+      });
     }
 
   }

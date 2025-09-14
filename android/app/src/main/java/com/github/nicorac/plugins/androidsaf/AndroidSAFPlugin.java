@@ -3,7 +3,6 @@ package com.github.nicorac.plugins.androidsaf;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.provider.ContactsContract;
 import android.provider.DocumentsContract;
 import android.util.Base64;
 import android.util.JsonWriter;
@@ -573,6 +572,48 @@ public class AndroidSAFPlugin extends Plugin {
       return null;
     }
     return df;
+  }
+
+  /**
+   * Share a file from the selected directory.
+   */
+  @PluginMethod()
+  public void shareFile(PluginCall call) {
+
+    // get file uri & displayName
+    var u = call.getString("uri", null);
+    if (u == null || u.isEmpty()) {
+      call.reject("Invalid URI", ERR_INVALID_URI);
+      return;
+    }
+    var safUri = Uri.parse(u);
+
+    // text to be added to message/mail holding the shared file
+    var text = call.getString("text", "");
+
+    var context = getBridge().getActivity();
+    var contentResolver = context.getContentResolver();
+
+    // create share intent
+    Intent shareIntent = new Intent(Intent.ACTION_SEND);
+    shareIntent.putExtra(Intent.EXTRA_STREAM, safUri);
+    shareIntent.putExtra(Intent.EXTRA_TEXT, text);
+    shareIntent.putExtra(Intent.EXTRA_TEMPLATE, text);
+
+    // set MIME type
+    var mimeType = contentResolver.getType(safUri);
+    shareIntent.setType(mimeType);
+
+    // allow temporary read access to shared file
+    shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+    shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+    // open app selector
+    context.startActivity(Intent.createChooser(shareIntent, "Share file"));
+
+    // no need to wait for the activity to finish, resolve the call
+    call.resolve();
+
   }
 
 }
