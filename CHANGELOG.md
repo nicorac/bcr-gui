@@ -1,5 +1,11 @@
 # Version history
 
+## Version 1.13.0 (2025-09-24)
+
+New features:
+
+- Improved recording share, now more compatible with apps requiring "delayed" access to shared recording file like GMail/Thunderbird (#209)
+
 ## Version 1.12.1 (2025-09-08)
 
 New features:
