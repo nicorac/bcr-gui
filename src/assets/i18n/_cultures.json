@@ -1,5 +1,7 @@
 [
   { "id": "en-US", "name": "English (US)" },
+  { "id": "az-AZ", "name": "Azərbaycanca" },
+  { "id": "az-IR", "name": "ترکجه" },
   { "id": "cs-CZ", "name": "Čeština" },
   { "id": "de-DE", "name": "Deutsch" },
   { "id": "es-ES", "name": "Español" },
@@ -9,6 +11,7 @@
   { "id": "it-IT", "name": "Italiano" },
   { "id": "ro-RO", "name": "Română" },
   { "id": "ru-RU", "name": "Русский" },
+  { "id": "tr-TR", "name": "Türkçe" },
   { "id": "uk-UA", "name": "Українська мова"},
   { "id": "vi-VN", "name": "Tiếng Việt" },
   { "id": "zh-Hans", "name": "中文（简体）" }
