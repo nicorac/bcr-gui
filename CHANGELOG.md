@@ -1,5 +1,11 @@
 # Version history
 
+## Version 1.13.1 (2025-10-10)
+
+New features:
+
+- Added Turkish, Azerbaijani and South Azerbaijani translations (thanks to @muctebanesiri)
+
 ## Version 1.13.0 (2025-09-24)
 
 New features:
