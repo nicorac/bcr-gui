@@ -1,5 +1,11 @@
 # Version history
 
+## Version 1.13.2 (2025-10-26)
+
+Bug fixes:
+
+- Playback speed was not initialized at player creation (#213)
+
 ## Version 1.13.1 (2025-10-10)
 
 New features:
