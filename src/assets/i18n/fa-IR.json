@@ -1,6 +1,6 @@
 {
   "ABOUT_COPYRIGHT": "بهره رونوشت",
-  "ABOUT_DESCRIPTION": "%appName% به شما کمک می‌کند تا مدیریت، سازماندهی و پخش مکالمات ضبط شده را به آسانی انجام دهید، همه در یک مکان. علاوه بر %bcrLink% (ضبط تماس پایه ای) بسیاری از برنامه‌های ضبط تماس دیگر هم پشتیبانی میکند.",
+  "ABOUT_DESCRIPTION": "%appName% به شما کمک می‌کند تا مدیریت، سازماندهی و بازپخش مکالمات ضبط شده را به آسانی انجام دهید، همه در یک مکان. این برنامه علاوه بر %bcrLink% (ضبط تماس پایه ای) از بسیاری از برنامه‌های ضبط تماس دیگر هم پشتیبانی می‌کند.",
   "ABOUT_DEV_MODE_DISABLED": "حالت توسعه‌دهنده غیرفعال شد",
   "ABOUT_DEV_MODE_ENABLED": "حالت توسعه‌دهنده فعال شد",
   "ABOUT_DONATIONS": "پشتیبانی ها",
@@ -86,7 +86,7 @@
   "HOME_EDIT_SEARCHCONTACT_FOUND_TITLE": "مخاطب پیدا شد",
   "HOME_EDIT_SEARCHCONTACT_NOT_FOUND_TEXT": "هیچ مخاطبی با این شماره پیدا نشد.\n\nآیا میخواهید مخاطب نو بسازید؟",
   "HOME_EDIT_SEARCHCONTACT_NOT_FOUND_TITLE": "مخاطب پیدا نشد",
-  "HOME_EDIT_SEARCHCONTACT_SET_TO_ALL": "آیا میخواهید برای همه‌ی ضبط ها با این شماره %displayName% بگذارید؟",
+  "HOME_EDIT_SEARCHCONTACT_SET_TO_ALL": "آیا میخواهید «%displayName%» را به همه‌ی ضبط شده ها با این شماره اختصاص دهید؟",
   "HOME_EDIT_TITLE": "ویرایش گزینه ضبط شده",
   "HOME_PULL_TO_REFRESH": "کشیدن برای تازه‌سازی",
   "HOME_REC_PHONE_NUMBER": "شماره",
