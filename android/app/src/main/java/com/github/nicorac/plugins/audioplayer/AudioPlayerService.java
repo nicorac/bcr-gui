@@ -482,35 +482,38 @@ public class AudioPlayerService extends MediaSessionService {
     sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
     proximitySensor = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
 
-    // listen to sensor events and call setOutputDevice() on changes
-    proximityListener = new SensorEventListener() {
+    if (proximitySensor != null) {
 
-      final float sensorMaxRange = proximitySensor.getMaximumRange();
+      // listen to sensor events and call setOutputDevice() on changes
+      proximityListener = new SensorEventListener() {
 
-      @Override
-      public void onSensorChanged(SensorEvent event) {
-        var newDevice = event.values[0] < sensorMaxRange
-          ? DEVICE_EARPIECE
-          : DEVICE_LOUDSPEAKER;
-        // sensor will continuously stream its value, so we'll need to avoid useless changes
-        if (newDevice != currentOutputDevice) {
-          setOutputDevice(newDevice);
+        final float sensorMaxRange = proximitySensor.getMaximumRange();
+
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+          var newDevice = event.values[0] < sensorMaxRange
+            ? DEVICE_EARPIECE
+            : DEVICE_LOUDSPEAKER;
+          // sensor will continuously stream its value, so we'll need to avoid useless changes
+          if (newDevice != currentOutputDevice) {
+            setOutputDevice(newDevice);
+          }
         }
-      }
 
-      @Override
-      public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        // Handle accuracy changes if needed
-      }
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+          // Handle accuracy changes if needed
+        }
 
-    };
+      };
 
-    // Register the proximity sensor listener (in current "CapacitorPlugins" thread)
-    sensorManager.registerListener(
-      proximityListener,
-      proximitySensor,
-      SensorManager.SENSOR_DELAY_NORMAL
-    );
+      // Register the proximity sensor listener (in current "CapacitorPlugins" thread)
+      sensorManager.registerListener(
+        proximityListener,
+        proximitySensor,
+        SensorManager.SENSOR_DELAY_NORMAL
+      );
+    }
 
   }
 
@@ -520,15 +523,13 @@ public class AudioPlayerService extends MediaSessionService {
   private void releaseProximitySensor() {
     if (sensorManager != null && proximityListener != null) {
       sensorManager.unregisterListener(proximityListener);
-      sensorManager = null;
-      proximityListener = null;
     }
-    if (wakeLockProximity != null) {
-      if (wakeLockProximity.isHeld()) {
-        wakeLockProximity.release();
-      }
-      wakeLockProximity = null;
+    if (wakeLockProximity != null && wakeLockProximity.isHeld()) {
+      wakeLockProximity.release();
     }
+    sensorManager = null;
+    proximityListener = null;
+    wakeLockProximity = null;
   }
 
   // update management
