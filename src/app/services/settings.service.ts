@@ -1,7 +1,6 @@
 import { BehaviorSubject } from 'rxjs';
 import { AndroidDateTimeSettings } from 'src/plugins/androiddatetimesettings';
 import { Injectable } from '@angular/core';
-import { Device } from '@capacitor/device';
 import { Preferences } from '@capacitor/preferences';
 import { FILENAME_PATTERN_TEMPLATES } from '../models/recording';
 import { deserializeObject, JsonProperty, serializeObject } from '../utils/json-serializer';
@@ -110,8 +109,8 @@ export class SettingsService {
 
   /**
    * Configured app culture
-   *  '': use system default
-   *  string (i.e. 'it-IT') forces this culture
+   *  '' (empty string): use system default
+   *  any other value  : forces the culture with that ID (i.e. 'it-IT')
    */
   @JsonProperty()
   public get culture(): string {
@@ -122,11 +121,6 @@ export class SettingsService {
     this.save();
   }
   private _culture = '';
-
-  public get defaultCulture(): string {
-    return this._defaultCulture;
-  };
-  private _defaultCulture = '';
 
   // attach to system settings
   private systemThemeModeChangeDetector?:MediaQueryList;
@@ -191,7 +185,6 @@ export class SettingsService {
 
     // load android settings
     ({ is12Hours: this.is12Hours } = await AndroidDateTimeSettings.is12Hours());
-    this._defaultCulture = (await Device.getLanguageTag()).value;
 
     // load settings
     const { value: jsonContent } = await Preferences.get({ key: 'settings' });

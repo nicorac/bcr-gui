@@ -55,9 +55,9 @@
             (ngModelChange)="clearPipesCache()"
           >
             <ion-select-option [value]="''">
-              {{ 'SETTINGS_SYSTEM_DEFAULT' | translatePipe }} ({{ settings.defaultCulture }})
+              {{ 'SETTINGS_SYSTEM_DEFAULT' | translatePipe }} ({{ i18n.deviceCultureID }})
             </ion-select-option>
-            @for (c of i18n.getDefinedCultures(); track c) {
+            @for (c of i18n.definedCultures; track c) {
               <ion-select-option [value]="c.id">{{ c.name }} ({{ c.id }})</ion-select-option>
             }
           </ion-select>

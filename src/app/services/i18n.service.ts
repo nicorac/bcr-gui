@@ -1,5 +1,6 @@
 import { AndroidSAF, Encoding } from 'src/plugins/androidsaf';
 import { Injectable } from '@angular/core';
+import { Device } from '@capacitor/device';
 import { SettingsService } from './settings.service';
 
 export type I18nKey = Uppercase<string>;
@@ -12,13 +13,14 @@ export type CultureContent = Record<I18nKey, string>;
 
 // constants
 const LANG_BASE_URL = 'assets/i18n';
-const FALLBACK_CULTURE = 'en-US';
+const FALLBACK_CULTURE_ID = 'en-US';
 const TRANSLATION_KEY_PREFIX = 'trn-';
 
 // Definition of a culture
 export type Culture = {
   id: string;
   name: string;
+  aliases?: string[];
 };
 
 /**
@@ -29,9 +31,10 @@ export type Culture = {
 })
 export class I18nService {
 
+  private _deviceCultureID: string = '';
   private _cultureDefs: Culture[] = [];
-  private _currentCulture = FALLBACK_CULTURE;
-  
+  private _currentCulture = FALLBACK_CULTURE_ID;
+
   // CAN'T use DI because of circular dependency, set in initialize() function
   private settings!: SettingsService;
 
@@ -55,6 +58,14 @@ export class I18nService {
 
     // load defined cultures
     this._cultureDefs = await this.getJsonContent(`${LANG_BASE_URL}/_cultures.json`);
+
+    // retrieve device culture ID (resolving aliases)
+    this._deviceCultureID = (await Device.getLanguageTag()).value;
+    const aliasedID = this._cultureDefs.find(c => c.aliases?.includes(this._deviceCultureID));
+    if (aliasedID) {
+      this._deviceCultureID = aliasedID.id;
+    }
+
   }
 
   /**
@@ -72,16 +83,24 @@ export class I18nService {
   }
 
   /**
+   * Device culture ID
+   */
+  get deviceCultureID() {
+    return this._deviceCultureID;
+  };
+
+  /**
    * Load the translations for the given culture.
    *
    * Culture can be loaded temporarily (i.e. during an assistance session), overriding user settings.
    * If left undefined, then the latest state is restored.
    */
-  async load(culture: string) {
+  async load(cultureID: string) {
 
     // check if culture is defined, otherwise load the default one
-    if (!this.isCultureAvailable(culture)) {
-      culture = FALLBACK_CULTURE;
+    cultureID = cultureID || this._deviceCultureID;
+    if (!this.isCultureAvailable(cultureID)) {
+      cultureID = FALLBACK_CULTURE_ID;
     }
 
     // prepare content
@@ -89,17 +108,17 @@ export class I18nService {
     const parseErrors: string[] = [];
 
     // load fallback language (if fallbackCulture !== culture)
-    if (culture !== FALLBACK_CULTURE) {
+    if (cultureID !== FALLBACK_CULTURE_ID) {
       content = {
         ...content,
-        ...await this.getJsonContent(`${LANG_BASE_URL}/${FALLBACK_CULTURE}.json`),
+        ...await this.getJsonContent(`${LANG_BASE_URL}/${FALLBACK_CULTURE_ID}.json`),
       }
     }
 
     // load given culture language
     content = {
       ...content,
-      ...await this.getJsonContent(`${LANG_BASE_URL}/${culture}.json`),
+      ...await this.getJsonContent(`${LANG_BASE_URL}/${cultureID}.json`),
     }
 
     // try to load x file
@@ -199,7 +218,7 @@ export class I18nService {
   /**
    * Return defined cultures
    */
-  getDefinedCultures(): Culture[] {
+  get definedCultures(): Culture[] {
     return this._cultureDefs;
   }
 

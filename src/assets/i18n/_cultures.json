@@ -14,6 +14,6 @@
   { "id": "tr-TR", "name": "Türkçe" },
   { "id": "uk-UA", "name": "Українська мова"},
   { "id": "vi-VN", "name": "Tiếng Việt" },
-  { "id": "zh-Hans", "name": "中文（简体）" },
-  { "id": "zh-Hant", "name": "中文（繁體）" }
+  { "id": "zh-Hans", "name": "中文（简体）", "aliases": [ "zh-CN", "zh-Hans-CN" ] },
+  { "id": "zh-Hant", "name": "中文（繁體）", "aliases": [ "zh-TW", "zh-Hant-TW" ] }
 ]
