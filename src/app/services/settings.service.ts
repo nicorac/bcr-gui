@@ -174,6 +174,12 @@ export class SettingsService {
   @JsonProperty()
   public developerMode = false;
 
+  /**
+   * Recording backend
+   */
+  @JsonProperty()
+  public backend = "";
+
   constructor(
     private mbs: MessageBoxService,
   ) { }
