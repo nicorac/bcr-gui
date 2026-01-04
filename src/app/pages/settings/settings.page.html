@@ -151,6 +151,44 @@
       </div>
     </ion-item>
 
+    <ion-item-divider>
+      <h4>{{ 'SETTINGS_BACKEND' | translatePipe }}</h4>
+    </ion-item-divider>
+
+    <ion-item>
+      <div class="wrapper">
+        <div class="label">
+          <div>{{ 'SETTINGS_BACKEND_SELECT' | translatePipe }}</div>
+          <div class="help">{{ 'SETTINGS_BACKEND_SELECT_HELP' | translatePipe }}</div>
+        </div>
+        <ion-select
+          [(ngModel)]="settings.backend"
+          (ionChange)="save()"
+          placeholder="{{ 'SETTINGS_BACKEND_UNSPECIFIED' | translatePipe }}">
+          <ion-select-option value="">
+            {{ 'SETTINGS_BACKEND_UNSPECIFIED' | translatePipe }}
+          </ion-select-option>
+          <ion-select-option value="org.chiller3.bcr">
+            {{ 'SETTINGS_BACKEND_BCR' | translatePipe }}
+          </ion-select-option>
+        </ion-select>
+      </div>
+    </ion-item>
+
+    @if (settings.backend === 'org.chiller3.bcr') {
+    <ion-item>
+      <div class="wrapper">
+        <div class="label">
+          <div>{{ 'SETTINGS_BCR_SETTINGS' | translatePipe }}</div>
+          <div class="help" [innerHTML]="'SETTINGS_BCR_SETTINGS_HELP' | translatePipe"></div>
+        </div>
+        <ion-button (click)="openBcrSettings()" style="white-space: nowrap;">
+          {{ 'SETTINGS_BCR_SETTINGS_OPEN' | translatePipe }}
+        </ion-button>
+      </div>
+    </ion-item>
+    }
+
   </ion-list>
 
 </ion-content>
