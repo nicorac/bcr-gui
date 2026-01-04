@@ -115,7 +115,7 @@
   "SETTINGS_BACKEND_UNSPECIFIED": "未指定",
   "SETTINGS_BACKEND_BCR": "Basic Call Recorder",
   "SETTINGS_BCR_SETTINGS": "調整 BCR 的設定",
-  "SETTINGS_BCR_SETTINGS_HELP": "<b><em>請勿</em></b> 隱藏 BCR 的啟動器圖示，否則此功能將無法運作！                                                          ",
+  "SETTINGS_BCR_SETTINGS_HELP": "<strong><em>請勿</em></strong> 隱藏 BCR 的啟動器圖示，否則此功能將無法運作！                                                          ",
   "SETTINGS_BCR_SETTINGS_OPEN": "開啟…",
   "SETTINGS_BCR_SETTINGS_NOT_FOUND": "無法啟動 BCR 設定介面。",
   "SETTINGS_COUNTRY_PREFIX": "預設國碼",

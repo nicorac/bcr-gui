@@ -115,7 +115,7 @@
   "SETTINGS_BACKEND_UNSPECIFIED": "Not specified",
   "SETTINGS_BACKEND_BCR": "Basic Call Recorder",
   "SETTINGS_BCR_SETTINGS": "Tweak BCR's own settings",
-  "SETTINGS_BCR_SETTINGS_HELP": "Do <b><em>NOT</em></b> hide BCR launcher icon, or this will not work!",
+  "SETTINGS_BCR_SETTINGS_HELP": "Do <strong><em>NOT</em></strong> hide BCR launcher icon, or this will not work!",
   "SETTINGS_BCR_SETTINGS_OPEN": "Open…",
   "SETTINGS_BCR_SETTINGS_NOT_FOUND": "Unable to start BCR settings activity",
   "SETTINGS_COUNTRY_PREFIX": "Default country prefix",
