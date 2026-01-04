@@ -151,6 +151,22 @@
       </div>
     </ion-item>
 
+    <ion-item-divider>
+      <h4>{{ 'SETTINGS_BACKEND' | translatePipe }}</h4>
+    </ion-item-divider>
+
+    <ion-item>
+      <div class="wrapper">
+        <div class="label">
+          <div>{{ 'SETTINGS_BCR_SETTINGS' | translatePipe }}</div>
+          <div class="help" [innerHTML]="'SETTINGS_BCR_SETTINGS_HELP' | translatePipe"></div>
+        </div>
+        <ion-button (click)="openBcrSettings()" style="white-space: nowrap;">
+          {{ 'SETTINGS_BCR_SETTINGS_OPEN' | translatePipe }}
+        </ion-button>
+      </div>
+    </ion-item>
+
   </ion-list>
 
 </ion-content>

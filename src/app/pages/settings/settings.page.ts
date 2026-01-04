@@ -8,6 +8,7 @@ import { MessageBoxService } from 'src/app/services/message-box.service';
 import { RecordingsService } from 'src/app/services/recordings.service';
 import { SortModeEnum } from 'src/app/utils/recordings-sorter';
 import version from 'src/app/version';
+import { BcrGui } from 'src/plugins/bcrgui';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -123,6 +124,45 @@ export class SettingsPage {
    */
   protected clearPipesCache() {
     location.reload();
+  }
+
+  /**
+   * Launch external BCR settings activity on Android.
+   */
+  async openBcrSettings() {
+    if (this.platform.is('android')) {
+      // first try SettingsActivityLauncher
+      try {
+        await BcrGui.launchActivity({
+          component: 'com.chiller3.bcr/.settings.SettingsActivityLauncher'
+        });
+        return;
+      } catch (err: any) {
+      }
+      // then try SettingsActivity
+      try {
+        await BcrGui.launchActivity({
+          component: 'com.chiller3.bcr/.settings.SettingsActivity'
+        });
+        return;
+      } catch (err: any) {
+      }
+      // finally try main component
+      try {
+        await BcrGui.launchActivity({
+          component: 'com.chiller3.bcr'
+        });
+        return;
+      } catch (err: any) {
+      }
+      // all attempts failed
+      this.messageBoxService.showError({ 
+        message: this.i18n.get('SETTINGS_BCR_SETTINGS_NOT_FOUND')
+      });
+    }
+    else {
+      console.info('BCR settings activity not supported on this platform');
+    }
   }
 
 }
