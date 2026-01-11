@@ -35,3 +35,10 @@ ion-button {
   min-width: 2em;
   max-width: 5em;
 }
+
+.section-help {
+  color: var(--ion-color-step-600, #666666);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  margin-bottom: 1em;
+}

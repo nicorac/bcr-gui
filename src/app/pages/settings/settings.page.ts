@@ -13,7 +13,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ModalController, Platform } from '@ionic/angular';
-import { SettingsService } from '../../services/settings.service';
+import { recorderApps, SettingsService } from '../../services/settings.service';
 import { DatetimeFormatEditorComponent } from './datetime-format-editor/datetime-format-editor.component';
 import { FilenamePatternEditorComponent } from './filename-pattern-editor/filename-pattern-editor.component';
 
@@ -32,6 +32,7 @@ import { FilenamePatternEditorComponent } from './filename-pattern-editor/filena
 })
 export class SettingsPage {
 
+  protected recorderApps = recorderApps;
   protected SortMode = SortModeEnum;
   protected version = version;
 
@@ -129,40 +130,33 @@ export class SettingsPage {
   /**
    * Launch external BCR settings activity on Android.
    */
-  async openBcrSettings() {
-    if (this.platform.is('android')) {
-      // first try SettingsActivityLauncher
-      try {
-        await BcrGui.launchActivity({
-          component: 'com.chiller3.bcr/.settings.SettingsActivityLauncher'
-        });
-        return;
-      } catch (err: any) {
-      }
-      // then try SettingsActivity
-      try {
-        await BcrGui.launchActivity({
-          component: 'com.chiller3.bcr/.settings.SettingsActivity'
-        });
-        return;
-      } catch (err: any) {
-      }
-      // finally try main component
-      try {
-        await BcrGui.launchActivity({
-          component: 'com.chiller3.bcr'
-        });
-        return;
-      } catch (err: any) {
-      }
-      // all attempts failed
-      this.messageBoxService.showError({ 
-        message: this.i18n.get('SETTINGS_BCR_SETTINGS_NOT_FOUND')
+  protected async openBcrSettings() {
+
+    // first try SettingsActivityLauncher
+    try {
+      await BcrGui.launchActivity({ component: 'com.chiller3.bcr/.settings.SettingsActivityLauncher' });
+      return;
+    } catch (err: any) {}
+
+    // then try SettingsActivity
+    try {
+      await BcrGui.launchActivity({
+        component: 'com.chiller3.bcr/.settings.SettingsActivity'
       });
-    }
-    else {
-      console.info('BCR settings activity not supported on this platform');
-    }
+      return;
+    } catch (err: any) {}
+
+    // fallback to main component
+    try {
+      await BcrGui.launchActivity({ component: 'com.chiller3.bcr' });
+      return;
+    } catch (err: any) {}
+
+    // all attempts failed
+    this.messageBoxService.showError({
+      message: this.i18n.get('SETTINGS_BCR_SETTINGS_NOT_FOUND')
+    });
+
   }
 
 }

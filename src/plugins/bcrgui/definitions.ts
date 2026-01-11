@@ -7,7 +7,7 @@ export interface BcrGui {
   createOrEditContact(options: { displayName?: string, phoneNumber?: string }): Promise<{ contactUri: string, displayName: string }>;
 
   /**
-   * Launch an Android activity from BCR app
+   * Launch an Android activity
    */
-  launchActivity(options: { component: string }): Promise<void>;                                                      
+  launchActivity(options: { component: string }): Promise<void>;
 }
