@@ -4,6 +4,7 @@
 
   <ion-list class="config-items" lines="full">
 
+    <!-- general section -->
     <ion-item-divider>
       <h4>{{ 'SETTINGS_GENERAL_SECTION' | translatePipe }}</h4>
     </ion-item-divider>
@@ -90,6 +91,7 @@
       </div>
     </ion-item>
 
+    <!-- recordings section -->
     <ion-item-divider>
       <h4>{{ 'SETTINGS_RECORDINGS_SECTION' | translatePipe }}</h4>
     </ion-item-divider>
@@ -106,6 +108,7 @@
       </div>
     </ion-item>
 
+    <!-- player section -->
     <ion-item-divider>
       <h4>{{ 'SETTINGS_PLAYER_SECTION' | translatePipe }}</h4>
     </ion-item-divider>
@@ -151,39 +154,47 @@
       </div>
     </ion-item>
 
+    <!-- recorder section -->
     <ion-item-divider>
-      <h4>{{ 'SETTINGS_BACKEND' | translatePipe }}</h4>
+      <div>
+        <h4>{{ 'SETTINGS_RECORDER' | translatePipe }}</h4>
+        @if (settings.recorderApp === '') {
+          <div class="section-help">
+            This section can show settings specific to your call recorder app.
+            Please select it from the list below to show them (if supported).
+          </div>
+        }
+      </div>
     </ion-item-divider>
 
     <ion-item>
       <div class="wrapper">
         <div class="label">
-          <div>{{ 'SETTINGS_BACKEND_SELECT' | translatePipe }}</div>
-          <div class="help">{{ 'SETTINGS_BACKEND_SELECT_HELP' | translatePipe }}</div>
+          <div>{{ 'SETTINGS_RECORDER_APPNAME' | translatePipe }}</div>
         </div>
         <ion-select
-          [(ngModel)]="settings.backend"
+          [(ngModel)]="settings.recorderApp"
           (ionChange)="save()"
-          placeholder="{{ 'SETTINGS_BACKEND_UNSPECIFIED' | translatePipe }}">
-          <ion-select-option value="">
-            {{ 'SETTINGS_BACKEND_UNSPECIFIED' | translatePipe }}
-          </ion-select-option>
-          <ion-select-option value="org.chiller3.bcr">
-            {{ 'SETTINGS_BACKEND_BCR' | translatePipe }}
-          </ion-select-option>
+          placeholder="{{ 'SETTINGS_RECORDER_UNSPECIFIED' | translatePipe }}"
+        >
+          @for (recorderApp of recorderApps; track recorderApp.id) {
+            <ion-select-option [value]="recorderApp.id">
+              {{ recorderApp.name || ('SETTINGS_RECORDER_UNSPECIFIED' | translatePipe) }}
+            </ion-select-option>
+          }
         </ion-select>
       </div>
     </ion-item>
 
-    @if (settings.backend === 'org.chiller3.bcr') {
+    @if (settings.recorderApp === 'bcr') {
     <ion-item>
       <div class="wrapper">
         <div class="label">
-          <div>{{ 'SETTINGS_BCR_SETTINGS' | translatePipe }}</div>
-          <div class="help" [innerHTML]="'SETTINGS_BCR_SETTINGS_HELP' | translatePipe"></div>
+          <div>{{ 'SETTINGS_RECORDER_BCR_SETTINGS' | translatePipe }}</div>
+          <div class="help" [innerHTML]="'SETTINGS_RECORDER_BCR_SETTINGS_HELP' | translatePipe"></div>
         </div>
         <ion-button (click)="openBcrSettings()" style="white-space: nowrap;">
-          {{ 'SETTINGS_BCR_SETTINGS_OPEN' | translatePipe }}
+          {{ 'SETTINGS_RECORDER_BCR_SETTINGS_OPEN' | translatePipe }}
         </ion-button>
       </div>
     </ion-item>

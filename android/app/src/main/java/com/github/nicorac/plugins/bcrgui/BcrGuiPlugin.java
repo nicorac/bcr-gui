@@ -110,7 +110,7 @@ public class BcrGuiPlugin extends Plugin {
     try {
       String component = call.getString("component");
       Intent intent;
-      
+
       if (component.contains("/")) {
         // Full component name - launch specific activity
         intent = new Intent();
@@ -120,11 +120,12 @@ public class BcrGuiPlugin extends Plugin {
         intent = new Intent(Intent.ACTION_MAIN);
         intent.setPackage(component);
       }
-      
+
       getActivity().startActivity(intent);
       call.resolve();
+
     } catch (Exception e) {
-      call.reject("launch_failed", e);
+      call.reject("Error launching activity", e);
     }
 
   }

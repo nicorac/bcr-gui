@@ -17,6 +17,16 @@ export type AppDateTimeFormat = {
 }
 export const DEFAULT_DATE_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
 
+/**
+ * Call recorder apps for which BCR-GUI can show special settings
+ */
+export type recorderAppId = '' | 'bcr';
+export const recorderApps: { id: recorderAppId, name: string }[] = [
+  { id: '',     name: '' },
+  { id: 'bcr',  name: 'Basic Call Recorder (BCR)' },
+];
+
+
 @Injectable({
   providedIn: 'root'
 })
@@ -175,10 +185,10 @@ export class SettingsService {
   public developerMode = false;
 
   /**
-   * Recording backend
+   * Recorder application
    */
   @JsonProperty()
-  public backend = "";
+  public recorderApp: recorderAppId = '';
 
   constructor(
     private mbs: MessageBoxService,
