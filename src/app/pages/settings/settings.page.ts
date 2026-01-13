@@ -58,6 +58,17 @@ export class SettingsPage {
     await this.save();
   }
 
+  async onRecorderAppChange() {
+    const app = recorderApps.find(app => app.id === this.settings.recorderApp);
+    
+    // If app not found or has no default pattern, force custom
+    if (!this.settings.recorderApp || !this.settings.getRecorderApp()?.filenamePattern) {
+      this.settings.useCustomFilenamePattern = true;
+    }
+    
+    await this.save();
+  }
+
   async save() {
     await this.settings.save();
   }

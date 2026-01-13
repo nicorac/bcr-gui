@@ -2,7 +2,6 @@ import { BehaviorSubject } from 'rxjs';
 import { AndroidDateTimeSettings } from 'src/plugins/androiddatetimesettings';
 import { Injectable } from '@angular/core';
 import { Preferences } from '@capacitor/preferences';
-import { FILENAME_PATTERN_TEMPLATES } from '../models/recording';
 import { deserializeObject, JsonProperty, serializeObject } from '../utils/json-serializer';
 import { SortModeEnum } from '../utils/recordings-sorter';
 import { I18nKey } from './i18n.service';
@@ -21,10 +20,37 @@ export const DEFAULT_DATE_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
 /**
  * Call recorder apps for which BCR-GUI can show special settings
  */
-export type recorderAppId = '' | 'com.chiller3.bcr';
-export const recorderApps: { id: recorderAppId, i18nKey: I18nKey }[] = [
-  { id: '',                 i18nKey: 'SETTINGS_RECORDER_APPNAME_UNSPECIFIED' },
-  { id: 'com.chiller3.bcr', i18nKey: 'SETTINGS_RECORDER_APPNAME_BCR' },
+export type recorderAppId = ''
+  | 'com.chiller3.bcr'
+  | 'com.android.dialer@coloros'    // FIXME
+  | 'com.android.dialer@grapheneos' // FIXME
+  | 'com.huawei.phone.recorder'
+  | 'com.lineageos.recorder';
+export const recorderApps: { id: recorderAppId, i18nKey: I18nKey, filenamePattern: string }[] = [
+  {
+    id: '', i18nKey: 'SETTINGS_RECORDER_APPNAME_UNSPECIFIED',
+    filenamePattern: ''
+  },
+  {
+    id: 'com.chiller3.bcr', i18nKey: 'SETTINGS_RECORDER_APPNAME_BCR',
+    filenamePattern: '^{date}(_{direction})?(_sim{sim_slot})?_{phone_number}(_{contact_name})?'
+  },
+  {
+    id: 'com.android.dialer@coloros', i18nKey: 'SETTINGS_RECORDER_APPNAME_COLOROS',
+    filenamePattern: '^{contact_name}-{date:year2}{date:month}{date:day}{date:hours}{date:minutes}'
+  },
+  {
+    id: 'com.android.dialer@grapheneos', i18nKey: 'SETTINGS_RECORDER_APPNAME_GRAPHENEOS',
+    filenamePattern: '^CallRecord_{date:year}{date:month}{date:day}-{date:hours}{date:minutes}{date:seconds}_{phone_number}'
+  },
+  {
+    id: 'com.huawei.phone.recorder', i18nKey: 'SETTINGS_RECORDER_APPNAME_HUAWEI',
+    filenamePattern: '^{contact_name}@{phone_number}_{date:year}{date:month}{date:day}{date:hours}{date:minutes}{date:seconds}'
+  },
+  {
+    id: 'com.lineageos.recorder', i18nKey: 'SETTINGS_RECORDER_APPNAME_LINEAGEOS',
+    filenamePattern: '^{phone_number}_{date:year2}{date:month}{date:day}_{date:hours}{date:minutes}{date:seconds}'
+  }
 ];
 
 @Injectable({
@@ -84,7 +110,7 @@ export class SettingsService {
    * Custom filename format
    */
   @JsonProperty()
-  public filenamePattern: string = FILENAME_PATTERN_TEMPLATES[0].pattern;
+  public filenamePattern: string = recorderApps[1].filenamePattern; // com.chiller3.bcr pattern
 
   /**
    * Date/time format
@@ -189,6 +215,14 @@ export class SettingsService {
    */
   @JsonProperty()
   public recorderApp: recorderAppId = '';
+  public getRecorderApp() {
+    return recorderApps.find(app => app.id === this.recorderApp);
+  }
+
+  /**
+   * Custom filename pattern
+   */
+  public useCustomFilenamePattern = false;
 
   constructor(
     private mbs: MessageBoxService,

@@ -23,15 +23,6 @@
 
     <ion-item>
       <div class="wrapper">
-        <div class="label">{{ 'SETTINGS_FILENAME_PATTERN' | translatePipe }}</div>
-        <ion-button icon="folder-open-outline" (click)="editFilenameFormat()">
-          {{ 'LBL_EDIT' | translatePipe }}
-        </ion-button>
-      </div>
-    </ion-item>
-
-    <ion-item>
-      <div class="wrapper">
         <div class="label">{{ 'SETTINGS_APPEARANCE' | translatePipe }}</div>
         <ion-select [(ngModel)]="settings.appearance">
           <ion-select-option [value]="'system'">{{ 'SETTINGS_SYSTEM_DEFAULT' | translatePipe }}</ion-select-option>
@@ -173,7 +164,7 @@
         </div>
         <ion-select
           [(ngModel)]="settings.recorderApp"
-          (ionChange)="save()"
+          (ionChange)="onRecorderAppChange()"
           placeholder="{{ 'SETTINGS_RECORDER_APPNAME_UNSPECIFIED' | translatePipe }}"
         >
           @for (recorderApp of recorderApps; track recorderApp.id) {
@@ -184,6 +175,48 @@
         </ion-select>
       </div>
     </ion-item>
+
+    @if (settings.recorderApp !== '') {
+    <ion-radio-group [(ngModel)]="settings.useCustomFilenamePattern" (ionChange)="save()">
+      <ion-item>
+        <ion-radio slot="start" [value]="false"></ion-radio>
+        <div class="wrapper">
+          <div class="label">
+            <div>{{ 'SETTINGS_FILENAME_PATTERN_DEFAULT' | translatePipe }}</div>
+            <div class="help">{{ settings.getRecorderApp()?.filenamePattern }}</div>
+          </div>
+        </div>
+      </ion-item>
+
+      <ion-item>
+        <ion-radio slot="start" [value]="true"></ion-radio>
+        <div class="wrapper">
+          <div class="label">
+            <div>{{ 'SETTINGS_FILENAME_PATTERN_CUSTOM' | translatePipe }}</div>
+            <div class="help">{{ settings.filenamePattern ? settings.filenamePattern : 'Select a pattern to use for recording filenames...' }}</div>
+          </div>
+          <ion-button icon="folder-open-outline" (click)="editFilenameFormat()">
+            {{ 'LBL_EDIT' | translatePipe }}
+          </ion-button>
+        </div>
+      </ion-item>
+    </ion-radio-group>
+    } @else {
+    <ion-radio-group [(ngModel)]="settings.useCustomFilenamePattern" (ionChange)="save()">
+      <ion-item>
+        <ion-radio slot="start" [value]="true"></ion-radio>
+        <div class="wrapper">
+          <div class="label">
+            <div>{{ 'SETTINGS_FILENAME_PATTERN_CUSTOM' | translatePipe }}</div>
+            <div class="help">{{ settings.filenamePattern ? settings.filenamePattern : 'Select a pattern to use for recording filenames...' }}</div>
+          </div>
+          <ion-button icon="folder-open-outline" (click)="editFilenameFormat()">
+            {{ 'LBL_EDIT' | translatePipe }}
+          </ion-button>
+        </div>
+      </ion-item>
+    </ion-radio-group>
+    }
 
     @if (settings.recorderApp === 'com.chiller3.bcr') {
     <ion-item>
