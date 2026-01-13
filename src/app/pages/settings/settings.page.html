@@ -175,18 +175,18 @@
         <ion-select
           [(ngModel)]="settings.recorderApp"
           (ionChange)="save()"
-          placeholder="{{ 'SETTINGS_RECORDER_UNSPECIFIED' | translatePipe }}"
+          placeholder="{{ 'SETTINGS_RECORDER_APPNAME_UNSPECIFIED' | translatePipe }}"
         >
           @for (recorderApp of recorderApps; track recorderApp.id) {
             <ion-select-option [value]="recorderApp.id">
-              {{ recorderApp.name || ('SETTINGS_RECORDER_UNSPECIFIED' | translatePipe) }}
+              {{ (recorderApp.i18nKey | translatePipe) || ('SETTINGS_RECORDER_APPNAME_UNSPECIFIED' | translatePipe) }}
             </ion-select-option>
           }
         </ion-select>
       </div>
     </ion-item>
 
-    @if (settings.recorderApp === 'bcr') {
+    @if (settings.recorderApp === 'com.chiller3.bcr') {
     <ion-item>
       <div class="wrapper">
         <div class="label">

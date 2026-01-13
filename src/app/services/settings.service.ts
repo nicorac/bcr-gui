@@ -5,6 +5,7 @@ import { Preferences } from '@capacitor/preferences';
 import { FILENAME_PATTERN_TEMPLATES } from '../models/recording';
 import { deserializeObject, JsonProperty, serializeObject } from '../utils/json-serializer';
 import { SortModeEnum } from '../utils/recordings-sorter';
+import { I18nKey } from './i18n.service';
 import { MessageBoxService } from './message-box.service';
 
 export type Appearance = 'system' | 'light' | 'dark';
@@ -20,12 +21,11 @@ export const DEFAULT_DATE_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
 /**
  * Call recorder apps for which BCR-GUI can show special settings
  */
-export type recorderAppId = '' | 'bcr';
-export const recorderApps: { id: recorderAppId, name: string }[] = [
-  { id: '',     name: '' },
-  { id: 'bcr',  name: 'Basic Call Recorder (BCR)' },
+export type recorderAppId = '' | 'com.chiller3.bcr';
+export const recorderApps: { id: recorderAppId, i18nKey: I18nKey }[] = [
+  { id: '',                 i18nKey: 'SETTINGS_RECORDER_APPNAME_UNSPECIFIED' },
+  { id: 'com.chiller3.bcr', i18nKey: 'SETTINGS_RECORDER_APPNAME_BCR' },
 ];
-
 
 @Injectable({
   providedIn: 'root'
