@@ -160,8 +160,7 @@
         <h4>{{ 'SETTINGS_RECORDER' | translatePipe }}</h4>
         @if (settings.recorderApp === '') {
           <div class="section-help">
-            This section can show settings specific to your call recorder app.
-            Please select it from the list below to show them (if supported).
+            {{ 'SETTINGS_RECORDER_HELP' | translatePipe }}
           </div>
         }
       </div>

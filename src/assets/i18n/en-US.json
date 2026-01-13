@@ -127,6 +127,7 @@
   "SETTINGS_PLAYER_SECTION": "Player",
   "SETTINGS_PLAYER_SEEK_TIME": "Seek time",
   "SETTINGS_RECORDER": "Call recorder app settings",
+  "SETTINGS_RECORDER_HELP": "This section can show settings specific to your call recorder app. Please select it from the list below to show them (if supported).",
   "SETTINGS_RECORDER_APPNAME": "Recorder app",
   "SETTINGS_RECORDER_APPNAME_BCR": "Basic Call Recorder (BCR)",
   "SETTINGS_RECORDER_APPNAME_UNSPECIFIED": "Unspecified",
