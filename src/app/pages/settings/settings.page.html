@@ -9,22 +9,22 @@
       <h4>{{ 'SETTINGS_GENERAL_SECTION' | translatePipe }}</h4>
     </ion-item-divider>
 
-    <ion-item>
+    <ion-item button (click)="selectRecordingsDirectory()">
       <div class="wrapper">
         <div class="label">
           <div>{{ 'SETTINGS_RECORDINGS_DIRECTORY' | translatePipe }}</div>
           <div class="help">{{ settings.recordingsDirectoryUri ? settings.recordingsDirectoryUri : 'Select directory containing recording files...' }}</div>
         </div>
-        <ion-button (click)="selectRecordingsDirectory()">
+        <ion-button (click)="$event.stopPropagation(); selectRecordingsDirectory()">
           <ion-icon name="folder-open-outline" />
         </ion-button>
       </div>
     </ion-item>
 
-    <ion-item>
+    <ion-item button (click)="appearanceSelect.open()">
       <div class="wrapper">
         <div class="label">{{ 'SETTINGS_APPEARANCE' | translatePipe }}</div>
-        <ion-select [(ngModel)]="settings.appearance">
+        <ion-select #appearanceSelect [(ngModel)]="settings.appearance">
           <ion-select-option [value]="'system'">{{ 'SETTINGS_SYSTEM_DEFAULT' | translatePipe }}</ion-select-option>
           <ion-select-option [value]="'light'">{{ 'SETTINGS_APPEARANCE_LIGHT' | translatePipe }}</ion-select-option>
           <ion-select-option [value]="'dark'">{{ 'SETTINGS_APPEARANCE_DARK' | translatePipe }}</ion-select-option>
@@ -32,17 +32,20 @@
       </div>
     </ion-item>
 
-    <ion-item>
+    <ion-item button (click)="languageSelect.open()">
       <div class="wrapper">
 
         <div class="label">
           {{ 'SETTINGS_LANGUAGE' | translatePipe }}
           <div class="help">{{ 'SETTINGS_LANGUAGE_TEXT' | translatePipe }}<br/>
-          (<a href="{{ version.addLanguageUri }}">{{ 'SETTINGS_LANGUAGE_ADD' | translatePipe }}</a>)
+          (<a href="{{ version.addLanguageUri }}" (click)="$event.stopPropagation()">{{
+             'SETTINGS_LANGUAGE_ADD' | translatePipe
+          }}</a>)
           </div>
         </div>
         <div>
           <ion-select
+            #languageSelect
             [(ngModel)]="settings.culture"
             (ngModelChange)="clearPipesCache()"
           >
@@ -57,22 +60,23 @@
       </div>
     </ion-item>
 
-    <ion-item>
+    <ion-item button (click)="editDatetimeFormat()">
       <div class="wrapper">
         <div class="label">{{ 'SETTINGS_DATETIME_FORMAT' | translatePipe }}</div>
-        <ion-button (click)="editDatetimeFormat()">
+        <ion-button (click)="$event.stopPropagation(); editDatetimeFormat()">
           {{ 'LBL_EDIT' | translatePipe }}
         </ion-button>
       </div>
     </ion-item>
 
-    <ion-item>
+    <ion-item button (click)="countryCodeInput.setFocus()" detail="false">
       <div class="wrapper">
         <div class="label">
           <div>{{ 'SETTINGS_COUNTRY_PREFIX' | translatePipe }}</div>
           <div class="help">{{ 'SETTINGS_COUNTRY_PREFIX_HELP' | translatePipe }}</div>
         </div>
         <ion-input
+          #countryCodeInput
           [ngModel]="settings.defaultCountryPrefix"
           (ngModelChange)="setDefaultCountryPrefix($event)"
           class="phone-prefix ion-text-right"
@@ -87,10 +91,13 @@
       <h4>{{ 'SETTINGS_RECORDINGS_SECTION' | translatePipe }}</h4>
     </ion-item-divider>
 
-    <ion-item>
+    <ion-item button (click)="sortModeSelect.open()">
       <div class="wrapper">
         <div class="label">{{ 'SETTINGS_RECORDINGS_SORT' | translatePipe }}</div>
-        <ion-select [(ngModel)]="settings.recordingsSortMode" (ngModelChange)="save()" placeholder="{{ 'SETTINGS_MAKE_SELECTION' | translatePipe }}">
+        <ion-select #sortModeSelect
+          [(ngModel)]="settings.recordingsSortMode" (ngModelChange)="save()"
+          placeholder="{{ 'SETTINGS_MAKE_SELECTION' | translatePipe }}"
+        >
           <ion-select-option [value]="SortMode.Date_ASC">{{ 'SETTINGS_RECORDINGS_SORT_DATE_ASC' | translatePipe }}</ion-select-option>
           <ion-select-option [value]="SortMode.Date_DESC">{{ 'SETTINGS_RECORDINGS_SORT_DATE_DESC' | translatePipe }}</ion-select-option>
           <ion-select-option [value]="SortMode.Duration_ASC">{{ 'SETTINGS_RECORDINGS_SORT_DURATION_ASC' | translatePipe }}</ion-select-option>
@@ -104,10 +111,13 @@
       <h4>{{ 'SETTINGS_PLAYER_SECTION' | translatePipe }}</h4>
     </ion-item-divider>
 
-    <ion-item>
+    <ion-item button (click)="seektimeSelect.open()">
       <div class="wrapper">
         <div class="label">{{ 'SETTINGS_PLAYER_SEEK_TIME' | translatePipe }}</div>
-        <ion-select [(ngModel)]="settings.seekTime" (ngModelChange)="save()" placeholder="{{ 'SETTINGS_MAKE_SELECTION' | translatePipe }}">
+        <ion-select #seektimeSelect
+          [(ngModel)]="settings.seekTime" (ngModelChange)="save()"
+          placeholder="{{ 'SETTINGS_MAKE_SELECTION' | translatePipe }}"
+        >
           <ion-select-option [value]="5">5s</ion-select-option>
           <ion-select-option [value]="10">10s</ion-select-option>
           <ion-select-option [value]="15">15s</ion-select-option>
@@ -119,7 +129,7 @@
       </div>
     </ion-item>
 
-    <ion-item>
+    <ion-item (click)="settings.enableEarpiece = !settings.enableEarpiece; save();">
       <div class="wrapper">
         <div class="label">
           <div>{{ 'SETTINGS_PLAYER_ENABLE_EARPIECE' | translatePipe }}</div>
@@ -132,7 +142,7 @@
       </div>
     </ion-item>
 
-    <ion-item>
+    <ion-item (click)="settings.keepAwakeWhenPlaying = !settings.keepAwakeWhenPlaying; save();">
       <div class="wrapper">
         <div class="label">
           <div>{{ 'SETTINGS_PLAYER_KEEP_AWAKE' | translatePipe }}</div>
