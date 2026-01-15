@@ -167,12 +167,13 @@
       </div>
     </ion-item-divider>
 
-    <ion-item>
+    <ion-item button (click)="recorderAppSelect.open()">
       <div class="wrapper">
         <div class="label">
           <div>{{ 'SETTINGS_RECORDER_APPNAME' | translatePipe }}</div>
         </div>
         <ion-select
+          #recorderAppSelect
           [(ngModel)]="settings.recorderApp"
           (ionChange)="onRecorderAppChange()"
           placeholder="{{ 'SETTINGS_RECORDER_APPNAME_UNSPECIFIED' | translatePipe }}"
@@ -189,7 +190,7 @@
     <ion-radio-group [(ngModel)]="settings.useCustomFilenamePattern" (ionChange)="save()">
 
       @if (settings.recorderApp !== '') {
-      <ion-item>
+      <ion-item (click)="settings.useCustomFilenamePattern = false; save();">
         <ion-radio slot="start" [value]="false"></ion-radio>
         <div class="wrapper">
           <div class="label">
@@ -200,14 +201,14 @@
       </ion-item>
       }
 
-      <ion-item>
+      <ion-item button="true" detail="false" (click)="settings.useCustomFilenamePattern = true; save();">
         <ion-radio slot="start" [value]="true"></ion-radio>
         <div class="wrapper">
           <div class="label">
             <div>{{ 'SETTINGS_FILENAME_PATTERN_CUSTOM' | translatePipe }}</div>
-            <div class="help">{{ settings.filenamePattern ? settings.filenamePattern : 'Select a pattern to use for recording filenames...' }}</div>
+            <div class="help">{{ settings.filenamePattern || 'Select a pattern...' }}</div>
           </div>
-          <ion-button icon="folder-open-outline" (click)="editFilenameFormat()">
+          <ion-button (click)="$event.stopPropagation(); editFilenameFormat()">
             {{ 'LBL_EDIT' | translatePipe }}
           </ion-button>
         </div>
@@ -216,13 +217,13 @@
     </ion-radio-group>
 
     @if (settings.recorderApp === 'com.chiller3.bcr') {
-    <ion-item>
+    <ion-item button (click)="openBcrSettings()">
       <div class="wrapper">
         <div class="label">
           <div>{{ 'SETTINGS_RECORDER_BCR_SETTINGS' | translatePipe }}</div>
           <div class="help" [innerHTML]="'SETTINGS_RECORDER_BCR_SETTINGS_HELP' | translatePipe"></div>
         </div>
-        <ion-button (click)="openBcrSettings()">
+        <ion-button (click)="$event.stopPropagation(); openBcrSettings()">
           {{ 'SETTINGS_RECORDER_BCR_SETTINGS_OPEN' | translatePipe }}
         </ion-button>
       </div>
