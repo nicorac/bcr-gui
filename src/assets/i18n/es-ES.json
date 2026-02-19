@@ -1,6 +1,6 @@
 {
   "ABOUT_COPYRIGHT": "Derechos de autor",
-  "ABOUT_DESCRIPTION": "%appName% es una aplicación complementaria para %bcrLink% (Basic Call Recorder), para facilitar la gestión de su base de datos de grabaciones",
+  "ABOUT_DESCRIPTION": "%appName% hace que sea fácil de administrar, organizar y mantener su colección de grabación de llamadas, todo en un lugar. En adición a %bcrLink% (Grabadora de Llamadas Básicas), admite otras varias grabadoras.",
   "ABOUT_DEV_MODE_DISABLED": "Modo de desarrollo desactivado",
   "ABOUT_DEV_MODE_ENABLED": "Modo de desarrollo activado",
   "ABOUT_DONATIONS": "Donaciones",
@@ -135,7 +135,7 @@
   "SETTINGS_RECORDINGS_SORT_DURATION_DESC": "Duración (decreciente)",
   "SETTINGS_RESCAN_TEXT": "¿Desea volver a escanear todos sus archivos (sin archivo JSON de metadatos) utilizando el nuevo formato del nombre del archivo?",
   "SETTINGS_RESCAN_TITLE": "Volver a escanear",
-  "SETTINGS_SELECT_DIRECTORY_MESSAGE": "Esta aplicación necesita acceso a la carpeta de las grabaciones.\n\nSi pulsa Aceptar, Android le mostrará un selector de carpetas.\n\nSeleccione la carpeta de grabaciones y permita el acceso a su contenido...",
+  "SETTINGS_SELECT_DIRECTORY_MESSAGE": "Esta aplicación necesita acceso al directorio de las grabaciones.\n\nSi pulsa Aceptar, Android le mostrará un selector de directorio.\n\nSeleccione la carpeta de grabaciones y permita el acceso a su contenido…",
   "SETTINGS_SELECT_DIRECTORY_TITLE": "Acceso a la carpeta de grabaciones",
   "SETTINGS_SYSTEM_DEFAULT": "Predeterminado del sistema"
 }
