@@ -2,7 +2,8 @@
  * Remove extension from the given filename
  */
 export function stripExtension(filename: string): string {
-  return filename.substring(0, filename.lastIndexOf('.'));
+  const index = filename.lastIndexOf('.');
+  return index >= 0 ? filename.substring(0, index) : filename;
 }
 
 /**
