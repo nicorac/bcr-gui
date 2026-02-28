@@ -230,10 +230,10 @@ export class Recording {
     res.direction = groups['direction'] as CallDirection;
     res.calls = [
       {
-        phone_number: groups['phone_number'],
-        phone_number_formatted: groups['phone_number'],
-        caller_name: groups['caller_name'] || groups['phone_number'],
-        contact_name: groups['caller_name'] || groups['phone_number'],
+        phone_number: groups['phone_number']?.trim(),
+        phone_number_formatted: groups['phone_number']?.trim(),
+        caller_name: (groups['caller_name'] || groups['phone_number'])?.trim(),
+        contact_name: (groups['caller_name'] || groups['phone_number'])?.trim(),
       }
     ];
 
