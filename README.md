@@ -67,6 +67,10 @@ Latest version is [available here](https://github.com/nicorac/bcr-gui/releases/)
 
 You can also [find it at IzzyOnDroid](https://apt.izzysoft.de/packages/com.github.nicorac.bcrgui).
 
+## Contributing
+
+To translate the app, see [translation guide](./src/assets/i18n/README.md).
+
 ## Libraries
 
 - Ionic 7
