@@ -1,7 +1,7 @@
 import { Subscription } from 'rxjs';
 import { IonicBundleModule } from 'src/app/IonicBundle.module';
 import { Recording } from 'src/app/models/recording';
-import { ToHmsPipe } from 'src/app/pipes/to-hms.pipe';
+import { toHms, ToHmsPipe } from 'src/app/pipes/to-hms.pipe';
 import { MessageBoxService } from 'src/app/services/message-box.service';
 import { RecordingsService } from 'src/app/services/recordings.service';
 import { SettingsService } from 'src/app/services/settings.service';
@@ -47,6 +47,9 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
   public previousEnabled = input(false);
   public nextEnabled = input(false);
   public onSkip = output<SkipDirection>();
+
+  // knob
+  protected isDraggingKnob = signal(false);
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -263,12 +266,25 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
   /**
    * User released the position knob
    */
+  protected async onIonKnobMoveStart(ev: Event) {
+    this.isDraggingKnob.set(true);
+  }
+
+  /**
+   * User is dragging the knob
+   */
+  protected rangePinFormatter(value: number) {
+    return toHms(value);
+  }
+
+  /**
+   * User released the position knob
+   */
   protected async onIonKnobMoveEnd(ev: Event) {
     const newPos = (ev as RangeCustomEvent).detail.value as number;
-    // this.progress.set(newPos);
-    // if (this.status() === PlayerStatusEnum.Playing) {
-      return this.setCurrentPosition(newPos);
-    // }
+    this.isDraggingKnob.set(false);
+    this.setCurrentPosition(newPos);
+    this.progress.set(newPos);
   }
 
 }

@@ -36,8 +36,6 @@ $buttonSize: 2.5em;
   }
 }
 
-
-
 .button,
 .button-in {
   display: flex;
@@ -142,7 +140,24 @@ ion-range::part(bar-active) {
   background: var(--ion-color-primary);
 }
 
-
 ion-range::part(knob) {
   background: var(--ion-color-primary-darker);
+}
+
+ion-range::part(pin) {
+  transition: none; /* Disables the animation */
+
+  /* Increase horizontal size */
+  min-width: 40px; /* Adjust as needed */
+  width: auto;
+
+  /* Styling to make it look better when wider */
+  border-radius: 10px;
+  padding: 8px;
+  font-size: 12px;
+
+  /* Ensure it stays above the knob */
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

@@ -2,8 +2,14 @@
   <div class="progress-label">{{ progress() | toHms }}</div>
   <ion-range class="range-bar"
     [disabled]="!ready()"
-    [value]="progress()"
+    [value]="!isDraggingKnob() && progress()"
     [max]="duration()"
+    [pin]="true"
+    [pinFormatter]="rangePinFormatter"
+    [step]="duration() > 600 ? 10 : duration() > 180 ? 5 : 1"
+    [snaps]="true"
+    [ticks]="false"
+    (ionKnobMoveStart)="onIonKnobMoveStart($event)"
     (ionKnobMoveEnd)="onIonKnobMoveEnd($event)"
   />
   <div class="progress-label">{{ duration() | toHms }}</div>
