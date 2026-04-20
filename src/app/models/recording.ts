@@ -135,8 +135,13 @@ export class Recording {
     // extract "other party" data
     const calls0 = metadata.calls?.[0];
     if (calls0) {
-      this.opNumber = calls0.phone_number_formatted ?? calls0.phone_number ?? UNKNOWN_NAME_OR_NUMBER;
-      this.opName = calls0.contact_name ?? this.opNumber;
+      this.opNumber = calls0.phone_number_formatted
+        ?? calls0.phone_number
+        ?? UNKNOWN_NAME_OR_NUMBER;
+      this.opName = calls0.contact_name
+        ?? metadata.call_log_name
+        ?? calls0.caller_name
+        ?? this.opNumber;
     }
 
   }
