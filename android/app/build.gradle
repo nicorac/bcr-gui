@@ -29,8 +29,8 @@ android {
     targetSdkVersion rootProject.ext.targetSdkVersion
     // version parts: M = Major, m = minor, b = build
     // -------- MMMmmmbbb
-    versionCode 1013003
-    versionName "1.13.3"
+    versionCode 1014000
+    versionName "1.14.0"
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     aaptOptions {
        // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.

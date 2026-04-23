@@ -1,5 +1,21 @@
 # Version history
 
+## Version 1.14.0 (2026-04-23)
+
+New features:
+
+* Improved timebar seek by showing scroll time into a pin over the bar handle (#229)
+
+* BCR metadata parser now handles more fields (contact_name -> call_log_name -> caller_name -> opNumber) (#228)
+
+* Regex parser now trims the extracted phone number and caller name fields
+
+Bug fixes:
+
+* Fixed error when seeking back at the very beginning of play (#230)
+
+* Fixed error in stripExtension() function that strips the whole filename if no extension is found
+
 ## Version 1.13.3 (2026-01-03)
 
 New features:
@@ -10,7 +26,7 @@ New features:
 
 * New feature to handle culture ID aliases for each defined culture and improve automatic device language detection for culture codes like `zh-Hant-TW` (#218)
 
-* Added proximity sensor requirement to app manifest, needed by some ROMs to let app read sensor state (#215)
+* Added proximity sensor requirement to app manifest, needed by some ROMs to let app access sensor (#215)
 
 Bug fixes:
 
