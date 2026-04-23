@@ -243,6 +243,9 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
    * Set position
    */
   protected async setCurrentPosition(position: number) {
+    if (!position || position < 0) {
+      position = 0;
+    }
     AudioPlayer.setCurrentPosition({ position: position * 1000 });
   }
 
