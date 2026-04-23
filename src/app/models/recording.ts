@@ -136,12 +136,12 @@ export class Recording {
     const calls0 = metadata.calls?.[0];
     if (calls0) {
       this.opNumber = calls0.phone_number_formatted
-        ?? calls0.phone_number
-        ?? UNKNOWN_NAME_OR_NUMBER;
+        || calls0.phone_number
+        || UNKNOWN_NAME_OR_NUMBER;
       this.opName = calls0.contact_name
-        ?? metadata.call_log_name
-        ?? calls0.caller_name
-        ?? this.opNumber;
+        || metadata.call_log_name
+        || calls0.caller_name
+        || this.opNumber;
     }
 
   }
