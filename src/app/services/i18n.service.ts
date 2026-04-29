@@ -35,11 +35,9 @@ export class I18nService {
   private _cultureDefs: Culture[] = [];
   private _currentCulture = FALLBACK_CULTURE_ID;
 
+  // services
   // CAN'T use DI because of circular dependency, set in initialize() function
   private settings!: SettingsService;
-
-  constructor(
-  ) { }
 
   async initialize(settings: SettingsService) {
 

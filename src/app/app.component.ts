@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, Optional } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { App } from '@capacitor/app';
 import { StatusBar } from '@capacitor/status-bar';
@@ -18,7 +18,6 @@ const TOOLBAR_BACKGROUND_DARK = '#1f241d';
 
 @Component({
   selector: 'app-root',
-  standalone: true,
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -30,17 +29,18 @@ const TOOLBAR_BACKGROUND_DARK = '#1f241d';
 })
 export class AppComponent implements OnInit {
 
-  AppRoutesEnum = AppRoutesEnum;
+  protected AppRoutesEnum = AppRoutesEnum;
 
-  constructor(
-    private i18n: I18nService,
-    private mbs: MessageBoxService,
-    private platform: Platform,
-    private recordingsService: RecordingsService,
-    private router: Router,
-    private settings: SettingsService,
-    @Optional() private routerOutlet?: IonRouterOutlet
-  ) {
+  // services
+  private i18n = inject(I18nService);
+  private mbs = inject(MessageBoxService);
+  private platform = inject(Platform);
+  private recordingsService = inject(RecordingsService);
+  private router = inject(Router);
+  private settings = inject(SettingsService);
+  private routerOutlet? = inject(IonRouterOutlet, { optional: true });
+
+  constructor() {
 
     // customize Back button management
     this.platform.backButton.subscribeWithPriority(-1, () => {

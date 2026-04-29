@@ -22,7 +22,7 @@ import { AndroidSAF } from 'src/plugins/androidsaf';
 import { ErrorCode } from 'src/plugins/bcrgui';
 import { CdkVirtualScrollViewport, ScrollingModule } from '@angular/cdk/scrolling';
 import { DatePipe } from '@angular/common';
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, signal, untracked, viewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, inject, signal, untracked, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Clipboard } from '@capacitor/clipboard';
@@ -31,7 +31,6 @@ import version from '../../version';
 
 @Component({
   selector: 'app-main',
-  standalone: true,
   templateUrl: './main.page.html',
   styleUrls: ['./main.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -53,7 +52,7 @@ import version from '../../version';
     ContactsService,
     DatePipe,
     ToHmsPipe,
-  ],
+  ]
 })
 export class MainPage implements AfterViewInit {
 
@@ -90,7 +89,7 @@ export class MainPage implements AfterViewInit {
     return filteredItems;
   });
 
-  protected topIndex = 0; // index of top shown recording
+  protected topIndex = signal(0); // index of top shown recording
   protected itemHeight = 78;
   protected itemGap = 12;
 
@@ -98,19 +97,19 @@ export class MainPage implements AfterViewInit {
   private scrollViewport = viewChild(CdkVirtualScrollViewport);
   private searchBar = viewChild(IonSearchbar);
 
-  constructor(
-    private asc: ActionSheetController,
-    private cdr: ChangeDetectorRef,
-    private contactsService: ContactsService,
-    private datePipe: DatePipe,
-    private i18n: I18nService,
-    private mbs: MessageBoxService,
-    private toHms: ToHmsPipe,
-    protected recordingsService: RecordingsService,
-    protected router: Router,
-    protected settings: SettingsService,
-  ) {
+  // services
+  private asc = inject(ActionSheetController);
+  private cdr = inject(ChangeDetectorRef);
+  private contactsService = inject(ContactsService);
+  private datePipe = inject(DatePipe);
+  private i18n = inject(I18nService);
+  private mbs = inject(MessageBoxService);
+  private toHms = inject(ToHmsPipe);
+  protected recordingsService = inject(RecordingsService);
+  protected router = inject(Router);
+  protected settings = inject(SettingsService);
 
+  constructor() {
     // // DEBUG: automatically select first recording
     // if (!environment.production) {
     //   effect(() => {
@@ -119,7 +118,6 @@ export class MainPage implements AfterViewInit {
     //     }
     //   });
     // }
-
   }
 
   async ionViewWillEnter() {
@@ -473,7 +471,7 @@ Duration: ${this.toHms.transform(item.duration)}
    * Default list scroll
    */
   onScroll(index: number) {
-    this.topIndex = index;
+    this.topIndex.set(index);
   }
 
   /**

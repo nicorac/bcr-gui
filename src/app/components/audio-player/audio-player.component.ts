@@ -6,7 +6,7 @@ import { MessageBoxService } from 'src/app/services/message-box.service';
 import { RecordingsService } from 'src/app/services/recordings.service';
 import { SettingsService } from 'src/app/services/settings.service';
 import { AudioPlayer } from 'src/plugins/audioplayer';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, input, OnDestroy, OnInit, output, signal, untracked } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, inject, input, OnDestroy, OnInit, output, signal, untracked } from '@angular/core';
 import { RangeCustomEvent } from '@ionic/angular';
 
 export enum PlayerStatusEnum {
@@ -21,13 +21,12 @@ export type SeekMode = 'begin' | 'rew' | 'fwd';
   selector: 'app-audio-player',
   templateUrl: './audio-player.component.html',
   styleUrls: ['./audio-player.component.scss'],
-  standalone: true,
-  imports: [ IonicBundleModule, ToHmsPipe ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [IonicBundleModule, ToHmsPipe],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AudioPlayerComponent implements OnInit, OnDestroy {
 
-  PlayerStatusEnum = PlayerStatusEnum;
+  protected PlayerStatusEnum = PlayerStatusEnum;
 
   // player status
   protected ready = signal(false);
@@ -50,20 +49,21 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
   // knob
   protected isDraggingKnob = signal(false);
 
-  constructor(
-    private cdr: ChangeDetectorRef,
-    private mbs: MessageBoxService,
-    private recordingsService: RecordingsService,
-    protected settings: SettingsService,
-  ) {
-    effect(() => {
-      untracked(async () => await this.unload());
-      if (this.recording()) {
-        untracked(async () => await this.load(this.recording()));
-      }
-    });
+  // services
+  private cdr = inject(ChangeDetectorRef);
+  private mbs = inject(MessageBoxService);
+  private recordingsService = inject(RecordingsService);
+  protected settings = inject(SettingsService);
 
-  }
+  // load audio file when selected recording changes
+  private _ = effect(() => {
+    // unload current one
+    untracked(async () => await this.unload());
+    if (this.recording()) {
+      // load new one
+      untracked(async () => await this.load(this.recording()));
+    }
+  });
 
   async ngOnInit() {
 

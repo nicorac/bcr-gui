@@ -3,7 +3,6 @@ import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
   name: 'filesize',
-  standalone: true,
 })
 export class FilesizePipe implements PipeTransform {
 

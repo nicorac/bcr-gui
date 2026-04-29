@@ -1,6 +1,6 @@
 import { BehaviorSubject } from 'rxjs';
 import { AndroidDateTimeSettings } from 'src/plugins/androiddatetimesettings';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Preferences } from '@capacitor/preferences';
 import { FILENAME_PATTERN_TEMPLATES } from '../models/recording';
 import { deserializeObject, JsonProperty, serializeObject } from '../utils/json-serializer';
@@ -24,6 +24,9 @@ export class SettingsService {
 
   private isInitialized = false;
   private isLoadingSaving = false;
+
+  // services
+  private mbs = inject(MessageBoxService);
 
   /**
    * Return true if time is currently set to 12-hours
@@ -173,10 +176,6 @@ export class SettingsService {
    */
   @JsonProperty()
   public developerMode = false;
-
-  constructor(
-    private mbs: MessageBoxService,
-  ) { }
 
   /**
    * Load app settings from storage

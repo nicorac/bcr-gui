@@ -4,23 +4,16 @@ import { FILENAME_PATTERN_SUPPORTED_VARS, FILENAME_PATTERN_TEMPLATES, Recording 
 import { TranslatePipe } from 'src/app/pipes/translate.pipe';
 import { I18nKey, I18nService } from 'src/app/services/i18n.service';
 import { AndroidSAF, ErrorCode } from 'src/plugins/androidsaf';
-import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, ElementRef, OnInit, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, inject, OnInit, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { IonModal, IonTextarea, ModalController, Platform } from '@ionic/angular';
 
 @Component({
   selector: 'app-filename-pattern-editor',
-  standalone: true,
   templateUrl: './filename-pattern-editor.component.html',
   styleUrls: ['../shared.scss', './filename-pattern-editor.component.scss'],
+  imports: [FormsModule, IonicBundleModule, TranslatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicBundleModule,
-    TranslatePipe,
-  ],
 })
 export class FilenamePatternEditorComponent implements OnInit {
 
@@ -28,7 +21,7 @@ export class FilenamePatternEditorComponent implements OnInit {
   protected testFilename = signal('');
   protected testResult = signal('');
   protected pattern = signal('');
-  protected patternError = signal<string|undefined>(undefined);
+  protected patternError = signal<string | undefined>(undefined);
 
   // injected by caller
   public initialPattern = '';
@@ -40,26 +33,32 @@ export class FilenamePatternEditorComponent implements OnInit {
   private placeholdersModal = viewChild.required<IonModal>('placeholdersModal');
   private templateLoadModal = viewChild.required<IonModal>('templateLoadModal');
 
-  protected placeholders = FILENAME_PATTERN_SUPPORTED_VARS.map(key => {
-    let val: Record<string,string>|undefined;
+  // services
+  private i18n = inject(I18nService);
+  private mc = inject(ModalController);
+  private platform = inject(Platform);
+  private ref = inject(ElementRef<HTMLIonModalElement>);
+
+  protected placeholders = FILENAME_PATTERN_SUPPORTED_VARS.map((key) => {
+    let val: Record<string, string> | undefined;
     switch (key) {
-      case 'direction': val = { values: "'in' | 'out' | 'conference'" }; break;
-      default: val = undefined;
+      case 'direction':
+        val = { values: "'in' | 'out' | 'conference'" };
+        break;
+      default:
+        val = undefined;
     }
     return {
       text: `{${key}}`,
       description: this.i18n.get(`FNP_EDITOR_VAR_${key}` as I18nKey, val),
-    }
+    };
   });
 
-  constructor(
-    private i18n: I18nService,
-    private mc: ModalController,
-    private platform: Platform,
-    private ref: ElementRef<HTMLIonModalElement>,
-  ) {
+  constructor() {
     // subscribe to hardware back button events
-    this.backSub = this.platform.backButton.subscribeWithPriority(10, () => this.cancel());
+    this.backSub = this.platform.backButton.subscribeWithPriority(10, () =>
+      this.cancel()
+    );
   }
 
   ngOnInit() {
@@ -75,53 +74,56 @@ export class FilenamePatternEditorComponent implements OnInit {
     this.backSub?.unsubscribe();
   }
 
-  cancel() {
+  protected cancel() {
     this.mc.dismiss();
   }
 
-  async confirm() {
+  protected async confirm() {
     await this.onConfirm?.(this.pattern());
     this.cancel();
   }
 
-  async selectTestFile() {
+  protected async selectTestFile() {
     try {
       const res = await AndroidSAF.selectFile();
       this.testFilename.set(res.displayName);
-    }
-    catch (error: any) {
+    } catch (error: any) {
       if (error.code !== ErrorCode.ERR_CANCELED) {
         console.error('Error selecting file:', error);
       }
     }
   }
 
-  async insertPlaceholder(ph: string) {
+  protected async insertPlaceholder(ph: string) {
     const txt = await this.patternField().getInputElement();
     let startPos = txt.selectionStart ?? 0;
     let endPos = txt.selectionStart ?? this.pattern.length;
-    this.pattern.update(v => v.substring(0, startPos) + ph + v.substring(startPos + endPos));
+    this.pattern.update(
+      (v) => v.substring(0, startPos) + ph + v.substring(startPos + endPos)
+    );
     this.placeholdersModal().dismiss();
   }
 
-  async loadTemplate(pattern: string) {
+  protected async loadTemplate(pattern: string) {
     this.pattern.set(pattern);
     this.templateLoadModal().dismiss();
     this.validatePattern();
   }
 
-  testPattern() {
+  protected testPattern() {
     const re = Recording.getFilenameRegExp(this.pattern());
     const obj = Recording.extractMetadataFromFilename(this.testFilename(), re);
     // add a string date value
-    (obj as any).call_date = new Date(+(obj.timestamp_unix_ms ?? 0)).toISOString();
+    (obj as any).call_date = new Date(
+      +(obj.timestamp_unix_ms ?? 0)
+    ).toISOString();
     this.testResult.set(JSON.stringify(obj, null, 2));
   }
 
   /**
    * Try to create a RegExp instance with current pattern
    */
-  validatePattern() {
+  protected validatePattern() {
     try {
       this.patternError.set(undefined);
 
@@ -130,12 +132,12 @@ export class FilenamePatternEditorComponent implements OnInit {
 
       // validate BCR vars
       const varsValidation = Recording.validateFilenamePattern(this.pattern());
-      this.patternError.set(varsValidation === true ? undefined : varsValidation);
-
+      this.patternError.set(
+        varsValidation === true ? undefined : varsValidation
+      );
     } catch (error: any) {
       this.patternError.set(error.message);
     }
-
   }
 
 }

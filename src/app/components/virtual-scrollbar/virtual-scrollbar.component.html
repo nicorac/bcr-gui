@@ -1,7 +1,7 @@
 <div class="cursor"
   [class.visible]="isVisible()"
-  [style.transform]="'translateY(' + cursorYPos() + 'px)'"
-  [style.height]="cursorHeight + 'px'"
-  [style.min-height]="cursorHeight + 'px'"
+  [style.transform]="`translateY(${cursorYPos()}px)`"
+  [style.height.px]="cursorHeight"
+  [style.min-height.px]="cursorHeight"
 >
 </div>

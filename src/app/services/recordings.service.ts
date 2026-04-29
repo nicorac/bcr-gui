@@ -1,6 +1,6 @@
 import { AndroidSAF, AndroidSAFUtils, ErrorCode, GetFileUriOptions, ReadFileOptions } from 'src/plugins/androidsaf';
 import { AudioPlayer } from 'src/plugins/audioplayer';
-import { Injectable, signal } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { Encoding } from '@capacitor/filesystem';
 import { Platform } from '@ionic/angular';
 import { DB_FILENAME, DB_SCHEMA_VERSION, DbContent } from '../models/dbContent';
@@ -38,13 +38,13 @@ export class RecordingsService {
   public refreshProgress = signal<number|undefined>(undefined);
   public isUpdatingDurations = false;
 
-  constructor(
-    private i18n: I18nService,
-    private contactsService: ContactsService,
-    private mbs: MessageBoxService,
-    private platform: Platform,
-    protected settings: SettingsService,
-  ) {}
+  // services
+  private i18n = inject(I18nService);
+  private contactsService = inject(ContactsService);
+  private mbs = inject(MessageBoxService);
+  private platform = inject(Platform);
+  protected settings = inject(SettingsService);
+
 
   /**
    * Initialize the recordings DB

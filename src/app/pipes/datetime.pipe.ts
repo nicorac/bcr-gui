@@ -1,16 +1,14 @@
 
-import { Pipe, PipeTransform } from '@angular/core';
+import { inject, Pipe, PipeTransform } from '@angular/core';
 import { AppDateTimeFormat, DEFAULT_DATE_FORMAT, SettingsService } from '../services/settings.service';
 
 @Pipe({
   name: 'datetime',
-  standalone: true,
 })
 export class DatetimePipe implements PipeTransform {
 
-  constructor(
-    private settings: SettingsService,
-  ) {}
+  // services
+  private settings = inject(SettingsService);
 
   transform(timestamp: Date|number, options?: AppDateTimeFormat): string {
 

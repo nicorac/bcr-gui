@@ -6,25 +6,24 @@ import { TranslatePipe } from 'src/app/pipes/translate.pipe';
 import { I18nService } from 'src/app/services/i18n.service';
 import { MessageBoxService } from 'src/app/services/message-box.service';
 import { SettingsService } from 'src/app/services/settings.service';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { Platform } from '@ionic/angular';
 import version from '../../version';
 
 @Component({
   selector: 'app-about',
-  standalone: true,
   templateUrl: './about.page.html',
   styleUrls: ['./about.page.scss'],
   imports: [
     HeaderComponent,
     IonicBundleModule,
-    TranslatePipe
-  ],
+    TranslatePipe,
+  ]
 })
 export class AboutPage {
 
-  private backSub?: Subscription;
+  private _sub?: Subscription;
 
   protected version = version;
 
@@ -33,19 +32,20 @@ export class AboutPage {
     bcrLink: `<a href="${version.bcrUri}">${version.bcrAppName}</a>`,
   };
 
-  constructor(
-    private i18n: I18nService,
-    private mbs: MessageBoxService,
-    protected platform: Platform,
-    protected router: Router,
-    protected settings: SettingsService,
-  ) {
+  // services
+  private i18n = inject(I18nService);
+  private mbs = inject(MessageBoxService);
+  protected platform = inject(Platform);
+  protected router = inject(Router);
+  protected settings = inject(SettingsService);
+
+  constructor() {
     // subscribe to hardware back button events
-    this.backSub = this.platform.backButton.subscribeWithPriority(10, () => this.router.navigateByUrl(AppRoutesEnum.Main));
+    this._sub = this.platform.backButton.subscribeWithPriority(10, () => this.router.navigateByUrl(AppRoutesEnum.Main));
   }
 
   ionViewWillLeave() {
-    this.backSub?.unsubscribe();
+    this._sub?.unsubscribe();
   }
 
   /**

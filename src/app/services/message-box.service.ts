@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Clipboard } from '@capacitor/clipboard';
 import { AlertButton, AlertController, AlertInput, IonicSafeString } from '@ionic/angular';
 import { I18nKey, I18nService, TranslationArgs } from './i18n.service';
@@ -10,10 +10,9 @@ export type MessageType = string|string[]|IonicSafeString;
 })
 export class MessageBoxService {
 
-  constructor(
-    private alertController: AlertController,
-    private i18n: I18nService,
-  ) { }
+  // services
+  private alertController = inject(AlertController);
+  private i18n = inject(I18nService);
 
   private formatMessage(message?: MessageType): string|IonicSafeString {
     if (Array.isArray(message)) {

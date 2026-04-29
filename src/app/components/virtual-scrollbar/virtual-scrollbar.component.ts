@@ -22,8 +22,6 @@ export class VirtualScrollbarComponent implements OnInit, OnDestroy {
   protected isVisible = signal(false);
   protected cursorYPos = signal(0);     // cursor current Y position
   private cursorYRange = 0;     // Y cursor scroll range (starting from 0)
-  private topOffset = 0;        // pointer events coordinates are absolute, so we need to offset them
-  private height = 0;
 
   // CDK list
   private listHeight = 0;       // height of CDK list component
@@ -95,9 +93,7 @@ export class VirtualScrollbarComponent implements OnInit, OnDestroy {
       // handle resize of this component
       if (entry.target === this.ne) {
         const r = this.ne.getBoundingClientRect();
-        this.height = r.height;
-        this.topOffset = r.top;
-        this.cursorYRange = this.height - this.cursorHeight;  // cursor can't go outside bottom bound
+        this.cursorYRange = r.height - this.cursorHeight;  // cursor can't go outside bottom bound
       }
 
       // handle resize of CDK spacer DIV

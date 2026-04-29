@@ -1,6 +1,6 @@
 import { AndroidSettings, NativeSettings } from 'capacitor-native-settings';
 import { BcrGui } from 'src/plugins/bcrgui';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { ContactPayload, Contacts } from '@capacitor-community/contacts';
 import { PermissionState } from '@capacitor/core';
 import { NumberDisplayNameMap } from '../models/NumberDisplayNameMap';
@@ -14,11 +14,10 @@ import { SettingsService } from './settings.service';
 })
 export class ContactsService {
 
-  constructor(
-    private i18n: I18nService,
-    private mbs: MessageBoxService,
-    private settings: SettingsService,
-  ) {}
+  // services
+  private i18n = inject (I18nService);
+  private mbs = inject (MessageBoxService);
+  private settings = inject (SettingsService);
 
   /**
    * @deprecated
@@ -101,7 +100,7 @@ export class ContactsService {
   /**
    * Check Android Contacts permission
    */
-  async checkPermission(): Promise<PermissionState> {
+  async checkPermission(): Promise<PermissionState | 'limited'> {
 
     // check current permission status
     const { contacts: perm } = await Contacts.requestPermissions();

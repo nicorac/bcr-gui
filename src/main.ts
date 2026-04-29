@@ -1,5 +1,5 @@
 import { provideHttpClient } from '@angular/common/http';
-import { APP_INITIALIZER, enableProdMode, ErrorHandler, importProvidersFrom } from '@angular/core';
+import { enableProdMode, ErrorHandler, importProvidersFrom, inject, provideAppInitializer } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideRouter, RouteReuseStrategy } from '@angular/router';
 import { IonicModule, IonicRouteStrategy, Platform } from '@ionic/angular';
@@ -17,10 +17,11 @@ if (environment.production) {
 
 bootstrapApplication(AppComponent, {
   providers: [
+    // provideZoneChangeDetection(),   // to be removed...
     provideHttpClient(),
     provideRouter(routes),
     importProvidersFrom(
-      IonicModule.forRoot({ innerHTMLTemplatesEnabled: true }),
+      IonicModule.forRoot({ innerHTMLTemplatesEnabled: true })
     ),
     {
       provide: ErrorHandler,
@@ -30,50 +31,39 @@ bootstrapApplication(AppComponent, {
       provide: RouteReuseStrategy,
       useClass: IonicRouteStrategy,
     },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: initializeApp,
-      multi: true,
-      deps: [
-        // NOTE: MUST have the same order as function parameters
-        I18nService,
-        SettingsService,
-        Platform,
-      ],
-    },
+    provideAppInitializer(() => initializeApp(
+      inject(I18nService),
+      inject(SettingsService),
+      inject(Platform),
+    )),
   ],
 }).catch((err) => console.error(err));
 
 /**
  * App initializer
  */
-function initializeApp(i18n: I18nService, settings: SettingsService, platform: Platform) {
+async function initializeApp(
+  i18n: I18nService,
+  settings: SettingsService,
+  platform: Platform
+) {
+  // wait for Ionic initialization
+  await platform.ready();
 
-  return async () => {
+  // initialize version & settings
+  await version.initialize();
+  await settings.initialize();
 
-    // if (!environment.production) {
-    //   waitForDebugger();
-    // }
+  // initialize i18n & load culture
+  await i18n.initialize(settings);
+  await i18n.load(settings.culture);
 
-    // wait for Ionic initialization
-    await platform.ready();
-
-    // initialize version & settings
-    await version.initialize();
-    await settings.initialize();
-
-    // initialize i18n & load culture
-    await i18n.initialize(settings);
-    await i18n.load(settings.culture);
-
-    // intercept unmanaged errors
-    window.onerror = function (message, file, line, col, error) {
-      alert("Error occurred: " + error?.message);
-      return false;
-    };
-    window.addEventListener('unhandledrejection', function (e) {
-      alert("Error occurred: " + e.reason.message);
-    })
-
-  }
+  // intercept unmanaged errors
+  window.onerror = function (message, file, line, col, error) {
+    alert('Error occurred: ' + error?.message);
+    return false;
+  };
+  window.addEventListener('unhandledrejection', function (e) {
+    alert('Error occurred: ' + e.reason.message);
+  });
 }

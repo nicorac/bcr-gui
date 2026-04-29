@@ -72,7 +72,7 @@
       [style.--item-gap]="itemGap + 'px'"
     >
 
-      @if (topIndex === 0) {
+      @if (topIndex() === 0) {
         <ion-refresher
           slot="fixed"
           pullFactor=".5"
@@ -114,7 +114,7 @@
               </ion-card-title>
               <ion-card-subtitle class="left-container subtitle">
                 <app-call-icon class="call-direction-icon" [direction]="item?.direction ?? ''" />
-                <span>{{ item?.date | datetime }}</span>
+                <span>{{ item.date | datetime }}</span>
                 @if (item.duration) {
                   • <span>{{ item.duration | toHms }}</span>
                 }

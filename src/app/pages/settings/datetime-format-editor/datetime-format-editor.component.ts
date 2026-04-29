@@ -4,7 +4,7 @@ import { DatetimePipe } from 'src/app/pipes/datetime.pipe';
 import { TranslatePipe } from 'src/app/pipes/translate.pipe';
 import { I18nKey, I18nService } from 'src/app/services/i18n.service';
 import { AppDateTimeFormat, SettingsService } from 'src/app/services/settings.service';
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ModalController } from '@ionic/angular';
 
@@ -12,8 +12,6 @@ import { ModalController } from '@ionic/angular';
   selector: 'app-datetime-format-editor',
   templateUrl: './datetime-format-editor.component.html',
   styleUrls: ['../shared.scss', './datetime-format-editor.component.scss'],
-  standalone: true,
-  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     DatetimePipe,
     FormsModule,
@@ -21,6 +19,7 @@ import { ModalController } from '@ionic/angular';
     IonicBundleModule,
     TranslatePipe,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DatetimeFormatEditorComponent {
 
@@ -28,6 +27,11 @@ export class DatetimeFormatEditorComponent {
   protected readonly dateTimeSample = new Date(new Date().getFullYear(), 11, 31, 23, 59, 59);
 
   protected format = signal<AppDateTimeFormat>({});
+  protected isValid = computed(() =>
+    this.format().customFormat
+    || this.format().dateStyle !== <any>'*'
+    || this.format().timeStyle !== <any>'*'
+  );
 
   // datetime format elements
   protected readonly DATETIME_FORMAT_ELEMS = [
@@ -51,11 +55,13 @@ export class DatetimeFormatEditorComponent {
     'a',
   ];
 
-  constructor(
-    protected i18n: I18nService,
-    protected mc: ModalController,
-    protected settings: SettingsService,
-  ) {
+  // services
+  protected i18n = inject(I18nService);
+  protected mc = inject(ModalController);
+  protected settings = inject(SettingsService);
+
+
+  constructor() {
     const initVal = <AppDateTimeFormat>{...this.settings.dateTimeFormat };
     // fix datetime styles (undefined can't be set as [value], so we use '*')
     if (!initVal.dateStyle) { initVal.dateStyle = <any>'*' };
@@ -80,12 +86,6 @@ export class DatetimeFormatEditorComponent {
 
   protected getElementKey(el: string): I18nKey {
     return <I18nKey>('DTF_EDITOR_PH_' + el);
-  }
-
-  protected isValid() {
-    return this.format().customFormat
-      || this.format().dateStyle !== <any>'*'
-      || this.format().timeStyle !== <any>'*';
   }
 
 }

@@ -8,7 +8,7 @@ import { MessageBoxService } from 'src/app/services/message-box.service';
 import { RecordingsService } from 'src/app/services/recordings.service';
 import { SortModeEnum } from 'src/app/utils/recordings-sorter';
 import version from 'src/app/version';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ModalController, Platform } from '@ionic/angular';
@@ -17,17 +17,16 @@ import { DatetimeFormatEditorComponent } from './datetime-format-editor/datetime
 import { FilenamePatternEditorComponent } from './filename-pattern-editor/filename-pattern-editor.component';
 
 @Component({
-  selector: 'app-settings',
-  standalone: true,
-  templateUrl: './settings.page.html',
-  styleUrls: ['./shared.scss', './settings.page.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [
-    FormsModule,
-    HeaderComponent,
-    IonicBundleModule,
-    TranslatePipe,
-  ],
+    selector: 'app-settings',
+    templateUrl: './settings.page.html',
+    styleUrls: ['./shared.scss', './settings.page.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        FormsModule,
+        HeaderComponent,
+        IonicBundleModule,
+        TranslatePipe,
+    ]
 })
 export class SettingsPage {
 
@@ -38,14 +37,16 @@ export class SettingsPage {
 
   private backSub?: Subscription;
 
+  // services
+  protected i18n = inject(I18nService);
+  protected messageBoxService = inject(MessageBoxService);
+  protected modalController = inject(ModalController);
+  protected platform = inject(Platform);
+  protected recordingsService = inject(RecordingsService);
+  protected router = inject(Router);
+  protected settings = inject(SettingsService);
+
   constructor(
-    protected i18n: I18nService,
-    protected messageBoxService: MessageBoxService,
-    protected modalController: ModalController,
-    protected platform: Platform,
-    protected recordingsService: RecordingsService,
-    protected router: Router,
-    protected settings: SettingsService,
   ) {
     // subscribe to hardware back button events
     this.backSub = this.platform.backButton.subscribeWithPriority(10, () => this.router.navigateByUrl(AppRoutesEnum.Main));
@@ -56,18 +57,18 @@ export class SettingsPage {
     await this.save();
   }
 
-  async save() {
+  protected async save() {
     await this.settings.save();
   }
 
-  selectRecordingsDirectory() {
+  protected selectRecordingsDirectory() {
     this.recordingsService.selectRecordingsDirectory(() => this.recordingsService.initialize());
   }
 
   /**
    * Open filename format editor modal
    */
-  async editFilenameFormat() {
+  protected async editFilenameFormat() {
 
     this.editor = await this.modalController.create({
       component: FilenamePatternEditorComponent,
@@ -93,7 +94,7 @@ export class SettingsPage {
   /**
    * Open datetime format editor modal
    */
-  async editDatetimeFormat() {
+  protected async editDatetimeFormat() {
 
     this.editor = await this.modalController.create({
       component: DatetimeFormatEditorComponent,
@@ -106,7 +107,7 @@ export class SettingsPage {
   /**
    * Set the default country prefix to settings
    */
-  setDefaultCountryPrefix(prefix: string) {
+  protected setDefaultCountryPrefix(prefix: string) {
     prefix = prefix.trim();
     if (prefix) {
       if (!prefix.startsWith('+')) {
