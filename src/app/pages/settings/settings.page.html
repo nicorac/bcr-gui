@@ -4,35 +4,27 @@
 
   <ion-list class="config-items" lines="full">
 
+    <!-- general section -->
     <ion-item-divider>
       <h4>{{ 'SETTINGS_GENERAL_SECTION' | translatePipe }}</h4>
     </ion-item-divider>
 
-    <ion-item>
+    <ion-item button (click)="selectRecordingsDirectory()">
       <div class="wrapper">
         <div class="label">
           <div>{{ 'SETTINGS_RECORDINGS_DIRECTORY' | translatePipe }}</div>
           <div class="help">{{ settings.recordingsDirectoryUri ? settings.recordingsDirectoryUri : 'Select directory containing recording files...' }}</div>
         </div>
-        <ion-button (click)="selectRecordingsDirectory()">
+        <ion-button (click)="$event.stopPropagation(); selectRecordingsDirectory()">
           <ion-icon name="folder-open-outline" />
         </ion-button>
       </div>
     </ion-item>
 
-    <ion-item>
-      <div class="wrapper">
-        <div class="label">{{ 'SETTINGS_FILENAME_PATTERN' | translatePipe }}</div>
-        <ion-button icon="folder-open-outline" (click)="editFilenameFormat()">
-          {{ 'LBL_EDIT' | translatePipe }}
-        </ion-button>
-      </div>
-    </ion-item>
-
-    <ion-item>
+    <ion-item button (click)="appearanceSelect.open()">
       <div class="wrapper">
         <div class="label">{{ 'SETTINGS_APPEARANCE' | translatePipe }}</div>
-        <ion-select [(ngModel)]="settings.appearance">
+        <ion-select #appearanceSelect [(ngModel)]="settings.appearance">
           <ion-select-option [value]="'system'">{{ 'SETTINGS_SYSTEM_DEFAULT' | translatePipe }}</ion-select-option>
           <ion-select-option [value]="'light'">{{ 'SETTINGS_APPEARANCE_LIGHT' | translatePipe }}</ion-select-option>
           <ion-select-option [value]="'dark'">{{ 'SETTINGS_APPEARANCE_DARK' | translatePipe }}</ion-select-option>
@@ -40,17 +32,20 @@
       </div>
     </ion-item>
 
-    <ion-item>
+    <ion-item button (click)="languageSelect.open()">
       <div class="wrapper">
 
         <div class="label">
           {{ 'SETTINGS_LANGUAGE' | translatePipe }}
           <div class="help">{{ 'SETTINGS_LANGUAGE_TEXT' | translatePipe }}<br/>
-          (<a href="{{ version.addLanguageUri }}">{{ 'SETTINGS_LANGUAGE_ADD' | translatePipe }}</a>)
+          (<a href="{{ version.addLanguageUri }}" (click)="$event.stopPropagation()">{{
+             'SETTINGS_LANGUAGE_ADD' | translatePipe
+          }}</a>)
           </div>
         </div>
         <div>
           <ion-select
+            #languageSelect
             [(ngModel)]="settings.culture"
             (ngModelChange)="clearPipesCache()"
           >
@@ -65,22 +60,23 @@
       </div>
     </ion-item>
 
-    <ion-item>
+    <ion-item button (click)="editDatetimeFormat()">
       <div class="wrapper">
         <div class="label">{{ 'SETTINGS_DATETIME_FORMAT' | translatePipe }}</div>
-        <ion-button (click)="editDatetimeFormat()">
+        <ion-button (click)="$event.stopPropagation(); editDatetimeFormat()">
           {{ 'LBL_EDIT' | translatePipe }}
         </ion-button>
       </div>
     </ion-item>
 
-    <ion-item>
+    <ion-item button (click)="countryCodeInput.setFocus()" detail="false">
       <div class="wrapper">
         <div class="label">
           <div>{{ 'SETTINGS_COUNTRY_PREFIX' | translatePipe }}</div>
           <div class="help">{{ 'SETTINGS_COUNTRY_PREFIX_HELP' | translatePipe }}</div>
         </div>
         <ion-input
+          #countryCodeInput
           [ngModel]="settings.defaultCountryPrefix"
           (ngModelChange)="setDefaultCountryPrefix($event)"
           class="phone-prefix ion-text-right"
@@ -90,14 +86,18 @@
       </div>
     </ion-item>
 
+    <!-- recordings section -->
     <ion-item-divider>
       <h4>{{ 'SETTINGS_RECORDINGS_SECTION' | translatePipe }}</h4>
     </ion-item-divider>
 
-    <ion-item>
+    <ion-item button (click)="sortModeSelect.open()">
       <div class="wrapper">
         <div class="label">{{ 'SETTINGS_RECORDINGS_SORT' | translatePipe }}</div>
-        <ion-select [(ngModel)]="settings.recordingsSortMode" (ngModelChange)="save()" placeholder="{{ 'SETTINGS_MAKE_SELECTION' | translatePipe }}">
+        <ion-select #sortModeSelect
+          [(ngModel)]="settings.recordingsSortMode" (ngModelChange)="save()"
+          placeholder="{{ 'SETTINGS_MAKE_SELECTION' | translatePipe }}"
+        >
           <ion-select-option [value]="SortMode.Date_ASC">{{ 'SETTINGS_RECORDINGS_SORT_DATE_ASC' | translatePipe }}</ion-select-option>
           <ion-select-option [value]="SortMode.Date_DESC">{{ 'SETTINGS_RECORDINGS_SORT_DATE_DESC' | translatePipe }}</ion-select-option>
           <ion-select-option [value]="SortMode.Duration_ASC">{{ 'SETTINGS_RECORDINGS_SORT_DURATION_ASC' | translatePipe }}</ion-select-option>
@@ -106,14 +106,18 @@
       </div>
     </ion-item>
 
+    <!-- player section -->
     <ion-item-divider>
       <h4>{{ 'SETTINGS_PLAYER_SECTION' | translatePipe }}</h4>
     </ion-item-divider>
 
-    <ion-item>
+    <ion-item button (click)="seektimeSelect.open()">
       <div class="wrapper">
         <div class="label">{{ 'SETTINGS_PLAYER_SEEK_TIME' | translatePipe }}</div>
-        <ion-select [(ngModel)]="settings.seekTime" (ngModelChange)="save()" placeholder="{{ 'SETTINGS_MAKE_SELECTION' | translatePipe }}">
+        <ion-select #seektimeSelect
+          [(ngModel)]="settings.seekTime" (ngModelChange)="save()"
+          placeholder="{{ 'SETTINGS_MAKE_SELECTION' | translatePipe }}"
+        >
           <ion-select-option [value]="5">5s</ion-select-option>
           <ion-select-option [value]="10">10s</ion-select-option>
           <ion-select-option [value]="15">15s</ion-select-option>
@@ -125,7 +129,7 @@
       </div>
     </ion-item>
 
-    <ion-item>
+    <ion-item (click)="settings.enableEarpiece = !settings.enableEarpiece; save();">
       <div class="wrapper">
         <div class="label">
           <div>{{ 'SETTINGS_PLAYER_ENABLE_EARPIECE' | translatePipe }}</div>
@@ -138,7 +142,7 @@
       </div>
     </ion-item>
 
-    <ion-item>
+    <ion-item (click)="settings.keepAwakeWhenPlaying = !settings.keepAwakeWhenPlaying; save();">
       <div class="wrapper">
         <div class="label">
           <div>{{ 'SETTINGS_PLAYER_KEEP_AWAKE' | translatePipe }}</div>
@@ -150,6 +154,99 @@
         />
       </div>
     </ion-item>
+
+    <!-- recorder section -->
+    <ion-item-divider>
+      <div>
+        <h4>{{ 'SETTINGS_RECORDER' | translatePipe }}</h4>
+        @if (settings.recorderApp === '') {
+          <div class="section-help">
+            {{ 'SETTINGS_RECORDER_HELP' | translatePipe }}
+          </div>
+        }
+      </div>
+    </ion-item-divider>
+
+    <ion-item button (click)="recorderAppSelect.open()">
+      <div class="wrapper">
+        <div class="label">
+          <div>{{ 'SETTINGS_RECORDER_APPNAME' | translatePipe }}</div>
+        </div>
+        <ion-select
+          #recorderAppSelect
+          [(ngModel)]="settings.recorderApp"
+          (ionChange)="onRecorderAppChange()"
+          placeholder="{{ 'SETTINGS_RECORDER_APPNAME_UNSPECIFIED' | translatePipe }}"
+        >
+          @for (recorderApp of recorderApps; track recorderApp.id) {
+            <ion-select-option [value]="recorderApp.id">
+              {{ (recorderApp.i18nKey | translatePipe) || ('SETTINGS_RECORDER_APPNAME_UNSPECIFIED' | translatePipe) }}
+            </ion-select-option>
+          }
+        </ion-select>
+      </div>
+    </ion-item>
+
+    <ion-radio-group [(ngModel)]="settings.useCustomFilenamePattern" (ionChange)="save()">
+
+      @if (settings.recorderApp !== '') {
+      <ion-item (click)="settings.useCustomFilenamePattern = false; save();">
+        <ion-radio slot="start" [value]="false"></ion-radio>
+        <div class="wrapper">
+          <div class="label">
+            <div>{{ 'SETTINGS_FILENAME_PATTERN_DEFAULT' | translatePipe }}</div>
+            <div class="help">{{ settings.getRecorderApp()?.filenamePattern }}</div>
+          </div>
+        </div>
+      </ion-item>
+      }
+
+      <ion-item button="true" detail="false" (click)="settings.useCustomFilenamePattern = true; save();">
+        <ion-radio slot="start" [value]="true"></ion-radio>
+        <div class="wrapper">
+          <div class="label">
+            <div>{{ 'SETTINGS_FILENAME_PATTERN_CUSTOM' | translatePipe }}</div>
+            <div class="help">{{ settings.filenamePattern || 'Select a pattern...' }}</div>
+          </div>
+          <ion-button (click)="$event.stopPropagation(); editFilenameFormat()">
+            {{ 'LBL_EDIT' | translatePipe }}
+          </ion-button>
+        </div>
+      </ion-item>
+
+    </ion-radio-group>
+
+    @if (settings.recorderApp === 'com.chiller3.bcr') {
+    <ion-item button (click)="openBcrSettings()">
+      <div class="wrapper">
+        <div class="label">
+          <div>{{ 'SETTINGS_RECORDER_BCR_SETTINGS' | translatePipe }}</div>
+          <div class="help" [innerHTML]="'SETTINGS_RECORDER_BCR_SETTINGS_HELP' | translatePipe"></div>
+        </div>
+        <ion-button (click)="$event.stopPropagation(); openBcrSettings()">
+          {{ 'SETTINGS_RECORDER_BCR_SETTINGS_OPEN' | translatePipe }}
+        </ion-button>
+      </div>
+    </ion-item>
+    }
+
+    <!--
+    @if (settings.recorderApp === 'com.android.dialer@coloros') {
+
+    }
+
+    @if (settings.recorderApp === 'com.android.dialer@grapheneos') {
+
+    }
+
+    @if (settings.recorderApp === 'com.huawei.phone.recorder') {
+
+    }
+
+    @if (settings.recorderApp === 'com.lineageos.recorder') {
+
+    }
+    -->
 
   </ion-list>
 

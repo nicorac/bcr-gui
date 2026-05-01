@@ -99,4 +99,35 @@ public class BcrGuiPlugin extends Plugin {
     return null;
   }
 
+  /**
+   * Launch an external activity by package name or specific component
+   * - Package name only (e.g. "com.chiller3.bcr"): launches default/launcher activity
+   * - Full component (e.g. "com.chiller3.bcr/.settings.SettingsActivity"): launches specific activity
+   */
+  @PluginMethod()
+  public void launchActivity(PluginCall call) {
+
+    try {
+      String component = call.getString("component");
+      Intent intent;
+
+      if (component.contains("/")) {
+        // Full component name - launch specific activity
+        intent = new Intent();
+        intent.setComponent(android.content.ComponentName.unflattenFromString(component));
+      } else {
+        // Package name only - launch default launcher activity
+        intent = new Intent(Intent.ACTION_MAIN);
+        intent.setPackage(component);
+      }
+
+      getActivity().startActivity(intent);
+      call.resolve();
+
+    } catch (Exception e) {
+      call.reject("Error launching activity", e);
+    }
+
+  }
+
 }

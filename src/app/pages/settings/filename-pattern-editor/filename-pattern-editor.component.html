@@ -74,11 +74,11 @@
           </ion-toolbar>
           <ion-content>
             <ion-list>
-              @for (item of FILENAME_PATTERN_TEMPLATES; track item) {
-                <ion-item (click)="loadTemplate(item.pattern);">
+              @for (recorderApp of recorderApps; track recorderApp.id) {
+                <ion-item (click)="loadTemplate(recorderApp.filenamePattern);">
                   <ion-label>
-                    <h2>{{ item.name }}</h2>
-                    <p class="description">{{ item.pattern }}</p>
+                    <h2>{{ recorderApp.i18nKey | translatePipe }}</h2>
+                    <p class="description">{{ recorderApp.filenamePattern }}</p>
                   </ion-label>
                 </ion-item>
               }
@@ -86,7 +86,6 @@
           </ion-content>
         </ng-template>
       </ion-modal>
-
 
     </div>
   <!-- </div> -->

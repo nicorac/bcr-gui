@@ -1,6 +1,5 @@
-import { environment } from 'src/environments/environment';
 import { AndroidSAF, AndroidSAFUtils, ErrorCode, GetFileUriOptions, ReadFileOptions } from 'src/plugins/androidsaf';
-import { effect, Injectable, signal } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { Encoding } from '@capacitor/filesystem';
 import { Platform } from '@ionic/angular';
 import { DB_FILENAME, DB_SCHEMA_VERSION, DbContent } from '../models/dbContent';
@@ -97,7 +96,9 @@ export class RecordingsService {
     const pnm = await this.contactsService.getPhoneNumbersMap();
 
     // filename RegExp parser instance
-    const filenameRegExp = Recording.getFilenameRegExp(this.settings.filenamePattern);
+    const filenameRegExp = this.settings.useCustomFilenamePattern
+      ? Recording.getFilenameRegExp(this.settings.filenamePattern)
+      : Recording.getFilenameRegExp(this.settings.getRecorderApp()?.filenamePattern ?? this.settings.filenamePattern);
 
     // save current DB in an object structure keyed by filename/audioDisplayName (to speedup search)
     let currentDbObj = Object.fromEntries(this.recordings().map(i => [ i.audioDisplayName, i ]));

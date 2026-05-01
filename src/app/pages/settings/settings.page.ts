@@ -8,11 +8,12 @@ import { MessageBoxService } from 'src/app/services/message-box.service';
 import { RecordingsService } from 'src/app/services/recordings.service';
 import { SortModeEnum } from 'src/app/utils/recordings-sorter';
 import version from 'src/app/version';
+import { BcrGui } from 'src/plugins/bcrgui';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ModalController, Platform } from '@ionic/angular';
-import { SettingsService } from '../../services/settings.service';
+import { recorderApps, SettingsService } from '../../services/settings.service';
 import { DatetimeFormatEditorComponent } from './datetime-format-editor/datetime-format-editor.component';
 import { FilenamePatternEditorComponent } from './filename-pattern-editor/filename-pattern-editor.component';
 
@@ -31,6 +32,7 @@ import { FilenamePatternEditorComponent } from './filename-pattern-editor/filena
 })
 export class SettingsPage {
 
+  protected recorderApps = recorderApps;
   protected SortMode = SortModeEnum;
   protected version = version;
 
@@ -53,6 +55,17 @@ export class SettingsPage {
 
   async ionViewWillLeave() {
     this.backSub?.unsubscribe();
+    await this.save();
+  }
+
+  async onRecorderAppChange() {
+    const app = recorderApps.find(app => app.id === this.settings.recorderApp);
+    
+    // If app not found or has no default pattern, force custom
+    if (!this.settings.recorderApp || !this.settings.getRecorderApp()?.filenamePattern) {
+      this.settings.useCustomFilenamePattern = true;
+    }
+    
     await this.save();
   }
 
@@ -123,6 +136,38 @@ export class SettingsPage {
    */
   protected clearPipesCache() {
     location.reload();
+  }
+
+  /**
+   * Launch external BCR settings activity on Android.
+   */
+  protected async openBcrSettings() {
+
+    // first try SettingsActivityLauncher
+    try {
+      await BcrGui.launchActivity({ component: 'com.chiller3.bcr/.settings.SettingsActivityLauncher' });
+      return;
+    } catch (err: any) {}
+
+    // then try SettingsActivity
+    try {
+      await BcrGui.launchActivity({
+        component: 'com.chiller3.bcr/.settings.SettingsActivity'
+      });
+      return;
+    } catch (err: any) {}
+
+    // fallback to main component
+    try {
+      await BcrGui.launchActivity({ component: 'com.chiller3.bcr' });
+      return;
+    } catch (err: any) {}
+
+    // all attempts failed
+    this.messageBoxService.showError({
+      message: this.i18n.get('SETTINGS_BCR_SETTINGS_NOT_FOUND')
+    });
+
   }
 
 }

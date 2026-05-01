@@ -16,6 +16,7 @@ ion-button {
   height: 1em;
   min-height: 2.5em;
   min-width: 4em;
+  white-space: nowrap;
 }
 
 .label {
@@ -34,4 +35,11 @@ ion-button {
   width: initial;
   min-width: 2em;
   max-width: 5em;
+}
+
+.section-help {
+  color: var(--ion-color-step-600, #666666);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  margin-bottom: 1em;
 }
