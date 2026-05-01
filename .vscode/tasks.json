@@ -5,7 +5,7 @@
       "label": "Ionic run (ext device)",
       "type": "shell",
       "command": "ionic",
-      "args": [ "capacitor", "run", "android", "--livereload", "--external" ],
+      "args": [ "capacitor", "run", "android", "--livereload", "--external", "--target=${env:ANDROID_DEVICE_ID}" ],
       "isBackground": true,
       "options": {
         "cwd": "${workspaceFolder}",
