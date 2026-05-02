@@ -181,8 +181,6 @@
       <app-audio-player #audioPlayer
         class="player"
         [recording]="selectedItem()!"
-        [previousEnabled]="items() && selectedItemIndex() > 0"
-        [nextEnabled]="items() && selectedItemIndex() < items().length - 1"
         (onSkip)="onSkip($event)"
       />
     }

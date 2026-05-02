@@ -23,7 +23,11 @@
   <!-- central -->
   <div class="buttons buttons-center" [class.disabled]="!ready()">
 
-    <div class="button" (click)="onSkip.emit('prev')" [class.disabled]="!previousEnabled()">
+    <!--
+      "prev" button resets play position if pressed after the first 3 seconds of play,
+      otherwise skip to previous recording
+    -->
+    <div class="button" (click)="progress() >= 3 ? onSeek('begin') : onSkip.emit('prev')">
       <div class="button-in">
         <ion-icon
           class="icon"
@@ -33,7 +37,7 @@
       </div>
     </div>
 
-    <div class="button" (click)="onSeek(-1)">
+    <div class="button" (click)="onSeek('rew')">
       <div class="button-in">
         <ion-icon
           class="icon"
@@ -52,7 +56,7 @@
       </div>
     </div>
 
-    <div class="button" (click)="onSeek(+1)">
+    <div class="button" (click)="onSeek('fwd')">
       <div class="button-in">
         <ion-icon
           class="icon"
@@ -62,7 +66,7 @@
       </div>
     </div>
 
-    <div class="button" (click)="onSkip.emit('next')" [class.disabled]="!nextEnabled()">
+    <div class="button" (click)="onSkip.emit('next')">
       <div class="button-in">
         <ion-icon
           class="icon"

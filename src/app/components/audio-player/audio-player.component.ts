@@ -15,6 +15,7 @@ export enum PlayerStatusEnum {
 }
 
 export type SkipDirection = 'prev' | 'next';
+export type SeekMode = 'begin' | 'rew' | 'fwd';
 
 @Component({
   selector: 'app-audio-player',
@@ -43,9 +44,7 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
   // inputs
   public recording = input.required<Recording>();
 
-  // prev/next buttons
-  public previousEnabled = input(false);
-  public nextEnabled = input(false);
+  // button events
   public onSkip = output<SkipDirection>();
 
   // knob
@@ -213,8 +212,20 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
   /**
    * Fast forward / rewind
    */
-  protected async onSeek(delta: number) {
-    return this.setCurrentPosition(this.progress() + delta * this.settings.seekTime);
+  protected async onSeek(mode: SeekMode) {
+    let pos: number = 0;
+    switch (mode) {
+      case 'begin':
+        pos = 0;
+        break;
+      case 'rew':
+        pos = this.progress() - this.settings.seekTime;
+        break;
+      case 'fwd':
+        pos = this.progress() + this.settings.seekTime;
+        break;
+    }
+    return this.setCurrentPosition(pos);
   }
 
   /**
