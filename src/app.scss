@@ -134,11 +134,21 @@ ion-modal.actions {
   }
 }
 
+// shared changes
+.msgbox .alert-wrapper,
+ion-loading.spinner .loading-wrapper {
+  border-radius: 0.8em;
+  border: 1px solid var(--item-border-color);
+  outline: none;
+}
+
 // messageboxes
 .msgbox .alert-wrapper {
-  border: 1px solid var(--item-border-color);
-  box-shadow: 0 0 1em .5em rgba(0, 0, 0, 0.6);
-  border-radius: 0.8em;
   background-color: var(--ion-background-color);
-  outline: none;
+  box-shadow: 0 0 1em .5em rgba(0, 0, 0, 0.6);
+}
+
+// spinner
+ion-loading.spinner {
+  backdrop-filter: blur(2px);
 }

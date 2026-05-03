@@ -26,7 +26,7 @@ import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, c
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Clipboard } from '@capacitor/clipboard';
-import { ActionSheetController, IonSearchbar, RefresherCustomEvent } from '@ionic/angular';
+import { ActionSheetController, IonSearchbar, LoadingController, RefresherCustomEvent } from '@ionic/angular';
 import version from '../../version';
 
 @Component({
@@ -103,6 +103,7 @@ export class MainPage implements AfterViewInit {
   private contactsService = inject(ContactsService);
   private datePipe = inject(DatePipe);
   private i18n = inject(I18nService);
+  private loadingCtrl = inject(LoadingController);
   private mbs = inject(MessageBoxService);
   private toHms = inject(ToHmsPipe);
   protected recordingsService = inject(RecordingsService);
@@ -265,10 +266,19 @@ export class MainPage implements AfterViewInit {
       message: this.i18n.get('HOME_DELETE_CONFIRM_TEXT', items.length),
       confirmText: this.i18n.get('LBL_DELETE'),
       onConfirm: async () => {
+        this.clearSelection();
+
         // forcibly unload audio
         await this.player()?.unload();
-        this.recordingsService.deleteRecording(items);
-        this.clearSelection();
+
+        // show wait spinner
+        const waitSpinner = await this.loadingCtrl.create({ cssClass: 'spinner', duration: 20000 });
+        waitSpinner.present();
+
+        // delete recordings and remove spinner
+        this.recordingsService.deleteRecording(items).then(() => {
+          waitSpinner.dismiss();
+        });
       }
     });
 
