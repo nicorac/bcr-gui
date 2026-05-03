@@ -13,9 +13,6 @@ import { RecordingsService } from './services/recordings.service';
 import { SettingsService, Theme } from './services/settings.service';
 import { untilTrue } from './utils/waitForAsync';
 
-const TOOLBAR_BACKGROUND_LIGHT = '#43a047';
-const TOOLBAR_BACKGROUND_DARK = '#1f241d';
-
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
@@ -100,9 +97,26 @@ export class AppComponent implements OnInit {
    * Add or remove the "dark" class on the document body
    */
   private updateDarkMode(theme: Theme) {
-    const androidColor = { color: theme === 'dark' ? TOOLBAR_BACKGROUND_DARK : TOOLBAR_BACKGROUND_LIGHT };
+
+    // update body style
     document.body.classList.toggle('dark', theme === 'dark');
-    StatusBar.setBackgroundColor(androidColor);
-    NavigationBar.setNavigationBarColor(androidColor);
+
+    // set new navbar color
+    const navigationColor = this.getBodyCssValue('--player-background-color');
+    NavigationBar.setNavigationBarColor({ color: navigationColor });
+
+    // set new statusbar color
+    const statusbarColor = this.getBodyCssValue('--ion-toolbar-background');
+    StatusBar.setBackgroundColor({ color: statusbarColor });
+
   }
+
+  /**
+   * Read the value of a body CSS variable
+   */
+  private getBodyCssValue(variableName: string) {
+    const style = getComputedStyle(document.body);
+    return style?.getPropertyValue(variableName) ?? '';
+  }
+
 }
