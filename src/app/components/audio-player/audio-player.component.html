@@ -1,27 +1,32 @@
-<div class="progress">
-  <div class="progress-label">{{ progress() | toHms }}</div>
-  <ion-range class="range-bar"
-    [disabled]="!ready()"
-    [value]="!isDraggingKnob() && progress()"
-    [max]="duration()"
-    [pin]="true"
-    [pinFormatter]="rangePinFormatter"
-    [step]="duration() > 600 ? 10 : duration() > 180 ? 5 : 1"
-    [snaps]="true"
-    [ticks]="false"
-    (ionKnobMoveStart)="onIonKnobMoveStart($event)"
-    (ionKnobMoveEnd)="onIonKnobMoveEnd($event)"
-  />
-  <div class="progress-label">{{ duration() | toHms }}</div>
-</div>
+<div class="content">
 
-<div class="controls">
+  <div class="range-container">
 
-  <!-- left -->
-  <div></div>
+    <!-- play position -->
+    <div class="progress-label">{{ progress() | toHms }}</div>
+
+    <!-- play total length -->
+    <div class="length-label">{{ duration() | toHms }}</div>
+
+
+    <!-- play bar -->
+    <ion-range class="range-bar"
+      [disabled]="!ready()"
+      [value]="!isDraggingKnob() && progress()"
+      [max]="duration()"
+      [pin]="true"
+      [pinFormatter]="rangePinFormatter"
+      [step]="duration() > 600 ? 10 : duration() > 180 ? 5 : 1"
+      [snaps]="true"
+      [ticks]="false"
+      (ionKnobMoveStart)="onIonKnobMoveStart($event)"
+      (ionKnobMoveEnd)="onIonKnobMoveEnd($event)"
+    />
+
+  </div>
 
   <!-- central -->
-  <div class="buttons buttons-center" [class.disabled]="!ready()">
+  <div class="buttons" [class.disabled]="!ready()">
 
     <!--
       "prev" button resets play position if pressed after the first 3 seconds of play,
@@ -76,11 +81,10 @@
       </div>
     </div>
 
-  </div>
+    <div class="button button-rect button-text" (click)="toggleSpeed()">
+      {{ settings.playbackSpeed }}x
+    </div>
 
-  <!-- right -->
-  <div class="buttons buttons-right" (click)="toggleSpeed()">
-    <div class="button button-rect button-text">{{ settings.playbackSpeed }}x</div>
   </div>
 
 </div>

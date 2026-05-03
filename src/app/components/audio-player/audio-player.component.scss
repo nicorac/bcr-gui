@@ -18,6 +18,18 @@ $buttonSize: 2.5em;
   --button-shadow-color: rgba(255,255,255,0.1);
 }
 
+.content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: .3em;
+  padding: 0 .8em;
+  align-items: center;
+  > * {
+    width: 100%;
+  }
+}
+
 .controls {
   width: 100%;
   display: grid;
@@ -27,13 +39,11 @@ $buttonSize: 2.5em;
 }
 
 .buttons {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(6, auto);
   align-items: center;
+  justify-items: center;
   gap: .5em;
-
-  &.buttons-right {
-    justify-self: self-end;
-  }
 }
 
 .button,
@@ -110,23 +120,26 @@ $buttonSize: 2.5em;
   padding: 0.2em;
 }
 
-.progress {
-  display: grid;
-  grid-template-columns: min-content minmax(0, 1fr) min-content;
-  align-items: center;
-  gap: 1em;
-  width: 100%;
-}
-
 .button-text {
   color: var(--ion-color-step-700)
 }
 
-.progress-label {
+.progress-label,
+.length-label {
+  position: absolute;
+  top: 0;
   color: var(--ion-color-step-600)
+}
+.length-label {
+  right: 0;
+}
+
+.range-container {
+  position: relative;
 }
 
 .range-bar {
+  padding-top: .6rem;
   --bar-height: 5px;
   --knob-size: 24px;
 }
