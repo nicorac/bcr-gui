@@ -11,6 +11,7 @@ It started as _companion app_ for the great [BCR](https://github.com/chenxiaolon
 - [ColorOS](https://www.oppo.com/en/coloros12/) Call Recorder (see [here](https://github.com/nicorac/bcr-gui/issues/100))
 - Huawei Call Recorder (see [here](https://github.com/nicorac/bcr-gui/issues/44))
 - [LineageOS](https://lineageos.org/) Call Recorder (see [here](https://github.com/nicorac/bcr-gui/issues/121))
+- [True Phone Dialer & Contacts](https://https://play.google.com/store/apps/details?id=com.hb.dialer.free)
 
 <img src="docs/images/screenshot-main.jpg?ver=1.11.0">
 

@@ -107,6 +107,7 @@ export class FilenamePatternEditorComponent implements OnInit {
   async loadTemplate(pattern: string) {
     this.pattern.set(pattern);
     this.templateLoadModal().dismiss();
+    this.validatePattern();
   }
 
   testPattern() {
