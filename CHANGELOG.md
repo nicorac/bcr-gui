@@ -1,5 +1,11 @@
 # Version history
 
+## Version 1.14.1 (2026-06-06)
+
+New features:
+
+* Added support to [True Phone Dialer & Contacts](https://play.google.com/store/apps/details?id=com.hb.dialer.free) recordings (#225)
+
 ## Version 1.14.0 (2026-04-23)
 
 New features:
