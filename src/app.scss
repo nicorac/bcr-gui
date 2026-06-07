@@ -1,3 +1,13 @@
+/* Handles the "Edge-to-Edge" Android mode, supported by Capacitor 8 */
+:root {
+  --ion-safe-area-top: env(safe-area-inset-top, 0px);
+  --ion-safe-area-bottom: env(safe-area-inset-bottom, 0px);
+}
+ion-content::part(scroll) {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+
 body {
   // default mode
   --ion-color-primary: #43a047;       // main color (buttons, ...)
