@@ -1,6 +1,6 @@
-import { IonicBundleModule } from 'src/app/IonicBundle.module';
-import { RecordingsService } from 'src/app/services/recordings.service';
 import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
+import { IonicBundleModule } from '@src/app/IonicBundle.module';
+import { RecordingsService } from '@src/app/services/recordings.service';
 
 export type ActionButton = {
   icon: () => string,

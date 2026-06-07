@@ -1,14 +1,14 @@
 import { Subscription } from 'rxjs';
-import { AppRoutesEnum } from 'src/app/app-routing.module';
-import { HeaderComponent } from 'src/app/components/header/header.component';
-import { IonicBundleModule } from 'src/app/IonicBundle.module';
-import { TranslatePipe } from 'src/app/pipes/translate.pipe';
-import { I18nService } from 'src/app/services/i18n.service';
-import { MessageBoxService } from 'src/app/services/message-box.service';
-import { SettingsService } from 'src/app/services/settings.service';
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { Platform } from '@ionic/angular';
+import { TranslatePipe } from '@pipes/translate.pipe';
+import { I18nService } from '@services/i18n.service';
+import { MessageBoxService } from '@services/message-box.service';
+import { SettingsService } from '@services/settings.service';
+import { AppRoutesEnum } from '@src/app/app-routing.module';
+import { HeaderComponent } from '@src/app/components/header/header.component';
+import { IonicBundleModule } from '@src/app/IonicBundle.module';
 import version from '../../version';
 
 @Component({

@@ -1,13 +1,13 @@
 import { Subscription } from 'rxjs';
-import { IonicBundleModule } from 'src/app/IonicBundle.module';
-import { Recording } from 'src/app/models/recording';
-import { toHms, ToHmsPipe } from 'src/app/pipes/to-hms.pipe';
-import { MessageBoxService } from 'src/app/services/message-box.service';
-import { RecordingsService } from 'src/app/services/recordings.service';
-import { SettingsService } from 'src/app/services/settings.service';
-import { AudioPlayer } from 'src/plugins/audioplayer';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, inject, input, OnDestroy, OnInit, output, signal, untracked } from '@angular/core';
 import { RangeCustomEvent } from '@ionic/angular';
+import { IonicBundleModule } from '@src/app/IonicBundle.module';
+import { Recording } from '@src/app/models/recording';
+import { toHms, ToHmsPipe } from '@src/app/pipes/to-hms.pipe';
+import { MessageBoxService } from '@src/app/services/message-box.service';
+import { RecordingsService } from '@src/app/services/recordings.service';
+import { SettingsService } from '@src/app/services/settings.service';
+import { AudioPlayer } from '@src/plugins/audioplayer';
 
 export enum PlayerStatusEnum {
   Paused = 0,
@@ -268,10 +268,10 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
 
     // pause audio
     await AudioPlayer.pause()
-      .then(_ => {
+      .then((_:any) => {
         this.status.set(PlayerStatusEnum.Paused);
       })
-      .catch(error => this.showError(error, 'pause()'));
+      .catch((error:any) => this.showError(error, 'pause()'));
   }
 
   /**

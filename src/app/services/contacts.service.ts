@@ -1,8 +1,8 @@
 import { AndroidSettings, NativeSettings } from 'capacitor-native-settings';
-import { BcrGui } from 'src/plugins/bcrgui';
 import { inject, Injectable } from '@angular/core';
 import { ContactPayload, Contacts } from '@capacitor-community/contacts';
 import { PermissionState } from '@capacitor/core';
+import { BcrGui } from '@src/plugins/bcrgui';
 import { NumberDisplayNameMap } from '../models/NumberDisplayNameMap';
 import { cleanupPhoneNumber, isPhoneNumber } from '../utils/phoneNumbers';
 import { I18nService } from './i18n.service';

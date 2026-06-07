@@ -1,5 +1,5 @@
-import { CallDirection } from 'src/app/models/BcrRecordingMetadata';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { CallDirection } from '@src/app/models/BcrRecordingMetadata';
 
 @Component({
   selector: 'app-call-icon',

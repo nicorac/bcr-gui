@@ -1,7 +1,7 @@
 import { BehaviorSubject } from 'rxjs';
-import { AndroidDateTimeSettings } from 'src/plugins/androiddatetimesettings';
 import { inject, Injectable } from '@angular/core';
 import { Preferences } from '@capacitor/preferences';
+import { AndroidDateTimeSettings } from '@src/plugins/androiddatetimesettings';
 import { FILENAME_PATTERN_TEMPLATES } from '../models/recording';
 import { deserializeObject, JsonProperty, serializeObject } from '../utils/json-serializer';
 import { SortModeEnum } from '../utils/recordings-sorter';

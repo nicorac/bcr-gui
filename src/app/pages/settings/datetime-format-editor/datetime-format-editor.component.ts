@@ -1,12 +1,12 @@
-import { HeaderComponent } from 'src/app/components/header/header.component';
-import { IonicBundleModule } from 'src/app/IonicBundle.module';
-import { DatetimePipe } from 'src/app/pipes/datetime.pipe';
-import { TranslatePipe } from 'src/app/pipes/translate.pipe';
-import { I18nKey, I18nService } from 'src/app/services/i18n.service';
-import { AppDateTimeFormat, SettingsService } from 'src/app/services/settings.service';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ModalController } from '@ionic/angular';
+import { DatetimePipe } from '@pipes/datetime.pipe';
+import { TranslatePipe } from '@pipes/translate.pipe';
+import { HeaderComponent } from '@src/app/components/header/header.component';
+import { IonicBundleModule } from '@src/app/IonicBundle.module';
+import { I18nKey, I18nService } from '@src/app/services/i18n.service';
+import { AppDateTimeFormat, SettingsService } from '@src/app/services/settings.service';
 
 @Component({
   selector: 'app-datetime-format-editor',

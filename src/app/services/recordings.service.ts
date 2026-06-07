@@ -1,8 +1,8 @@
-import { AndroidSAF, AndroidSAFUtils, ErrorCode, GetFileUriOptions, ReadFileOptions } from 'src/plugins/androidsaf';
-import { AudioPlayer } from 'src/plugins/audioplayer';
 import { inject, Injectable, signal } from '@angular/core';
 import { Encoding } from '@capacitor/filesystem';
 import { Platform } from '@ionic/angular';
+import { AndroidSAF, AndroidSAFUtils, ErrorCode, GetFileUriOptions, ReadFileOptions } from '@src/plugins/androidsaf';
+import { AudioPlayer } from '@src/plugins/audioplayer';
 import { DB_FILENAME, DB_SCHEMA_VERSION, DbContent } from '../models/dbContent';
 import { Recording, UNKNOWN_NAME_OR_NUMBER } from '../models/recording';
 import { MainPage } from '../pages/main/main.page';

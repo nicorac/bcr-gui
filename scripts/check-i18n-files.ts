@@ -1,10 +1,10 @@
+import { Culture, CultureContent, I18nKey } from 'fron';
 /**
  * Update & synchronize language files
  */
 import * as fs from 'fs';
 import * as path from 'path';
 import * as readline from 'readline';
-import { Culture, CultureContent, I18nKey } from 'src/app/services/i18n.service';
 
 // constants
 const SHOW_DETAILS = false;

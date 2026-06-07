@@ -1,17 +1,17 @@
 import { Subscription } from 'rxjs';
-import { AppRoutesEnum } from 'src/app/app-routing.module';
-import { HeaderComponent } from 'src/app/components/header/header.component';
-import { IonicBundleModule } from 'src/app/IonicBundle.module';
-import { TranslatePipe } from 'src/app/pipes/translate.pipe';
-import { I18nService } from 'src/app/services/i18n.service';
-import { MessageBoxService } from 'src/app/services/message-box.service';
-import { RecordingsService } from 'src/app/services/recordings.service';
-import { SortModeEnum } from 'src/app/utils/recordings-sorter';
-import version from 'src/app/version';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ModalController, Platform } from '@ionic/angular';
+import { TranslatePipe } from '@pipes/translate.pipe';
+import { AppRoutesEnum } from '@src/app/app-routing.module';
+import { HeaderComponent } from '@src/app/components/header/header.component';
+import { IonicBundleModule } from '@src/app/IonicBundle.module';
+import { I18nService } from '@src/app/services/i18n.service';
+import { MessageBoxService } from '@src/app/services/message-box.service';
+import { RecordingsService } from '@src/app/services/recordings.service';
+import { SortModeEnum } from '@src/app/utils/recordings-sorter';
+import version from '@src/app/version';
 import { SettingsService } from '../../services/settings.service';
 import { DatetimeFormatEditorComponent } from './datetime-format-editor/datetime-format-editor.component';
 import { FilenamePatternEditorComponent } from './filename-pattern-editor/filename-pattern-editor.component';
@@ -22,10 +22,10 @@ import { FilenamePatternEditorComponent } from './filename-pattern-editor/filena
     styleUrls: ['./shared.scss', './settings.page.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        FormsModule,
-        HeaderComponent,
-        IonicBundleModule,
-        TranslatePipe,
+      FormsModule,
+      HeaderComponent,
+      IonicBundleModule,
+      TranslatePipe,
     ]
 })
 export class SettingsPage {

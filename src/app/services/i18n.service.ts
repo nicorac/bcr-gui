@@ -1,6 +1,6 @@
-import { AndroidSAF, Encoding } from 'src/plugins/androidsaf';
 import { Injectable } from '@angular/core';
 import { Device } from '@capacitor/device';
+import { AndroidSAF, Encoding } from '@src/plugins/androidsaf';
 import { SettingsService } from './settings.service';
 
 export type I18nKey = Uppercase<string>;
