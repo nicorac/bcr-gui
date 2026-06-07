@@ -108,9 +108,28 @@ export class AppComponent implements OnInit {
    * Add or remove the "dark" class on the document body
    */
   private updateDarkMode(theme: Theme) {
-    const androidColor = { color: theme === 'dark' ? TOOLBAR_BACKGROUND_DARK : TOOLBAR_BACKGROUND_LIGHT };
+
+    // update body style
     document.body.classList.toggle('dark', theme === 'dark');
-    StatusBar.setBackgroundColor(androidColor);
-    NavigationBar.setNavigationBarColor(androidColor);
+
+    // set new navbar color
+    // this is useless in A15+ (because of the edge-to-edge feature),
+    // left here for older versions compatibility
+    const navigationColor = this.getBodyCssValue('--player-background-color');
+    NavigationBar.setNavigationBarColor({ color: navigationColor });
+
+    // set new statusbar color
+    const statusbarColor = this.getBodyCssValue('--ion-toolbar-background');
+    StatusBar.setBackgroundColor({ color: statusbarColor });
+
   }
+
+  /**
+   * Read the value of a body CSS variable
+   */
+  private getBodyCssValue(variableName: string) {
+    const style = getComputedStyle(document.body);
+    return style?.getPropertyValue(variableName) ?? '';
+  }
+
 }

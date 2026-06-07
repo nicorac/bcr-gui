@@ -4,7 +4,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding content">
+<ion-content class="content">
 
   <!-- pattern -->
   <!-- <div class="section"> -->
@@ -123,7 +123,11 @@
 </ion-content>
 
 <!-- footer -->
-<ion-footer class="right-container buttons-container">
-  <ion-button color="primary" fill="clear" (click)="cancel()">{{ 'LBL_CANCEL' | translatePipe }}</ion-button>
-  <ion-button color="primary" fill="clear" (click)="confirm()">{{ 'LBL_OK' | translatePipe }}</ion-button>
+<ion-footer>
+  <ion-toolbar>
+    <ion-buttons slot="end">
+      <ion-button color="primary" fill="clear" (click)="cancel()">{{ 'LBL_CANCEL' | translatePipe }}</ion-button>
+      <ion-button color="primary" fill="clear" (click)="confirm()">{{ 'LBL_OK' | translatePipe }}</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
 </ion-footer>
