@@ -1,3 +1,15 @@
+/**
+ * Handles the "Edge-to-Edge" Android mode, supported by Capacitor 8
+ */
+// add margin to avoid lists flow under the navigation bar (frustrating UI change in A15+...)
+ion-content:not(:has(~ ion-footer))::part(scroll) {
+  margin-bottom: env(safe-area-inset-bottom, 0px);
+}
+// dedicated color to all footers backgrounds (including the ones in settings page...)
+ion-footer {
+  --ion-toolbar-background: var(--player-background-color);
+}
+
 body {
   // default mode
   --ion-color-primary: #43a047;       // main color (buttons, ...)
