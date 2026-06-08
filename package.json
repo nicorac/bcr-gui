@@ -70,6 +70,12 @@
     "ts-node": "10.9.2",
     "typescript": "5.5.4"
   },
+  "allowScripts": {
+    "esbuild": true,
+    "lmdb": true,
+    "msgpackr-extract@3.0.3": true,
+    "sharp": true
+  },
   "engines": {
     "npm": ">= 10.9.0",
     "node": ">= 20.0.0"
