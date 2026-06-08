@@ -176,15 +176,16 @@
 
     </ion-list>
 
-    <!-- audio player -->
-    @if (selectedItem() && !isMultiselect()) {
-      <app-audio-player #audioPlayer
-        class="player"
-        [recording]="selectedItem()!"
-        (onSkip)="onSkip($event)"
-      />
-    }
-
   </div>
 
 </ion-content>
+
+<!-- audio player -->
+@if (selectedItem() && !isMultiselect()) {
+  <ion-footer>
+    <app-audio-player #audioPlayer class="player"
+      [recording]="selectedItem()!"
+      (onSkip)="onSkip($event)"
+    />
+  </ion-footer>
+}

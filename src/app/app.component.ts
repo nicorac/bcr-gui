@@ -102,6 +102,8 @@ export class AppComponent implements OnInit {
     document.body.classList.toggle('dark', theme === 'dark');
 
     // set new navbar color
+    // this is useless in A15+ (because of the edge-to-edge feature),
+    // left here for older versions compatibility
     const navigationColor = this.getBodyCssValue('--player-background-color');
     NavigationBar.setNavigationBarColor({ color: navigationColor });
 

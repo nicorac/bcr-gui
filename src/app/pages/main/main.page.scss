@@ -41,7 +41,7 @@
 }
 
 .player {
-  padding: 1em 1em calc(.8em + env(safe-area-inset-bottom)) 1em;
+  padding: 1em 1em calc(1em + env(safe-area-inset-bottom, 0px)) 1em;
   background-color: var(--player-background-color);
   z-index: 1; // needed for the box-shadow to go over last recording
 }
