@@ -19,6 +19,7 @@ import { sortRecordings } from 'src/app/utils/recordings-sorter';
 import { bringIntoView } from 'src/app/utils/scroll';
 import { untilTrue } from 'src/app/utils/waitForAsync';
 import { AndroidSAF } from 'src/plugins/androidsaf';
+import { ErrorCode } from 'src/plugins/bcrgui';
 import { CdkVirtualScrollViewport, ScrollingModule } from '@angular/cdk/scrolling';
 import { DatePipe } from '@angular/common';
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, signal, untracked, viewChild } from '@angular/core';
@@ -381,7 +382,8 @@ export class MainPage implements AfterViewInit {
     this.contactsService.createOrEditContact({
       displayName: rec.opName,
       phoneNumber: rec.opNumber
-    }).then(async res => {
+    })
+    .then(async res => {
 
       // a new contact has been created (or an existing one was modified)
       console.log(`Created/edited contact: '${res.displayName}`);
@@ -394,7 +396,17 @@ export class MainPage implements AfterViewInit {
         }
       });
 
+    })
+    .catch(err => {
+      // error ERR_USER_CANCELED is returned when user exits the contact editor without saving, we can just ignore it
+      if (err.code !== ErrorCode.ERR_USER_CANCELED) {
+        this.mbs.showError({
+          error: err,
+        });
+      }
     });
+
+  ;
 
   }
 

@@ -1,3 +1,10 @@
+/**
+ * Error codes returned on failures
+ */
+export const ErrorCode = {
+  ERR_USER_CANCELED: "ERR_USER_CANCELED",
+} as const;
+
 export interface BcrGui {
 
   /**

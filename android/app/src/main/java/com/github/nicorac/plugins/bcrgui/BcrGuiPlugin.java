@@ -56,7 +56,7 @@ public class BcrGuiPlugin extends Plugin {
     }
 
     if (result.getResultCode() != AppCompatActivity.RESULT_OK) {
-      call.reject(result.toString());
+      call.reject(result.toString(), ErrorCodes.ERR_USER_CANCELED);
       return;
     }
 
