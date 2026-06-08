@@ -26,6 +26,7 @@ import { sortRecordings } from '@src/app/utils/recordings-sorter';
 import { bringIntoView } from '@src/app/utils/scroll';
 import { untilTrue } from '@src/app/utils/waitForAsync';
 import { AndroidSAF } from '@src/plugins/androidsaf';
+import { ErrorCode } from '@src/plugins/bcrgui';
 import version from '../../version';
 
 @Component({
