@@ -75,17 +75,16 @@ export class MainPage implements AfterViewInit {
 
   // filtered items collection
   protected items = computed<Recording[]>(() => {
-    // filter
+    // filter & sort
     let filteredItems = filterList(this.recordingsService.recordings(), this.searchValue(), r => `${r.opName} ${r.opNumber}`);
-    // close any open player to let the list update without leaving "orphaned" player IDs
-    let selItem: Recording|undefined;
-    untracked(() => selItem = this.selectedItem());
-    // sort
     filteredItems = sortRecordings(filteredItems, this.settings.recordingsSortMode);
     // reset selection if item is now missing
-    if (selItem && !filteredItems.includes(selItem)) {
-      this.clearSelection();
-    }
+    untracked(() => {
+      const selItem = this.selectedItem();
+      if (selItem && !filteredItems.includes(selItem)) {
+        this.clearSelection();
+      }
+    });
     // return sorted
     return filteredItems;
   });
