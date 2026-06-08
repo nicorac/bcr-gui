@@ -1,5 +1,17 @@
 # Version history
 
+## Version 1.14.2 (2026-06-08)
+
+New features:
+
+* Added polsky language (thanks to [@janowakps](https://github.com/janowakps))
+
+Bug fixes:
+
+* Fixed error on user cancel when selecting a contact (#237)
+
+* Fixed error when search box filter causes the list to miss the selected item (#236)
+
 ## Version 1.14.1 (2026-06-06)
 
 New features:
