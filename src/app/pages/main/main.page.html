@@ -97,7 +97,7 @@
       >
 
         <!-- recording item -->
-        <ion-card *cdkVirtualFor="let item of items(); let index = index"
+        <ion-card *cdkVirtualFor="let item of items(); let index = index; trackBy: trackByUri"
           class="item"
           [class.selected]="item.selected"
         >

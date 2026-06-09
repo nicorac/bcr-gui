@@ -16,7 +16,7 @@
         "echo": true,
         "panel": "shared",
       },
-      "dependsOn": "Android fix permissions",
+      // "dependsOn": "Android fix permissions",
     },
     {
       "label": "Android fix permissions",

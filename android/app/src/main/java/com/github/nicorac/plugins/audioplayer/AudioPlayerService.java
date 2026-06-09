@@ -16,6 +16,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.AudioManager;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
@@ -191,7 +192,6 @@ public class AudioPlayerService extends MediaSessionService {
               if (isPreparing) {
                 isPreparing = false;
                 var res = new JSObject();
-                res.put("duration", player.getDuration());
                 plugin.sendJSEvent("playerReady", res);
                 isLoaded = true;
                 // reset playback speed
@@ -335,22 +335,6 @@ public class AudioPlayerService extends MediaSessionService {
     if (player != null && player.isPlaying()) {
       player.stop();
     }
-  }
-
-  /**
-   * Get current audio duration (in milliseconds)
-   */
-  public void getDuration(PluginCall call) {
-
-    if (!isLoaded) {
-      call.reject(ErrorCodes.ERR_NOT_LOADED);
-      return;
-    }
-
-    var res = new JSObject();
-    res.put("duration", player.getDuration());
-    call.resolve(res);
-
   }
 
   /**
@@ -578,11 +562,10 @@ public class AudioPlayerService extends MediaSessionService {
 
   @SuppressLint("DefaultLocale")
   private String toHMS(long milliseconds) {
-    long hours = milliseconds / (1000 * 60 * 60);
-    milliseconds %= (1000 * 60 * 60);
-    long minutes = milliseconds / (1000 * 60);
-    milliseconds %= (1000 * 60);
-    long seconds = milliseconds / 1000;
+    var totalSeconds = Math.round(milliseconds / 1000.0);
+    long hours   = totalSeconds / 3600;
+    long minutes = (totalSeconds / 60) % 60;
+    long seconds = totalSeconds % 60;
     if (hours > 0) {
       return String.format("%02d:%02d:%02d", hours, minutes, seconds);
     } else {
@@ -625,6 +608,36 @@ public class AudioPlayerService extends MediaSessionService {
     if (isNotificationVisible) {
       notificationManager.cancel(NOTIFICATION_ID);
     }
+  }
+
+  /**
+   * Parse the given file Uri and extract media duration (in ms)
+   */
+  public void getAudioFileDuration(PluginCall call) {
+
+    // get input arguments
+    var fileUriStr = call.getString("fileUri");
+    if (fileUriStr == null) {
+      call.reject("Missing fileUri parameter", ErrorCodes.ERR_BAD_URI);
+      return;
+    }
+    var fileUri = Uri.parse(fileUriStr);
+
+    var duration = 0L;
+    try (var retriever = new MediaMetadataRetriever()) {
+      retriever.setDataSource(getBaseContext(), fileUri);
+      String durationStr = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+      if (durationStr != null) {
+        duration = Long.parseLong(durationStr);
+      }
+    }
+    catch (Exception ignored) { }
+
+    // return result
+    var res = new JSObject();
+    res.put("duration", duration);
+    call.resolve(res);
+
   }
 
 }

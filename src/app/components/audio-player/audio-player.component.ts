@@ -97,6 +97,16 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
 
       try {
 
+        // test if the selected recording duration field has been filled
+        // (duration field is filled asynchronously)
+        if ((rec.duration || 0) <= 0) {
+          const { duration } = await AudioPlayer.getAudioFileDuration({ fileUri: rec.audioUri });
+          rec.duration = duration / 1000;
+          // forcibly save updated recordings DB
+          await this.recordingsService.save();
+        }
+        this.duration.set(rec.duration);
+
         await AudioPlayer.load({
           fileUri: rec.audioUri,
           notificationTitle: rec.opName,
@@ -111,22 +121,9 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
         }
 
         // subscribe to player ready event
-        this.removePlayerReadyListener = await AudioPlayer.addListener('playerReady', async (res) => {
-          // get audio duration
-          const playerDuration = res.duration / 1000;
-          this.duration.set(playerDuration);
+        this.removePlayerReadyListener = await AudioPlayer.addListener('playerReady', async () => {
           this.status.set(PlayerStatusEnum.Paused);
           this.progress.set(0);
-          // set duration to recording item if
-          // - not already set with JSON metadata
-          // - already set but different (i.e. Android player detects a length different from the one in metadata JSON file)
-          if (rec.duration !== playerDuration) {
-            rec.duration = playerDuration;
-            // forcibly save updated recordings DB
-            await this.recordingsService.save();
-            this.cdr.detectChanges(); // workaround needed to let Angular update values...
-          }
-
           // init complete
           this.ready.set(true);
           this.cdr.detectChanges(); // workaround needed to let Angular update values...

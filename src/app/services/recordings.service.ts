@@ -1,6 +1,6 @@
-import { environment } from 'src/environments/environment';
 import { AndroidSAF, AndroidSAFUtils, ErrorCode, GetFileUriOptions, ReadFileOptions } from 'src/plugins/androidsaf';
-import { effect, Injectable, signal } from '@angular/core';
+import { AudioPlayer } from 'src/plugins/audioplayer';
+import { Injectable, signal } from '@angular/core';
 import { Encoding } from '@capacitor/filesystem';
 import { Platform } from '@ionic/angular';
 import { DB_FILENAME, DB_SCHEMA_VERSION, DbContent } from '../models/dbContent';
@@ -36,6 +36,7 @@ export class RecordingsService {
    * 0 < value <=1  ==> refresh progress (%)
    */
   public refreshProgress = signal<number|undefined>(undefined);
+  public isUpdatingDurations = false;
 
   constructor(
     private i18n: I18nService,
@@ -171,6 +172,9 @@ export class RecordingsService {
       this.lastUpdate = new Date().getTime();
       this.recordings.set(Object.values(currentDbObj));
       await this.save(false);
+
+      // start asynchronously (DO NOT AWAIT IT!)
+      this.updateDurations();
 
     }
     catch(error: any) {
@@ -455,6 +459,58 @@ export class RecordingsService {
       }
 
     }
+
+  }
+
+  /**
+   * Updates the recordings that miss a duration value
+   */
+  private async updateDurations() {
+
+    if (this.isUpdatingDurations) return;
+    this.isUpdatingDurations = true;
+
+    // extract records to update
+    const items = this.recordings().filter(i => (i.duration || 0) <= 0);
+
+    // extract duration of the extracted files
+    let signalUpdateCount = 0;
+    let saveCount = 0;
+    for (const r of items) {
+
+      // call plugin to get audio duration
+      try {
+        const { duration } = await AudioPlayer.getAudioFileDuration({ fileUri: r.audioUri });
+        r.duration = Math.round(duration / 1000);
+        // console.info('Updated duration of file:', r.audioUri);
+      }
+      catch (error) {
+        console.error('Error extracting duration of file:', r.audioUri, error);
+      }
+
+      // update the signal every 20 items to avoid repeated recreation of the whole array
+      if (++signalUpdateCount >= 20) {
+        signalUpdateCount = 0;
+        this.recordings.update(r => [...r]);
+      }
+
+      // save the DB every 100 items to avoid repeated save
+      if (++saveCount >= 100) {
+        saveCount = 0;
+        await this.save();
+      }
+
+    }
+
+    // last update & save
+    if (signalUpdateCount) {
+      this.recordings.update(r => [...r]);
+    }
+    if (saveCount) {
+      await this.save();
+    }
+
+    this.isUpdatingDurations = false;
 
   }
 

@@ -497,4 +497,8 @@ Duration: ${this.toHms.transform(item.duration)}
     }
   }
 
+  protected trackByUri(idx: number, item: Recording) {
+    return item.audioUri;
+  }
+
 }

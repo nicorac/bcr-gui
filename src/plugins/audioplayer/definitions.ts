@@ -19,9 +19,6 @@ export interface AudioPlayer extends EventManagerPlugin {
   pause(): Promise<void>;
   stop(): Promise<void>;
 
-  // Get audio file duration (in ms)
-  getDuration(): Promise<{ duration: number }>;
-
   // Get/set current play position (in ms)
   getCurrentPosition(): Promise<{ position: number }>;
   setCurrentPosition(options: ISetCurrentPositionParams): Promise<void>;
@@ -30,18 +27,21 @@ export interface AudioPlayer extends EventManagerPlugin {
   setPlaybackSpeed(data: { playbackSpeed: number }): Promise<void>;
 
   // events
-  addListener(eventName: 'playerReady', listenerFunc: (data: IReadyData) => void): Promise<PluginListenerHandle> & PluginListenerHandle;
+  addListener(eventName: 'playerReady', listenerFunc: () => void): Promise<PluginListenerHandle> & PluginListenerHandle;
   addListener(eventName: 'playerUpdate', listenerFunc: (data: IUpdateData) => void): Promise<PluginListenerHandle> & PluginListenerHandle;
   addListener(eventName: 'playerCompleted', listenerFunc: () => void): Promise<PluginListenerHandle> & PluginListenerHandle;
+
+  // utils
+
+  // Get the duration of a media file (in ms)
+  getAudioFileDuration(data: {
+    fileUri: string,
+  }): Promise<{ duration: number }>;
 
 }
 
 export interface ISetCurrentPositionParams {
   position?: number;  // seek position to set (in ms)
-}
-
-export interface IReadyData {
-  duration: number;  // media duration (in ms)
 }
 
 export interface IUpdateData {
