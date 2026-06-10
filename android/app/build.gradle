@@ -116,3 +116,10 @@ try {
 } catch(Exception e) {
   logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
 }
+
+// verbose build log
+gradle.projectsEvaluated {
+  tasks.withType(JavaCompile) {
+    options.compilerArgs << "-Xlint:deprecation" << "-Xlint:unchecked"
+  }
+}

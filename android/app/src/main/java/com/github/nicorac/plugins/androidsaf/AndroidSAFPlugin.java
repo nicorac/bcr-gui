@@ -43,7 +43,7 @@ public class AndroidSAFPlugin extends Plugin {
   private static final String ERR_UNKNOWN = "ERR_UNKNOWN";
 
   /**
-   * Allow client to select a directory and get access to contained files and subdirectorys
+   * Allow client to select a directory and get access to contained files and subdirectories
    */
   @PluginMethod()
   public void selectDirectory(PluginCall call) {
@@ -53,7 +53,7 @@ public class AndroidSAFPlugin extends Plugin {
 
     // open directory selector
     var intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-    if (initialUri != "") {
+    if (!Objects.equals(initialUri, "")) {
       intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, initialUri);
     }
 
@@ -76,7 +76,14 @@ public class AndroidSAFPlugin extends Plugin {
 
     // extract intent
     Intent intent = result.getData();
-    Uri uri = intent.getData();
+    Uri uri = null;
+    if (intent != null) {
+      uri = intent.getData();
+    }
+    if (uri == null) {
+      call.reject("Null uri in intent data", ERR_UNKNOWN);
+      return;
+    }
 
     // ask for persistent access
     int takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
@@ -103,7 +110,7 @@ public class AndroidSAFPlugin extends Plugin {
     var intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
     intent.setType("*/*");
     intent.addCategory(Intent.CATEGORY_OPENABLE);
-    if (initialUri != "") {
+    if (!Objects.equals(initialUri, "")) {
       intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, initialUri);
     }
 
@@ -126,16 +133,28 @@ public class AndroidSAFPlugin extends Plugin {
 
     // extract intent
     Intent intent = result.getData();
-    Uri uri = intent.getData();
+    Uri uri = null;
+    if (intent != null) {
+      uri = intent.getData();
+    }
+    if (uri == null) {
+      call.reject("Null uri in intent data", ERR_UNKNOWN);
+      return;
+    }
 
     // get DocumentFile from selected file
     var fileDf = DocumentFile.fromSingleUri(getContext(), uri);
 
     // Do something with the result data
-    var ret = new JSObject();
-    ret.put("selectedUri", intent.getDataString());
-    ret.put("displayName", fileDf.getName());
-    call.resolve(ret);
+    if (fileDf != null) {
+      var ret = new JSObject();
+      ret.put("displayName", fileDf.getName());
+      ret.put("selectedUri", intent.getDataString());
+      call.resolve(ret);
+    }
+    else {
+      call.reject("Can't extract DocumentFile from file uri", ERR_UNKNOWN);
+    }
 
   }
 
@@ -175,7 +194,7 @@ public class AndroidSAFPlugin extends Plugin {
     try (
       Cursor c = getContext().getContentResolver().query(uri, new String[] {
         DocumentsContract.Document.COLUMN_LAST_MODIFIED,   // 0
-      }, null, null, null);
+      }, null, null, null)
     ) {
       if (c != null && c.moveToNext()) {
         final var timestamp = c.getLong(0);
@@ -260,7 +279,7 @@ public class AndroidSAFPlugin extends Plugin {
     if (fileDF == null) {
       call.reject("Error creating file", ERR_IO_EXCEPTION);
       return;
-    };
+    }
 
     // call writeFile() passing the created fileDF
     _writeFile(call, fileDF);
@@ -300,8 +319,13 @@ public class AndroidSAFPlugin extends Plugin {
 
     // write content (and resolve/reject call)
     try {
-      _writeFileContent(fileDF.getUri(), content, charset);
-      call.resolve(new JSObject().put("fileUri", fileDF.getUri()));
+      if (fileDF != null) {
+        _writeFileContent(fileDF.getUri(), content, charset);
+        call.resolve(new JSObject().put("fileUri", fileDF.getUri()));
+      }
+      else {
+        call.reject("Error writing to file", ERR_IO_EXCEPTION);
+      }
     } catch (IOException e) {
       call.reject("Error writing to file", ERR_IO_EXCEPTION);
     }
@@ -319,7 +343,7 @@ public class AndroidSAFPlugin extends Plugin {
       // if charset is not null assume its a plain text file the user wants to save
       if (charset != null) {
         try (
-          var osw = new OutputStreamWriter(os, charset);
+          var osw = new OutputStreamWriter(os, charset)
         ) {
           osw.write(content);
           osw.flush();
@@ -385,7 +409,6 @@ public class AndroidSAFPlugin extends Plugin {
   /**
    * More efficient method to find a file, avoiding calls to
    * slow DocumentFile methods like .getDisplayName()
-   *
    * BEWARE: can't filter results of getContentResolver().query(), so it could be slow for crowded directories...
    *
    * @return Uri of the searched file or null
@@ -407,7 +430,7 @@ public class AndroidSAFPlugin extends Plugin {
       Cursor c = getContext().getContentResolver().query(childrenUri, new String[] {
         DocumentsContract.Document.COLUMN_DOCUMENT_ID,    // 0
         DocumentsContract.Document.COLUMN_DISPLAY_NAME,   // 1
-      }, null, null, null);
+      }, null, null, null)
     ) {
       while (c != null && c.moveToNext()) {
         var displayName = c.getString(1);
@@ -445,7 +468,7 @@ public class AndroidSAFPlugin extends Plugin {
         DocumentsContract.Document.COLUMN_LAST_MODIFIED,  // 5
       }, null, null, null);
       var sw = new StringWriter();
-      var jw = new JsonWriter(sw);
+      var jw = new JsonWriter(sw)
     ) {
       if (c == null) return null;
 
@@ -495,7 +518,7 @@ public class AndroidSAFPlugin extends Plugin {
   private String readFileAsString(InputStream is, String encoding) throws IOException {
     var outputStream = new ByteArrayOutputStream();
     byte[] buffer = new byte[1024];
-    int length = 0;
+    int length;
 
     while ((length = is.read(buffer)) != -1) {
       outputStream.write(buffer, 0, length);

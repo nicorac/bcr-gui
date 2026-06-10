@@ -22,6 +22,7 @@ import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.PowerManager;
 
 import androidx.annotation.Nullable;
@@ -244,7 +245,7 @@ public class AudioPlayerService extends MediaSessionService {
             }
             stopUpdateTask();
             // remove service from foreground
-            stopForeground(false);
+            stopForeground(STOP_FOREGROUND_DETACH);
             // delete notification (call above with "true" doesn't always work)
             cancelNotification();
           }
@@ -538,7 +539,7 @@ public class AudioPlayerService extends MediaSessionService {
    * Start an update task (each UPDATE_INTERVAL ms) to update notification text
    */
   private void startUpdateTask() {
-    updateHandler = new Handler();
+    updateHandler = new Handler(Objects.requireNonNullElse(Looper.myLooper(), Looper.getMainLooper()));
     updateRunnable = new Runnable() {
       @Override
       public void run() {
