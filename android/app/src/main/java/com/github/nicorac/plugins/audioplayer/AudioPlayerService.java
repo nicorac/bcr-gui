@@ -25,10 +25,16 @@ import android.os.IBinder;
 import android.os.PowerManager;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.OptIn;
 import androidx.core.app.NotificationCompat;
 import androidx.media3.common.C;
 import androidx.media3.common.MediaItem;
+import androidx.media3.common.util.UnstableApi;
 import androidx.media3.exoplayer.ExoPlayer;
+import androidx.media3.datasource.DefaultDataSource;
+import androidx.media3.exoplayer.source.ProgressiveMediaSource;
+import androidx.media3.extractor.DefaultExtractorsFactory;
+import androidx.media3.extractor.amr.AmrExtractor;
 import androidx.media3.session.MediaSession;
 import androidx.media3.session.MediaSessionService;
 
@@ -83,7 +89,6 @@ public class AudioPlayerService extends MediaSessionService {
 
   // proximity sensor management
   private SensorManager sensorManager;
-  private Sensor proximitySensor;
   private SensorEventListener proximityListener;
 
   // events and update handler (in current "CapacitorPlugins" thread)
@@ -158,6 +163,7 @@ public class AudioPlayerService extends MediaSessionService {
   /**
    * Initialize the player on the given audio file
    */
+  @OptIn(markerClass = UnstableApi.class)
   public void load(PluginCall call) {
 
     if (isLoaded) {
@@ -175,9 +181,19 @@ public class AudioPlayerService extends MediaSessionService {
 
     // load media file
     try {
+      // this is required to let player setPosition() work
+      // with .amr files without a "seek-table"
+      var extractorsFactory = new DefaultExtractorsFactory()
+        .setAmrExtractorFlags(AmrExtractor.FLAG_ENABLE_CONSTANT_BITRATE_SEEKING);
+      var mediaSourceFactory = new ProgressiveMediaSource.Factory(
+        new DefaultDataSource.Factory(getApplicationContext()),
+        extractorsFactory
+      );
 
       // create MediaPlayer instance
-      player = new ExoPlayer.Builder(getApplicationContext()).build();
+      player = new ExoPlayer.Builder(getApplicationContext())
+        .setMediaSourceFactory(mediaSourceFactory)
+        .build();
       var mediaItem = MediaItem.fromUri(fileUri);
       setOutputDevice(DEVICE_LOUDSPEAKER);
       player.setMediaItem(mediaItem);
@@ -464,7 +480,7 @@ public class AudioPlayerService extends MediaSessionService {
     }
 
     sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-    proximitySensor = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
+    Sensor proximitySensor = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
 
     if (proximitySensor != null) {
 
@@ -625,7 +641,7 @@ public class AudioPlayerService extends MediaSessionService {
 
     var duration = 0L;
     try (var retriever = new MediaMetadataRetriever()) {
-      retriever.setDataSource(getBaseContext(), fileUri);
+      retriever.setDataSource(getApplicationContext(), fileUri);
       String durationStr = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
       if (durationStr != null) {
         duration = Long.parseLong(durationStr);
