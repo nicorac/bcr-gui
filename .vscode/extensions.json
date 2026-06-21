@@ -4,6 +4,7 @@
     "dbaeumer.vscode-eslint",
     "infinity1207.angular2-switcher",
     "mike-co.import-sorter",
-    "mpotthoff.vscode-android-webview-debug"
+    "mpotthoff.vscode-android-webview-debug",
+    "rioj7.command-variable"
   ]
 }
