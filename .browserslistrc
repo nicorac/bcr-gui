@@ -8,13 +8,7 @@
 # You can see what browsers were selected by your queries by running:
 #   npx browserslist
 
-# Capacitor 8 + Angular 21 (Permissive Target)
+# Capacitor 9 + Angular 21 (Permissive Target)
 
 # Mobile WebViews
-Android >= 10
-Chrome >= 111
 ChromeAndroid >= 100
-# not firefox
-# not ios_saf
-# not edge
-# not IE 11
