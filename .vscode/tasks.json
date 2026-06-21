@@ -5,7 +5,7 @@
       "label": "Ionic run (ext device)",
       "type": "shell",
       "command": "ionic",
-      "args": [ "capacitor", "run", "android", "--livereload", "--external", "--target=${env:ANDROID_DEVICE_ID}" ],
+      "args": [ "capacitor", "run", "android", "--livereload", "--external", "--target=${input:getDeviceID}" ],
       "isBackground": true,
       "options": {
         "cwd": "${workspaceFolder}",
@@ -45,6 +45,19 @@
         "echo": true,
         "panel": "shared",
       },
+    }
+  ],
+  "inputs": [
+    {
+      // This trick forces VS Code to dynamically execute a script to fetch the variable on every F5
+      "id": "getDeviceID",
+      "type": "command",
+      "command": "extension.commandvariable.file.content",
+      "args": {
+        "fileName": "${workspaceFolder}/.env",
+        "key": "ANDROID_DEVICE_ID",
+        "default": "Please-set-the-android-device-key-in-.env-file"
+      }
     }
   ]
 }
