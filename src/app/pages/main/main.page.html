@@ -113,7 +113,7 @@
                 <div class="op-name">{{ item.opName }}</div>
               </ion-card-title>
               <ion-card-subtitle class="left-container subtitle">
-                <app-call-icon class="call-direction-icon" [direction]="item?.direction ?? ''" />
+                <app-call-icon class="call-direction-icon" [direction]="item?.direction || ''" />
                 <span>{{ item.date | datetime }}</span>
                 @if (item.duration) {
                   • <span>{{ item.duration | toHms }}</span>
