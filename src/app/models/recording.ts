@@ -233,7 +233,7 @@ export class Recording {
     }
 
     // other fields
-    res.direction = groups['direction'] as CallDirection;
+    res.direction = (groups['direction']?.toLowerCase()) as CallDirection;
     res.calls = [
       {
         phone_number: groups['phone_number']?.trim(),
