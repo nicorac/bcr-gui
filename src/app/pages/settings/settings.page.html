@@ -12,7 +12,7 @@
       <div class="wrapper">
         <div class="label">
           <div>{{ 'SETTINGS_RECORDINGS_DIRECTORY' | translatePipe }}</div>
-          <div class="help">{{ settings.recordingsDirectoryUri ? settings.recordingsDirectoryUri : 'Select directory containing recording files...' }}</div>
+          <div class="help">{{ settings.recordingsDirectoryUri ? settings.recordingsDirectoryUri : ('SETTINGS_RECORDINGS_DIRECTORY_HELP' | translatePipe) }}</div>
         </div>
         <ion-button (click)="selectRecordingsDirectory()">
           <ion-icon name="folder-open-outline" />

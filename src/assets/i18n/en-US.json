@@ -127,6 +127,7 @@
   "SETTINGS_PLAYER_SECTION": "Player",
   "SETTINGS_PLAYER_SEEK_TIME": "Seek time",
   "SETTINGS_RECORDINGS_DIRECTORY": "Recordings directory",
+  "SETTINGS_RECORDINGS_DIRECTORY_HELP": "Select directory containing recording files...",
   "SETTINGS_RECORDINGS_SECTION": "Recordings",
   "SETTINGS_RECORDINGS_SORT": "List sort mode",
   "SETTINGS_RECORDINGS_SORT_DATE_ASC": "Date (ascending)",

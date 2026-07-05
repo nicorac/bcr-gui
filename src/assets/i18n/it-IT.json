@@ -127,6 +127,7 @@
   "SETTINGS_PLAYER_SECTION": "Riproduzione",
   "SETTINGS_PLAYER_SEEK_TIME": "Intervallo ricerca",
   "SETTINGS_RECORDINGS_DIRECTORY": "Cartella registrazioni",
+  "SETTINGS_RECORDINGS_DIRECTORY_HELP": "Selezionare la cartella contenente i file di registrazione...",
   "SETTINGS_RECORDINGS_SECTION": "Registrazioni",
   "SETTINGS_RECORDINGS_SORT": "Ordinamento lista",
   "SETTINGS_RECORDINGS_SORT_DATE_ASC": "Data (crescente)",
