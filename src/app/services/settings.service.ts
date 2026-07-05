@@ -218,23 +218,42 @@ export class SettingsService {
   }
 
   /**
-   * Save app settings to storage
+   * Save app settings to storage.
+   * If passed in, the given jsonContent is persisted into storage.
    */
-  async save() {
+  async save(jsonContent: string|undefined = undefined) {
+
     if (this.isLoadingSaving) return;
+
     try {
       this.isLoadingSaving = true;
-      const jsonObj = serializeObject(this);
-      return Preferences.set({ key: 'settings', value: JSON.stringify(jsonObj) });
-    } catch (error) {
+      if (!jsonContent) {
+        const jsonObj = this.getSettings();
+        jsonContent = JSON.stringify(jsonObj);
+      }
+      await Preferences.set({ key: 'settings', value: jsonContent });
+      return true;
+    }
+    catch (error) {
       this.mbs.showError({
         error: error,
         appErrorCode: 'ERR_CFG002',
       });
-  } finally {
+      return false;
+    }
+    finally {
       this.isLoadingSaving = false;
     }
   }
+
+  /**
+   * Return the serialized version of this object.
+   * (it will contain only the serializable properties)
+   */
+  getSettings(): object {
+    return serializeObject(this);
+  }
+
 
   /**
    * Update darkMode subject status

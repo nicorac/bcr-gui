@@ -29,5 +29,8 @@ project(':capacitor-status-bar').projectDir = new File('../node_modules/@capacit
 include ':capgo-capacitor-navigation-bar'
 project(':capgo-capacitor-navigation-bar').projectDir = new File('../node_modules/@capgo/capacitor-navigation-bar/android')
 
+include ':kristianheljas-capacitor-app-restart'
+project(':kristianheljas-capacitor-app-restart').projectDir = new File('../node_modules/@kristianheljas/capacitor-app-restart/android')
+
 include ':capacitor-native-settings'
 project(':capacitor-native-settings').projectDir = new File('../node_modules/capacitor-native-settings/android')

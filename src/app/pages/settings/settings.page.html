@@ -4,6 +4,7 @@
 
   <ion-list class="config-items" lines="full">
 
+    <!-- general section -->
     <ion-item-divider>
       <h4>{{ 'SETTINGS_GENERAL_SECTION' | translatePipe }}</h4>
     </ion-item-divider>
@@ -90,6 +91,7 @@
       </div>
     </ion-item>
 
+    <!-- recordings section -->
     <ion-item-divider>
       <h4>{{ 'SETTINGS_RECORDINGS_SECTION' | translatePipe }}</h4>
     </ion-item-divider>
@@ -148,6 +150,31 @@
           [(ngModel)]="settings.keepAwakeWhenPlaying"
           (ngModelChange)="save()"
         />
+      </div>
+    </ion-item>
+
+    <!-- import/export -->
+    <ion-item-divider>
+      <h4>{{ 'SETTINGS_IMPEXP_TITLE' | translatePipe }}</h4>
+    </ion-item-divider>
+
+    <ion-item button (click)="fileInput.click()">
+      <div class="label" >
+        <div>{{ 'SETTINGS_IMPEXP_IMPORT' | translatePipe }}</div>
+        <div class="help">{{ 'SETTINGS_IMPEXP_IMPORT_HELP' | translatePipe }}</div>
+      </div>
+      <input
+        #fileInput
+        type="file"
+        accept="application/json,*.settings.json"
+        style="display: none"
+        (change)="importSettings($event)" />
+    </ion-item>
+
+    <ion-item button (click)="exportSettings()">
+      <div class="label">
+        <div>{{ 'SETTINGS_IMPEXP_EXPORT' | translatePipe }}</div>
+        <div class="help">{{ 'SETTINGS_IMPEXP_EXPORT_HELP' | translatePipe }}</div>
       </div>
     </ion-item>
 
