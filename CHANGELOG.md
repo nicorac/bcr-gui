@@ -1,5 +1,11 @@
 # Version history
 
+## Version 1.15.2 (2026-08-04)
+
+New features:
+
+* Updated Turkish, Norwegian, Polish translations
+
 ## Version 1.15.1 (2026-08-04)
 
 New features:
