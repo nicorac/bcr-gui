@@ -1,5 +1,19 @@
 # Version history
 
+## Version 1.15.1 (2026-08-04)
+
+New features:
+
+* New feature to import/export app configuration (#245)
+
+* Updated Czech, Chinese Simplified, Italian, English, Spanish translations
+
+Bug fixes:
+
+* Added missing translation to "Recordings directory" setting
+
+* Direction field parsing fails when filenames are uppercase (fixes #243)
+
 ## Version 1.15.0 (2026-06-16)
 
 New features:
