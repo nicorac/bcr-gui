@@ -11,7 +11,7 @@
     "build": "ng build",
     "fix-android-permissions": "adb shell su -c chmod a+rw /proc/net/unix",
     "check-i18n-files": "node -r ts-node/register scripts/check-i18n-files.ts",
-    "prebuild:android": "node scripts/check-android-version.js",
+    "prebuild:android": "node scripts/pre-build-checks.js",
     "build:android": "ionic capacitor build android --no-open --prod && cd android && gradlew assembleRelease && cd ..",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
