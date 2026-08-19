@@ -15,9 +15,16 @@ apply plugin: 'com.android.application'
 System.print("Loading Android keystore config from: ")
 System.println(System.getenv("ANDROID_KEYSTORE_PROPS"))
 def keystoreProperties = new Properties()
-def keystorePropertiesFile = file(System.getenv("ANDROID_KEYSTORE_PROPS"))
-if (keystorePropertiesFile.exists()) {
-  keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+def keystorePropertiesPath = System.getenv("ANDROID_KEYSTORE_PROPS")
+// An unset ANDROID_KEYSTORE_PROPS used to abort configuration (file(null) throws),
+// which broke `assembleDebug` too. Signing is only needed for release builds.
+def hasKeystore = false
+if (keystorePropertiesPath) {
+  def keystorePropertiesFile = file(keystorePropertiesPath)
+  if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+    hasKeystore = true
+  }
 }
 
 android {
@@ -41,11 +48,13 @@ android {
 
   // signature config (release only)
   signingConfigs {
-    release {
-      keyAlias keystoreProperties['keyAlias']
-      keyPassword keystoreProperties['keyPassword']
-      storeFile file(keystoreProperties['storeFile'])
-      storePassword keystoreProperties['storePassword']
+    if (hasKeystore) {
+      release {
+        keyAlias keystoreProperties['keyAlias']
+        keyPassword keystoreProperties['keyPassword']
+        storeFile file(keystoreProperties['storeFile'])
+        storePassword keystoreProperties['storePassword']
+      }
     }
   }
   buildTypes {
@@ -56,7 +65,9 @@ android {
     release {
       minifyEnabled false
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-      signingConfig signingConfigs.release
+      if (hasKeystore) {
+        signingConfig signingConfigs.release
+      }
     }
   }
 
@@ -104,6 +115,12 @@ dependencies {
   implementation project(':capacitor-cordova-android-plugins')
   implementation 'androidx.media3:media3-exoplayer:1.4.1'
   implementation 'androidx.media3:media3-session:1.4.1'
+  // Xposed APIs: compileOnly on purpose -- provided by the framework at runtime,
+  // must NOT be packaged into the APK.
+  // Both are declared: the modern one is what Vector 2.2 implements, the legacy one
+  // keeps the module loadable on frameworks that do not support API 102 yet.
+  compileOnly 'de.robv.android.xposed:api:82'
+  compileOnly 'io.github.libxposed:api:102.0.0'
 }
 
 apply from: 'capacitor.build.gradle'

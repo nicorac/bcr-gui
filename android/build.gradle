@@ -21,6 +21,8 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        // Xposed API stubs (compileOnly) for the dialer integration module
+        maven { url 'https://api.xposed.info/' }
     }
 }
 
