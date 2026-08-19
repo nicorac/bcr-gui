@@ -153,6 +153,74 @@
       </div>
     </ion-item>
 
+    <!-- dialer integration (Xposed module) -->
+    <ion-item-divider>
+      <h4>{{ 'SETTINGS_DIALER_SECTION' | translatePipe }}</h4>
+    </ion-item-divider>
+
+    <ion-item>
+      <div class="wrapper">
+        <div class="label">
+          <div>{{ 'SETTINGS_DIALER_ENABLE' | translatePipe }}</div>
+          <div class="help">{{ 'SETTINGS_DIALER_ENABLE_HELP' | translatePipe }}</div>
+        </div>
+        <ion-checkbox
+          [(ngModel)]="settings.dialerIntegrationEnabled"
+          (ngModelChange)="onDialerIntegrationToggled()"
+        />
+      </div>
+    </ion-item>
+
+    @if (settings.dialerIntegrationEnabled && dialerStatus) {
+      <ion-item>
+        <div class="label">
+          <div>{{ 'SETTINGS_DIALER_STATUS' | translatePipe }}</div>
+          <div class="help">
+            @if (dialerStatus.moduleActive) {
+              ✅ {{ 'SETTINGS_DIALER_STATUS_ACTIVE' | translatePipe }}
+            } @else {
+              ⚠️ {{ 'SETTINGS_DIALER_STATUS_INACTIVE' | translatePipe }}
+            }
+            <br/>
+            {{ 'SETTINGS_DIALER_DEFAULT_APP' | translatePipe }}:
+            {{ dialerStatus.defaultDialerLabel ?? ('SETTINGS_DIALER_NONE' | translatePipe) }}
+          </div>
+        </div>
+        <ion-button fill="clear" (click)="refreshDialerStatus()">
+          <ion-icon name="refresh-outline" />
+        </ion-button>
+      </ion-item>
+
+      <ion-item>
+        <div class="wrapper">
+          <div class="label">
+            <div>{{ 'SETTINGS_DIALER_DIAGNOSTICS' | translatePipe }}</div>
+            <div class="help">{{ 'SETTINGS_DIALER_DIAGNOSTICS_HELP' | translatePipe }}</div>
+          </div>
+          <ion-checkbox
+            [(ngModel)]="settings.dialerDiagnostics"
+            (ngModelChange)="save()"
+          />
+        </div>
+      </ion-item>
+
+      <ion-item button (click)="exportDialerDiagnostics()">
+        <div class="label">
+          <div>{{ 'SETTINGS_DIALER_EXPORT_LOGS' | translatePipe }}</div>
+          <div class="help">{{ 'SETTINGS_DIALER_EXPORT_LOGS_HELP' | translatePipe }}</div>
+        </div>
+      </ion-item>
+
+      @if (!dialerStatus.moduleActive && dialerStatus.xposedManager) {
+        <ion-item button (click)="openXposedManager()">
+          <div class="label">
+            <div>{{ 'SETTINGS_DIALER_OPEN_MANAGER' | translatePipe }}</div>
+            <div class="help">{{ 'SETTINGS_DIALER_OPEN_MANAGER_HELP' | translatePipe }}</div>
+          </div>
+        </ion-item>
+      }
+    }
+
     <!-- import/export -->
     <ion-item-divider>
       <h4>{{ 'SETTINGS_IMPEXP_TITLE' | translatePipe }}</h4>

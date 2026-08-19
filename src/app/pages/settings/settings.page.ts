@@ -9,7 +9,8 @@ import { MessageBoxService } from 'src/app/services/message-box.service';
 import { RecordingsService } from 'src/app/services/recordings.service';
 import { SortModeEnum } from 'src/app/utils/recordings-sorter';
 import version from 'src/app/version';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { BcrGui, DialerIntegrationStatus } from 'src/plugins/bcrgui';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Directory, Encoding, Filesystem } from '@capacitor/filesystem';
@@ -47,7 +48,11 @@ export class SettingsPage {
 
   public readonly IMPORT_EXPORT_FILENAME = "bcr-gui.settings.json";
 
+  /** State of the Xposed dialer integration, undefined until first read */
+  protected dialerStatus?: DialerIntegrationStatus;
+
   constructor(
+    private cdr: ChangeDetectorRef,
     private dtp: DatetimePipe,
     protected i18n: I18nService,
     protected messageBoxService: MessageBoxService,
@@ -61,6 +66,12 @@ export class SettingsPage {
     this.backSub = this.platform.backButton.subscribeWithPriority(10, () => this.router.navigateByUrl(AppRoutesEnum.Main));
   }
 
+  async ionViewWillEnter() {
+    if (this.settings.dialerIntegrationEnabled) {
+      await this.refreshDialerStatus();
+    }
+  }
+
   async ionViewWillLeave() {
     this.backSub?.unsubscribe();
     await this.save();
@@ -69,6 +80,82 @@ export class SettingsPage {
   async save() {
     await this.settings.save();
   }
+
+  //#region dialer integration (Xposed)
+
+  protected async refreshDialerStatus() {
+    try {
+      this.dialerStatus = await BcrGui.getDialerIntegrationStatus();
+    } catch (error) {
+      console.error(error);
+      this.dialerStatus = undefined;
+    }
+    this.cdr.markForCheck();
+  }
+
+  protected async onDialerIntegrationToggled() {
+    await this.save();
+    if (this.settings.dialerIntegrationEnabled) {
+      await this.refreshDialerStatus();
+      // The module reads its config once, when the dialer process starts, so a
+      // freshly enabled integration only appears after the dialer is restarted.
+      if (!this.dialerStatus?.moduleActive) {
+        this.messageBoxService.showConfirm({
+          header: this.i18n.get('SETTINGS_DIALER_SECTION'),
+          message: this.i18n.get('SETTINGS_DIALER_SETUP_HELP'),
+          showCancelButton: false,
+          onConfirm: async () => {},
+        });
+      }
+    } else {
+      this.dialerStatus = undefined;
+    }
+  }
+
+  /**
+   * Share whatever the dialer-side module last handed over.
+   *
+   * The module keeps a short history in memory at all times and pushes it across
+   * every couple of minutes, so this usually has something useful even when
+   * diagnostics were never switched on.
+   */
+  protected async exportDialerDiagnostics() {
+    try {
+      const { available, content, collectedAt } = await BcrGui.readDialerDiagnostics();
+      if (!available || !content) {
+        this.messageBoxService.showError({
+          header: this.i18n.get('SETTINGS_DIALER_EXPORT_LOGS'),
+          message: this.i18n.get('SETTINGS_DIALER_EXPORT_LOGS_EMPTY'),
+        });
+        return;
+      }
+      const filename = 'bcr-gui-dialer-diagnostics.log';
+      await Filesystem.writeFile({
+        path: filename,
+        data: content,
+        directory: Directory.Cache,
+        encoding: Encoding.UTF8,
+      });
+      const { uri } = await Filesystem.getUri({ path: filename, directory: Directory.Cache });
+      await Share.share({
+        title: filename,
+        text: `BCR-GUI dialer diagnostics (${new Date(collectedAt).toISOString()})`,
+        url: uri,
+      });
+    } catch (error) {
+      this.messageBoxService.showError({ error });
+    }
+  }
+
+  protected async openXposedManager() {
+    try {
+      await BcrGui.openXposedManager();
+    } catch (error) {
+      this.messageBoxService.showError({ error });
+    }
+  }
+
+  //#endregion
 
   protected selectRecordingsDirectory() {
     this.recordingsService.selectRecordingsDirectory(() => this.recordingsService.initialize());

@@ -4,6 +4,7 @@ import { App } from '@capacitor/app';
 import { StatusBar } from '@capacitor/status-bar';
 import { NavigationBar } from '@capgo/capacitor-navigation-bar';
 import { IonRouterOutlet, Platform } from '@ionic/angular';
+import { BcrGui } from 'src/plugins/bcrgui';
 import { AppRoutesEnum } from './app-routing.module';
 import { IonicBundleModule } from './IonicBundle.module';
 import { TranslatePipe } from './pipes/translate.pipe';
@@ -57,6 +58,40 @@ export class AppComponent implements OnInit {
   ngOnInit() {
     // attach to darkMode status changes
     this.settings.themeMode.subscribe(theme => this.updateDarkMode(theme));
+    this.offerDialerIntegration();
+  }
+
+  /**
+   * Tell the user, once, that BCR-GUI can put a play button in their phone app.
+   *
+   * Only offered when an Xposed framework is actually present, so users without
+   * root never see a prompt for something they can't use.
+   */
+  private async offerDialerIntegration() {
+
+    if (this.settings.dialerIntegrationInviteShown || this.settings.dialerIntegrationEnabled) {
+      return;
+    }
+
+    try {
+      const status = await BcrGui.getDialerIntegrationStatus();
+      if (!status.moduleActive && !status.xposedManager) {
+        // no framework detected: stay silent, and keep the invite pending in case
+        // the user installs one later
+        return;
+      }
+
+      this.settings.dialerIntegrationInviteShown = true;
+      await this.settings.save();
+
+      this.mbs.showConfirm({
+        header: this.i18n.get('SETTINGS_DIALER_INVITE_TITLE'),
+        message: this.i18n.get('SETTINGS_DIALER_INVITE'),
+        onConfirm: () => this.router.navigateByUrl(AppRoutesEnum.Settings),
+      });
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   /**
