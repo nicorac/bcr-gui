@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+
+    <!-- Label of the button injected into the dialer's call log. Kept as an Android
+         resource, not in the Angular i18n files: it is read by RecordingsProvider and
+         handed to code running inside the dialer's process. -->
+    <string name="xposed_play_label">Play</string>
+
+    <string name="xposed_description">Adds a "play recording" button to the call log of your dialer, served by BCR-GUI. Enable this module and scope it to BCR-GUI plus your dialer app.</string>
+
+    <!--
+      Scope suggested to the Xposed manager. BCR-GUI itself must stay in the list:
+      that is how the app detects the module is active. Any dialer not listed here
+      still works, it just has to be ticked manually.
+    -->
+    <string-array name="xposed_scope">
+        <item>com.github.nicorac.bcrgui</item>
+        <item>com.google.android.dialer</item>
+        <item>com.android.dialer</item>
+        <item>com.android.contacts</item>
+        <item>com.samsung.android.dialer</item>
+        <item>com.oneplus.dialer</item>
+        <item>com.coloros.dialer</item>
+        <item>com.miui.dialer</item>
+        <item>org.lineageos.dialer</item>
+        <item>com.hb.dialer.free</item>
+    </string-array>
+
+</resources>

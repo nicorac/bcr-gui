@@ -19,3 +19,10 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Xposed entry points are instantiated by the framework, never referenced from code.
+-keep class com.github.nicorac.xposed.XposedEntry { *; }
+-keep class com.github.nicorac.xposed.ModuleStatus { *; }
+-keep public class * extends io.github.libxposed.api.XposedModule { public <init>(); }
+-dontwarn io.github.libxposed.**
+-dontwarn de.robv.android.xposed.**

@@ -1,0 +1,6 @@
+# libxposed module descriptor. minApiVersion stays at 100 so a framework on an
+# earlier generation of the modern API can still load this; frameworks older than
+# that fall back to the legacy entry declared in assets/xposed_init.
+minApiVersion=100
+targetApiVersion=102
+staticScope=false
