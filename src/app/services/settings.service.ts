@@ -174,6 +174,33 @@ export class SettingsService {
   @JsonProperty()
   public developerMode = false;
 
+  /**
+   * Allow the Xposed module to show a play button in the dialer call log.
+   *
+   * Opt-in: while false, RecordingsProvider refuses to serve recordings to the
+   * dialer at all, so nothing leaves the app until the user asks for it.
+   */
+  @JsonProperty()
+  public dialerIntegrationEnabled = false;
+
+  /**
+   * Collect verbose diagnostics from the dialer-side module.
+   *
+   * The module always keeps a short in-memory history and hands it over
+   * periodically, so a report can be produced without this being on beforehand.
+   * This adds per-view tracing and an on-device log file, which are only worth
+   * their cost while actually chasing something.
+   */
+  @JsonProperty()
+  public dialerDiagnostics = false;
+
+  /**
+   * Set once the "you can enable the dialer integration" invite has been shown,
+   * so it is offered a single time instead of on every start.
+   */
+  @JsonProperty()
+  public dialerIntegrationInviteShown = false;
+
   constructor(
     private mbs: MessageBoxService,
   ) { }
