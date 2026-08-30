@@ -1,5 +1,15 @@
 # Version history
 
+## Version 1.15.3 (2026-08-30)
+
+New features:
+
+* Updated French translation
+
+Bug fixes:
+
+* Improved README.md content to let user set the proper filename pattern with call recorders other than BCR (waiting for #252 improvements)
+
 ## Version 1.15.2 (2026-08-04)
 
 New features:

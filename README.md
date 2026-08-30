@@ -4,7 +4,12 @@
 
 BCR-GUI makes it easy to manage, organize, and play back your call recordings collection, all in one place.
 
-It started as _companion app_ for the great [BCR](https://github.com/chenxiaolong/BCR) (Basic Call Recorder) Android application and grown up to support many other call recorders:
+It started as _companion app_ for the great [BCR](https://github.com/chenxiaolong/BCR) (Basic Call Recorder) Android application and then it grow up to support many other call recorders.
+
+BCR is supported out-of-the-box; for other apps BCR-GUI needs to extract call data from recording filename.
+Once installed you need to open the settings page and select the right **filename template** for your recorder from the bundled templates (or set your custom one).
+
+Supported call recorders:
 
 - [BCR - Basic Call Recorder](https://github.com/chenxiaolong/BCR)
 - [GrapheneOS](https://grapheneos.org/) Call Recorder (see [here](https://github.com/nicorac/bcr-gui/issues/30))
@@ -61,13 +66,13 @@ Feel free to share your thoughts!
 
 ## Install
 
-BCR-GUI is not available in the PlayStore (...yet).
+BCR-GUI is not available in the PlayStore.
 
-I'll publish it there if its popularity grows but... since **BCR** is a Magisk module, and it requires some skills to be installed, I'm sure that you're also able to download & install a simple APK 😉.
+Since call recorders actually require some skills to be installed on modern Android versions (root and/or custom ROMs), I'm sure that you're also able to download & install a simple APK 😉.
 
 Latest version is [available here](https://github.com/nicorac/bcr-gui/releases/).
 
-You can also [find it at IzzyOnDroid](https://apt.izzysoft.de/packages/com.github.nicorac.bcrgui).
+You can also find it at [IzzyOnDroid](https://apt.izzysoft.de/packages/com.github.nicorac.bcrgui).
 
 ## Contributing
 
@@ -75,8 +80,8 @@ To translate the app, see [translation guide](./src/assets/i18n/README.md).
 
 ## Libraries
 
-- Ionic 7
-- Capacitor 6 (with custom AndroidSAF and AudioPlayer plugins)
+- Ionic 8
+- Capacitor 6.1 (with custom AndroidSAF and AudioPlayer plugins)
 - Angular 18
 - Icons from [Ionicons](https://ionic.io/ionicons/v4) and [FreeSVG (public domain icons)](https://freesvg.org/1547046949)
 

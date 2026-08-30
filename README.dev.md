@@ -4,9 +4,9 @@ This is a base template to build an Android (and iOS) app using the following li
 
 Library     | Version
 ------------|--------
-Ionic       | 7
-Capacitor   | 5.2
-Angular     | 16.1
+Ionic       | 8
+Capacitor   | 6.1
+Angular     | 18.2
 
 ## Ionic VSCode extension
 
