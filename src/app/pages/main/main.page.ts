@@ -61,9 +61,23 @@ export class MainPage implements AfterViewInit {
   protected isMultiselect = signal(false);
   protected isSearch = signal(false);
   protected searchValue = signal('');
+  // Signals to hold the start and end dates for filtering the call list
+  protected startDateFilter = signal('');
+  protected endDateFilter = signal('');
+
+  // Computed signal to check if start date is after end date
+  protected hasDateError = computed(() => {
+    const start = this.startDateFilter();
+    const end = this.endDateFilter();
+    if (start && end) {
+      return new Date(start) > new Date(end);
+    }
+    return false;
+  });
+
   actionButtons: ActionButton[] = [
     {
-      icon: () => this.searchValue() ? 'search-circle' : 'search-circle-outline',
+      icon: () => (this.searchValue() || this.startDateFilter() || this.endDateFilter()) ? 'search-circle' : 'search-circle-outline',
       visible: () => !this.isMultiselect(),
       onClick: () => this.toggleSearchBar(),
     },
@@ -78,6 +92,23 @@ export class MainPage implements AfterViewInit {
   protected items = computed<Recording[]>(() => {
     // filter & sort
     let filteredItems = filterList(this.recordingsService.recordings(), this.searchValue(), r => `${r.opName} ${r.opNumber}`);
+
+    // Filter by start date if one is selected
+    const startDate = this.startDateFilter();
+    if (startDate) {
+      // Append T00:00:00 to ensure the time starts at the beginning of the selected day
+      const startMs = new Date(`${startDate}T00:00:00`).valueOf();
+      filteredItems = filteredItems.filter(r => r.date >= startMs);
+    }
+
+    // Filter by end date if one is selected
+    const endDate = this.endDateFilter();
+    if (endDate) {
+      // Append T23:59:59.999 to ensure the time goes up to the very end of the selected day
+      const endMs = new Date(`${endDate}T23:59:59.999`).valueOf();
+      filteredItems = filteredItems.filter(r => r.date <= endMs);
+    }
+
     filteredItems = sortRecordings(filteredItems, this.settings.recordingsSortMode);
     // reset selection if item is now missing
     untracked(() => {
@@ -223,6 +254,8 @@ export class MainPage implements AfterViewInit {
 
   clearFilter() {
     this.searchValue.set('');
+    this.startDateFilter.set('');
+    this.endDateFilter.set('');
     this.isSearch.set(false);
     // this.updateFilter();
   }

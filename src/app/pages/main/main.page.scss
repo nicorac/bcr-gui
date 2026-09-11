@@ -140,3 +140,14 @@
     -webkit-line-clamp: 1;
   }
 }
+
+.date-filter-input {
+  --color: var(--ion-color-step-600);
+  --highlight-color-focused: var(--ion-color-step-600);
+  --highlight-color-valid: var(--ion-color-step-600);
+  --highlight-color-invalid: var(--ion-color-step-600);
+
+  &::part(label) {
+    color: var(--ion-color-step-600) !important;
+  }
+}

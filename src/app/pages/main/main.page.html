@@ -51,8 +51,27 @@
       [debounce]="750"
       [(ngModel)]="searchValue"
       [placeholder]="'LBL_SEARCH' | translatePipe"
-      (ionClear)="clearFilter()"
+      (ionClear)="searchValue.set('')"
     />
+  </ion-toolbar>
+
+  <!-- Date pickers for filtering calls by a start and end date -->
+  <ion-toolbar>
+    <ion-item lines="none">
+      <ion-input type="date" class="date-filter-input" [label]="'LBL_START_DATE' | translatePipe" labelPlacement="stacked"
+        [(ngModel)]="startDateFilter">
+      </ion-input>
+      <ion-input type="date" class="date-filter-input ion-margin-start" [label]="'LBL_END_DATE' | translatePipe"
+        labelPlacement="stacked" [(ngModel)]="endDateFilter">
+      </ion-input>
+    </ion-item>
+    @if (hasDateError()) {
+    <div style="padding: 0 16px 8px 16px;">
+      <ion-text color="danger">
+        <small>{{ 'ERR_DATE_FILTER' | translatePipe }}</small>
+      </ion-text>
+    </div>
+    }
   </ion-toolbar>
 }
 
