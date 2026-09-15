@@ -8,9 +8,19 @@
 # You can see what browsers were selected by your queries by running:
 #   npx browserslist
 
-Chrome >=79
-ChromeAndroid >=79
-Firefox >=70
-Edge >=79
-Safari >=14
-iOS >=14
+# Capacitor 8 + Angular 21 (Permissive Target)
+
+# Mobile WebViews
+Android >= 10
+ChromeAndroid >= 100
+iOS >= 16
+
+# Desktop & General Coverage
+Chrome >= 100
+Firefox >= 100
+Safari >= 16
+Edge >= 100
+
+# Exclude dead/legacy targets
+not IE 11
+not dead

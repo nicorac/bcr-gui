@@ -1,6 +1,5 @@
 import { IonicBundleModule } from 'src/app/IonicBundle.module';
 import { RecordingsService } from 'src/app/services/recordings.service';
-import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
 export type ActionButton = {
@@ -13,9 +12,8 @@ export type ActionButton = {
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ AsyncPipe, IonicBundleModule ]
+  imports: [ IonicBundleModule ]
 })
 export class HeaderComponent {
 

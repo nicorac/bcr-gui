@@ -12,7 +12,6 @@ import { ModalController } from '@ionic/angular';
   selector: 'app-datetime-format-editor',
   templateUrl: './datetime-format-editor.component.html',
   styleUrls: ['../shared.scss', './datetime-format-editor.component.scss'],
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     DatetimePipe,

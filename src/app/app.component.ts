@@ -18,7 +18,6 @@ const TOOLBAR_BACKGROUND_DARK = '#1f241d';
 
 @Component({
   selector: 'app-root',
-  standalone: true,
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
