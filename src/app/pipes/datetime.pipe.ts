@@ -12,7 +12,7 @@ export class DatetimePipe implements PipeTransform {
     private settings: SettingsService,
   ) {}
 
-  transform(timestamp: Date|number, options?: AppDateTimeFormat): string {
+  transform(timestamp: Date|number|null|undefined, options?: AppDateTimeFormat): string {
 
     if (timestamp === null || timestamp === undefined) return '';
 
