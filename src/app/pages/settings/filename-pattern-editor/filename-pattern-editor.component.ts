@@ -11,7 +11,6 @@ import { IonModal, IonTextarea, ModalController, Platform } from '@ionic/angular
 
 @Component({
   selector: 'app-filename-pattern-editor',
-  standalone: true,
   templateUrl: './filename-pattern-editor.component.html',
   styleUrls: ['../shared.scss', './filename-pattern-editor.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

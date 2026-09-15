@@ -21,7 +21,6 @@ export type SeekMode = 'begin' | 'rew' | 'fwd';
   selector: 'app-audio-player',
   templateUrl: './audio-player.component.html',
   styleUrls: ['./audio-player.component.scss'],
-  standalone: true,
   imports: [ IonicBundleModule, ToHmsPipe ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

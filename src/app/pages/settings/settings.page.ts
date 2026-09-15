@@ -22,7 +22,6 @@ import { FilenamePatternEditorComponent } from './filename-pattern-editor/filena
 
 @Component({
   selector: 'app-settings',
-  standalone: true,
   templateUrl: './settings.page.html',
   styleUrls: ['./shared.scss', './settings.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

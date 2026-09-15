@@ -31,7 +31,6 @@ import version from '../../version';
 
 @Component({
   selector: 'app-main',
-  standalone: true,
   templateUrl: './main.page.html',
   styleUrls: ['./main.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

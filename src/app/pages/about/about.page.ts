@@ -13,14 +13,13 @@ import version from '../../version';
 
 @Component({
   selector: 'app-about',
-  standalone: true,
   templateUrl: './about.page.html',
   styleUrls: ['./about.page.scss'],
   imports: [
     HeaderComponent,
     IonicBundleModule,
-    TranslatePipe
-  ],
+    TranslatePipe,
+  ]
 })
 export class AboutPage {
 
