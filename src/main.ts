@@ -1,5 +1,11 @@
 import { provideHttpClient } from '@angular/common/http';
-import { APP_INITIALIZER, enableProdMode, ErrorHandler, importProvidersFrom } from '@angular/core';
+import {
+  APP_INITIALIZER,
+  enableProdMode,
+  ErrorHandler,
+  importProvidersFrom,
+  provideZoneChangeDetection,
+} from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideRouter, RouteReuseStrategy } from '@angular/router';
 import { IonicModule, IonicRouteStrategy, Platform } from '@ionic/angular';
@@ -17,10 +23,11 @@ if (environment.production) {
 
 bootstrapApplication(AppComponent, {
   providers: [
+    provideZoneChangeDetection(),
     provideHttpClient(),
     provideRouter(routes),
     importProvidersFrom(
-      IonicModule.forRoot({ innerHTMLTemplatesEnabled: true }),
+      IonicModule.forRoot({ innerHTMLTemplatesEnabled: true })
     ),
     {
       provide: ErrorHandler,
@@ -47,10 +54,12 @@ bootstrapApplication(AppComponent, {
 /**
  * App initializer
  */
-function initializeApp(i18n: I18nService, settings: SettingsService, platform: Platform) {
-
+function initializeApp(
+  i18n: I18nService,
+  settings: SettingsService,
+  platform: Platform
+) {
   return async () => {
-
     // if (!environment.production) {
     //   waitForDebugger();
     // }
@@ -68,12 +77,11 @@ function initializeApp(i18n: I18nService, settings: SettingsService, platform: P
 
     // intercept unmanaged errors
     window.onerror = function (message, file, line, col, error) {
-      alert("Error occurred: " + error?.message);
+      alert('Error occurred: ' + error?.message);
       return false;
     };
     window.addEventListener('unhandledrejection', function (e) {
-      alert("Error occurred: " + e.reason.message);
-    })
-
-  }
+      alert('Error occurred: ' + e.reason.message);
+    });
+  };
 }
