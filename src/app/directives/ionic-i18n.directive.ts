@@ -1,5 +1,5 @@
 import { Directive, ElementRef } from '@angular/core';
-import { IonSelect } from '@ionic/angular';
+import { IonSelect } from '@ionic/angular/lazy';
 import { I18nService } from '../services/i18n.service';
 
 /**

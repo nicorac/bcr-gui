@@ -6,7 +6,7 @@ import { I18nKey, I18nService } from 'src/app/services/i18n.service';
 import { AppDateTimeFormat, SettingsService } from 'src/app/services/settings.service';
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ModalController } from '@ionic/angular';
+import { ModalController } from '@ionic/angular/lazy';
 
 @Component({
   selector: 'app-datetime-format-editor',

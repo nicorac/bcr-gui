@@ -7,7 +7,7 @@ import { AndroidSAF, ErrorCode } from 'src/plugins/androidsaf';
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, ElementRef, OnInit, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { IonModal, IonTextarea, ModalController, Platform } from '@ionic/angular';
+import { IonModal, IonTextarea, ModalController, Platform } from '@ionic/angular/lazy';
 
 @Component({
   selector: 'app-filename-pattern-editor',

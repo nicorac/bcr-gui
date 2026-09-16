@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Clipboard } from '@capacitor/clipboard';
-import { AlertButton, AlertController, AlertInput, IonicSafeString } from '@ionic/angular';
+import { AlertButton, AlertController, AlertInput, IonicSafeString } from '@ionic/angular/lazy';
 import { I18nKey, I18nService, TranslationArgs } from './i18n.service';
 
 export type MessageType = string|string[]|IonicSafeString;

@@ -40,7 +40,7 @@
     "@capacitor/share": "6.0.2",
     "@capacitor/status-bar": "6.0.1",
     "@capgo/capacitor-navigation-bar": "6.1.64",
-    "@ionic/angular": "8.8.19",
+    "@ionic/angular": "^9.0.3",
     "@kristianheljas/capacitor-app-restart": "^1.0.1",
     "capacitor-native-settings": "6.0.1",
     "filesize": "10.1.6",
@@ -60,7 +60,7 @@
     "@angular/compiler-cli": "21.2.23",
     "@capacitor/assets": "3.0.5",
     "@capacitor/cli": "6.1.2",
-    "@ionic/angular-toolkit": "12.1.1",
+    "@ionic/angular-toolkit": "13.0.0",
     "@types/jasmine": "5.1.4",
     "@types/node": "24.13.5",
     "@typescript-eslint/eslint-plugin": "8.14.0",
@@ -74,8 +74,9 @@
   "allowScripts": {
     "esbuild": true,
     "lmdb": true,
-    "msgpackr-extract@3.0.3": true,
-    "sharp": true
+    "sharp": true,
+    "@parcel/watcher@2.6.0": true,
+    "msgpackr-extract@3.0.4": true
   },
   "engines": {
     "npm": ">= 10.9.0",

@@ -7,7 +7,7 @@ import { RecordingsService } from 'src/app/services/recordings.service';
 import { SettingsService } from 'src/app/services/settings.service';
 import { AudioPlayer } from 'src/plugins/audioplayer';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, input, OnDestroy, OnInit, output, signal, untracked } from '@angular/core';
-import { RangeCustomEvent } from '@ionic/angular';
+import { RangeCustomEvent } from '@ionic/angular/lazy';
 
 export enum PlayerStatusEnum {
   Paused = 0,

@@ -8,7 +8,7 @@ import { MessageBoxService } from 'src/app/services/message-box.service';
 import { SettingsService } from 'src/app/services/settings.service';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { Platform } from '@ionic/angular';
+import { Platform } from '@ionic/angular/lazy';
 import version from '../../version';
 
 @Component({

@@ -26,7 +26,7 @@ import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, c
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Clipboard } from '@capacitor/clipboard';
-import { ActionSheetController, IonSearchbar, RefresherCustomEvent } from '@ionic/angular';
+import { ActionSheetController, IonSearchbar, RefresherCustomEvent } from '@ionic/angular/lazy';
 import version from '../../version';
 
 @Component({

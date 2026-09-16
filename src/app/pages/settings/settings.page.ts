@@ -14,7 +14,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Directory, Encoding, Filesystem } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
-import { ModalController, Platform } from '@ionic/angular';
+import { ModalController, Platform } from '@ionic/angular/lazy';
 import { CapacitorAppRestart } from '@kristianheljas/capacitor-app-restart';
 import { SettingsService } from '../../services/settings.service';
 import { DatetimeFormatEditorComponent } from './datetime-format-editor/datetime-format-editor.component';

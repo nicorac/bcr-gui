@@ -2,7 +2,7 @@ import { AndroidSAF, AndroidSAFUtils, ErrorCode, GetFileUriOptions, ReadFileOpti
 import { AudioPlayer } from 'src/plugins/audioplayer';
 import { Injectable, signal } from '@angular/core';
 import { Encoding } from '@capacitor/filesystem';
-import { Platform } from '@ionic/angular';
+import { Platform } from '@ionic/angular/lazy';
 import { DB_FILENAME, DB_SCHEMA_VERSION, DbContent } from '../models/dbContent';
 import { Recording, UNKNOWN_NAME_OR_NUMBER } from '../models/recording';
 import { MainPage } from '../pages/main/main.page';

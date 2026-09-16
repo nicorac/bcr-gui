@@ -3,7 +3,7 @@ import { Router, RouterLink } from '@angular/router';
 import { App } from '@capacitor/app';
 import { StatusBar } from '@capacitor/status-bar';
 import { NavigationBar } from '@capgo/capacitor-navigation-bar';
-import { IonRouterOutlet, Platform } from '@ionic/angular';
+import { IonRouterOutlet, Platform } from '@ionic/angular/lazy';
 import { AppRoutesEnum } from './app-routing.module';
 import { IonicBundleModule } from './IonicBundle.module';
 import { TranslatePipe } from './pipes/translate.pipe';
