@@ -1,12 +1,11 @@
 import { HeaderComponent } from 'src/app/components/header/header.component';
-import { IonicBundleModule } from 'src/app/IonicBundle.module';
 import { DatetimePipe } from 'src/app/pipes/datetime.pipe';
 import { TranslatePipe } from 'src/app/pipes/translate.pipe';
 import { I18nKey, I18nService } from 'src/app/services/i18n.service';
 import { AppDateTimeFormat, SettingsService } from 'src/app/services/settings.service';
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ModalController } from '@ionic/angular';
+import { IonButton, IonContent, IonFooter, IonInput, IonItem, IonSelect, IonSelectOption, ModalController } from '@ionic/angular';
 
 @Component({
   selector: 'app-datetime-format-editor',
@@ -17,7 +16,13 @@ import { ModalController } from '@ionic/angular';
     DatetimePipe,
     FormsModule,
     HeaderComponent,
-    IonicBundleModule,
+    IonButton,
+    IonContent,
+    IonFooter,
+    IonInput,
+    IonItem,
+    IonSelect,
+    IonSelectOption,
     TranslatePipe,
   ],
 })
@@ -50,17 +55,17 @@ export class DatetimeFormatEditorComponent {
     'a',
   ];
 
-  constructor(
-    protected i18n: I18nService,
-    protected mc: ModalController,
-    protected settings: SettingsService,
-  ) {
+  protected i18n = inject(I18nService);
+  protected mc = inject(ModalController);
+  protected settings = inject(SettingsService);
+
+  constructor() {
     const initVal = <AppDateTimeFormat>{...this.settings.dateTimeFormat };
     // fix datetime styles (undefined can't be set as [value], so we use '*')
     if (!initVal.dateStyle) { initVal.dateStyle = <any>'*' };
     if (!initVal.timeStyle) { initVal.timeStyle = <any>'*' };
     this.format.set(initVal);
-   }
+  }
 
   cancel() {
     this.mc.dismiss();

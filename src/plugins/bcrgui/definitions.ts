@@ -13,4 +13,10 @@ export interface BcrGui {
    */
   createOrEditContact(options: { displayName?: string, phoneNumber?: string }): Promise<{ contactUri: string, displayName: string }>;
 
+  /**
+   * Restart the app
+   */
+  restartApp(): void;
+
+
 }
