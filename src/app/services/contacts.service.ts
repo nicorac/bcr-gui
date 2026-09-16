@@ -101,7 +101,7 @@ export class ContactsService {
   /**
    * Check Android Contacts permission
    */
-  async checkPermission(): Promise<PermissionState> {
+  async checkPermission(): Promise<PermissionState|'limited'> {
 
     // check current permission status
     const { contacts: perm } = await Contacts.requestPermissions();

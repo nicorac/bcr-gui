@@ -12,15 +12,9 @@
 
 # Mobile WebViews
 Android >= 10
+Chrome >= 111
 ChromeAndroid >= 100
-iOS >= 16
-
-# Desktop & General Coverage
-Chrome >= 100
-Firefox >= 100
-Safari >= 16
-Edge >= 100
-
-# Exclude dead/legacy targets
-not IE 11
-not dead
+# not firefox
+# not ios_saf
+# not edge
+# not IE 11

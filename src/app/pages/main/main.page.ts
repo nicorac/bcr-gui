@@ -3,7 +3,6 @@ import { CallIconComponent } from 'src/app/components/call-icon/call-icon.compon
 import { ActionButton, HeaderComponent } from 'src/app/components/header/header.component';
 import { VirtualScrollbarComponent } from 'src/app/components/virtual-scrollbar/virtual-scrollbar.component';
 import { LongPressDirective } from 'src/app/directives/long-press.directive';
-import { IonicBundleModule } from 'src/app/IonicBundle.module';
 import { Recording } from 'src/app/models/recording';
 import { DatetimePipe } from 'src/app/pipes/datetime.pipe';
 import { FilesizePipe } from 'src/app/pipes/filesize.pipe';
@@ -22,11 +21,11 @@ import { AndroidSAF } from 'src/plugins/androidsaf';
 import { ErrorCode } from 'src/plugins/bcrgui';
 import { CdkVirtualScrollViewport, ScrollingModule } from '@angular/cdk/scrolling';
 import { DatePipe } from '@angular/common';
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, signal, untracked, viewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, inject, signal, untracked, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Clipboard } from '@capacitor/clipboard';
-import { ActionSheetController, IonSearchbar, RefresherCustomEvent } from '@ionic/angular';
+import { ActionSheetController, IonButton, IonButtons, IonCard, IonCardContent, IonCardSubtitle, IonCardTitle, IonContent, IonIcon, IonItem, IonList, IonPopover, IonRefresher, IonRefresherContent, IonSearchbar, IonToolbar, RefresherCustomEvent } from '@ionic/angular';
 import version from '../../version';
 
 @Component({
@@ -41,7 +40,21 @@ import version from '../../version';
     FilesizePipe,
     FormsModule,
     HeaderComponent,
-    IonicBundleModule,
+    IonButton,
+    IonButtons,
+    IonCard,
+    IonCardContent,
+    IonCardSubtitle,
+    IonCardTitle,
+    IonContent,
+    IonIcon,
+    IonItem,
+    IonList,
+    IonPopover,
+    IonRefresher,
+    IonRefresherContent,
+    IonSearchbar,
+    IonToolbar,
     LongPressDirective,
     ScrollingModule,
     ToHmsPipe,
@@ -97,29 +110,27 @@ export class MainPage implements AfterViewInit {
   private scrollViewport = viewChild(CdkVirtualScrollViewport);
   private searchBar = viewChild(IonSearchbar);
 
-  constructor(
-    private asc: ActionSheetController,
-    private cdr: ChangeDetectorRef,
-    private contactsService: ContactsService,
-    private datePipe: DatePipe,
-    private i18n: I18nService,
-    private mbs: MessageBoxService,
-    private toHms: ToHmsPipe,
-    protected recordingsService: RecordingsService,
-    protected router: Router,
-    protected settings: SettingsService,
-  ) {
+  private asc = inject(ActionSheetController);
+  private cdr = inject(ChangeDetectorRef);
+  private contactsService = inject(ContactsService);
+  private datePipe = inject(DatePipe);
+  private i18n = inject(I18nService);
+  private mbs = inject(MessageBoxService);
+  private toHms = inject(ToHmsPipe);
+  protected recordingsService = inject(RecordingsService);
+  protected router = inject(Router);
+  protected settings = inject(SettingsService);
 
-    // // DEBUG: automatically select first recording
-    // if (!environment.production) {
-    //   effect(() => {
-    //     if (this.items()?.length) {
-    //       setTimeout(() => this.onItemClick(this.items()[0]), 250);
-    //     }
-    //   });
-    // }
-
-  }
+  // constructor() {
+  //   // DEBUG: automatically select first recording
+  //   if (!environment.production) {
+  //     effect(() => {
+  //       if (this.items()?.length) {
+  //         setTimeout(() => this.onItemClick(this.items()[0]), 250);
+  //       }
+  //     });
+  //   }
+  // }
 
   async ionViewWillEnter() {
 

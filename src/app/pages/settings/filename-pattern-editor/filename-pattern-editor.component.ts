@@ -1,22 +1,35 @@
 import { Subscription } from 'rxjs';
-import { IonicBundleModule } from 'src/app/IonicBundle.module';
 import { FILENAME_PATTERN_SUPPORTED_VARS, FILENAME_PATTERN_TEMPLATES, Recording } from 'src/app/models/recording';
 import { TranslatePipe } from 'src/app/pipes/translate.pipe';
 import { I18nKey, I18nService } from 'src/app/services/i18n.service';
 import { AndroidSAF, ErrorCode } from 'src/plugins/androidsaf';
-import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, ElementRef, OnInit, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, inject, OnInit, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { IonModal, IonTextarea, ModalController, Platform } from '@ionic/angular';
+import { IonButton, IonContent, IonFooter, IonHeader, IonItem, IonLabel, IonList, IonModal, IonTextarea, IonTitle, IonToolbar, ModalController, Platform } from '@ionic/angular';
 
 @Component({
   selector: 'app-filename-pattern-editor',
   templateUrl: './filename-pattern-editor.component.html',
   styleUrls: ['../shared.scss', './filename-pattern-editor.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, IonicBundleModule, TranslatePipe],
+  imports: [
+    FormsModule,
+    IonButton,
+    IonContent,
+    IonFooter,
+    IonHeader,
+    IonItem,
+    IonLabel,
+    IonList,
+    IonModal,
+    IonTextarea,
+    IonTitle,
+    IonToolbar,
+    TranslatePipe,
+  ],
 })
 export class FilenamePatternEditorComponent implements OnInit {
+
   protected FILENAME_PATTERN_TEMPLATES = FILENAME_PATTERN_TEMPLATES;
   protected testFilename = signal('');
   protected testResult = signal('');
@@ -48,12 +61,12 @@ export class FilenamePatternEditorComponent implements OnInit {
     };
   });
 
-  constructor(
-    private i18n: I18nService,
-    private mc: ModalController,
-    private platform: Platform,
-    private ref: ElementRef<HTMLIonModalElement>,
-  ) {
+  private i18n = inject(I18nService);
+  private mc = inject(ModalController);
+  private platform = inject(Platform);
+  private ref = inject(ElementRef<HTMLIonModalElement>);
+
+  constructor() {
     // subscribe to hardware back button events
     this.backSub = this.platform.backButton.subscribeWithPriority(10, () => this.cancel());
   }

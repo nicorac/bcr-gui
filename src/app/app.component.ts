@@ -1,11 +1,10 @@
-import { ChangeDetectionStrategy, Component, OnInit, Optional } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { App } from '@capacitor/app';
 import { StatusBar } from '@capacitor/status-bar';
 import { NavigationBar } from '@capgo/capacitor-navigation-bar';
-import { IonRouterOutlet, Platform } from '@ionic/angular';
+import { IonApp, IonContent, IonHeader, IonIcon, IonLabel, IonList, IonMenu, IonMenuToggle, IonRouterOutlet, IonTitle, IonToolbar, Platform } from '@ionic/angular';
 import { AppRoutesEnum } from './app-routing.module';
-import { IonicBundleModule } from './IonicBundle.module';
 import { TranslatePipe } from './pipes/translate.pipe';
 import { I18nService } from './services/i18n.service';
 import { MessageBoxService } from './services/message-box.service';
@@ -22,24 +21,34 @@ const TOOLBAR_BACKGROUND_DARK = '#1f241d';
   styleUrls: ['app.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    IonicBundleModule,
+    IonApp,
+    IonMenu,
+    IonContent,
+    IonHeader,
+    IonIcon,
+    IonLabel,
+    IonList,
+    IonMenuToggle,
+    IonRouterOutlet,
+    IonTitle,
+    IonToolbar,
     RouterLink,
     TranslatePipe,
   ],
 })
 export class AppComponent implements OnInit {
 
-  AppRoutesEnum = AppRoutesEnum;
+  protected AppRoutesEnum = AppRoutesEnum;
 
-  constructor(
-    private i18n: I18nService,
-    private mbs: MessageBoxService,
-    private platform: Platform,
-    private recordingsService: RecordingsService,
-    private router: Router,
-    private settings: SettingsService,
-    @Optional() private routerOutlet?: IonRouterOutlet
-  ) {
+  private i18n = inject(I18nService);
+  private mbs = inject(MessageBoxService);
+  private platform = inject(Platform);
+  private recordingsService = inject(RecordingsService);
+  private router = inject(Router);
+  private settings = inject(SettingsService);
+  private routerOutlet = inject(IonRouterOutlet);
+
+  constructor() {
 
     // customize Back button management
     this.platform.backButton.subscribeWithPriority(-1, () => {

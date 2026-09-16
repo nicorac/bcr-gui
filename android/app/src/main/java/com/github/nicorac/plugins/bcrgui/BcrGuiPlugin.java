@@ -1,5 +1,6 @@
 package com.github.nicorac.plugins.bcrgui;
 
+import android.content.ComponentName;
 import android.content.Intent;
 import android.net.Uri;
 import android.provider.ContactsContract;
@@ -97,6 +98,26 @@ public class BcrGuiPlugin extends Plugin {
     }
 
     return null;
+  }
+
+  /**
+   * Own version of restartApp, inspired by the now-obsolete @kristianheljas/capacitor-app-restart plugin
+   * <a href="https://github.com/kristianheljas/capacitor-app-restart/blob/main/android/src/main/java/ee/kristian/capacitorapprestart/CapacitorAppRestartPlugin.java">...</a>
+   */
+  @PluginMethod
+  public void restartApp(PluginCall call) {
+    var context = getContext();
+    var packageManager = context.getPackageManager();
+    Intent intent = packageManager.getLaunchIntentForPackage(context.getPackageName());
+    ComponentName componentName = null;
+    if (intent != null) {
+      componentName = intent.getComponent();
+    }
+    Intent mainIntent = Intent.makeRestartActivityTask(componentName);
+
+    mainIntent.setPackage(context.getPackageName());
+    context.startActivity(mainIntent);
+    Runtime.getRuntime().exit(0);
   }
 
 }
