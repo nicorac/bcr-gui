@@ -14,20 +14,14 @@ import { IonModal, IonTextarea, ModalController, Platform } from '@ionic/angular
   templateUrl: './filename-pattern-editor.component.html',
   styleUrls: ['../shared.scss', './filename-pattern-editor.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicBundleModule,
-    TranslatePipe,
-  ],
+  imports: [FormsModule, IonicBundleModule, TranslatePipe],
 })
 export class FilenamePatternEditorComponent implements OnInit {
-
   protected FILENAME_PATTERN_TEMPLATES = FILENAME_PATTERN_TEMPLATES;
   protected testFilename = signal('');
   protected testResult = signal('');
   protected pattern = signal('');
-  protected patternError = signal<string|undefined>(undefined);
+  protected patternError = signal<string | undefined>(undefined);
 
   // injected by caller
   public initialPattern = '';
@@ -39,16 +33,19 @@ export class FilenamePatternEditorComponent implements OnInit {
   private placeholdersModal = viewChild.required<IonModal>('placeholdersModal');
   private templateLoadModal = viewChild.required<IonModal>('templateLoadModal');
 
-  protected placeholders = FILENAME_PATTERN_SUPPORTED_VARS.map(key => {
-    let val: Record<string,string>|undefined;
+  protected placeholders = FILENAME_PATTERN_SUPPORTED_VARS.map((key) => {
+    let val: Record<string, string> | undefined;
     switch (key) {
-      case 'direction': val = { values: "'in' | 'out' | 'conference'" }; break;
-      default: val = undefined;
+      case 'direction':
+        val = { values: "'in' | 'out' | 'conference'" };
+        break;
+      default:
+        val = undefined;
     }
     return {
       text: `{${key}}`,
       description: this.i18n.get(`FNP_EDITOR_VAR_${key}` as I18nKey, val),
-    }
+    };
   });
 
   constructor(
