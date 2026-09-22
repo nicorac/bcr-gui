@@ -1,11 +1,11 @@
 import { Subscription } from 'rxjs';
-import { FILENAME_PATTERN_SUPPORTED_VARS, FILENAME_PATTERN_TEMPLATES, Recording } from 'src/app/models/recording';
-import { TranslatePipe } from 'src/app/pipes/translate.pipe';
-import { I18nKey, I18nService } from 'src/app/services/i18n.service';
-import { AndroidSAF, ErrorCode } from 'src/plugins/androidsaf';
 import { ChangeDetectionStrategy, Component, ElementRef, inject, OnInit, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { IonButton, IonContent, IonFooter, IonHeader, IonItem, IonLabel, IonList, IonModal, IonTextarea, IonTitle, IonToolbar, ModalController, Platform } from '@ionic/angular';
+import { FILENAME_PATTERN_SUPPORTED_VARS, FILENAME_PATTERN_TEMPLATES, Recording } from '@app/models/recording';
+import { TranslatePipe } from '@app/pipes/translate.pipe';
+import { I18nKey, I18nService } from '@app/services/i18n.service';
+import { IonButton, IonButtons, IonContent, IonFooter, IonHeader, IonItem, IonLabel, IonList, IonModal, IonTextarea, IonTitle, IonToolbar, ModalController, Platform } from '@ionic/angular';
+import { AndroidSAF, ErrorCode } from '@plugins/androidsaf';
 
 @Component({
   selector: 'app-filename-pattern-editor',
@@ -15,6 +15,7 @@ import { IonButton, IonContent, IonFooter, IonHeader, IonItem, IonLabel, IonList
   imports: [
     FormsModule,
     IonButton,
+    IonButtons,
     IonContent,
     IonFooter,
     IonHeader,

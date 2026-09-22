@@ -1,5 +1,5 @@
-import { RecordingsService } from 'src/app/services/recordings.service';
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
+import { RecordingsService } from '@app/services/recordings.service';
 import { IonButton, IonButtons, IonHeader, IonIcon, IonMenuButton, IonProgressBar, IonTitle, IonToolbar } from '@ionic/angular';
 
 export type ActionButton = {
@@ -22,6 +22,9 @@ export type ActionButton = {
     IonTitle,
     IonToolbar,
     IonProgressBar,
+  ],
+  providers: [
+    RecordingsService,
   ]
 })
 export class HeaderComponent {
@@ -30,9 +33,6 @@ export class HeaderComponent {
   actionButtons = input<ActionButton[]>([]);
   showCustomContent = input(false);
 
-  constructor(
-    protected recordingsService: RecordingsService,
-  )
-  { }
+  protected recordingsService = inject(RecordingsService);
 
 }

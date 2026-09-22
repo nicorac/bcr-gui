@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, viewChild } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { App } from '@capacitor/app';
 import { StatusBar } from '@capacitor/status-bar';
@@ -46,13 +46,13 @@ export class AppComponent implements OnInit {
   private recordingsService = inject(RecordingsService);
   private router = inject(Router);
   private settings = inject(SettingsService);
-  private routerOutlet = inject(IonRouterOutlet);
+  private routerOutlet = viewChild(IonRouterOutlet);
 
   constructor() {
 
     // customize Back button management
     this.platform.backButton.subscribeWithPriority(-1, () => {
-      if (!this.routerOutlet?.canGoBack()) {
+      if (!this.routerOutlet()?.canGoBack()) {
         App.exitApp();
       }
     });

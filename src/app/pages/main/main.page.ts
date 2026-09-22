@@ -1,31 +1,31 @@
-import { AudioPlayerComponent, SkipDirection } from 'src/app/components/audio-player/audio-player.component';
-import { CallIconComponent } from 'src/app/components/call-icon/call-icon.component';
-import { ActionButton, HeaderComponent } from 'src/app/components/header/header.component';
-import { VirtualScrollbarComponent } from 'src/app/components/virtual-scrollbar/virtual-scrollbar.component';
-import { LongPressDirective } from 'src/app/directives/long-press.directive';
-import { Recording } from 'src/app/models/recording';
-import { DatetimePipe } from 'src/app/pipes/datetime.pipe';
-import { FilesizePipe } from 'src/app/pipes/filesize.pipe';
-import { ToHmsPipe } from 'src/app/pipes/to-hms.pipe';
-import { TranslatePipe } from 'src/app/pipes/translate.pipe';
-import { ContactsService } from 'src/app/services/contacts.service';
-import { I18nService } from 'src/app/services/i18n.service';
-import { MessageBoxService } from 'src/app/services/message-box.service';
-import { RecordingsService } from 'src/app/services/recordings.service';
-import { SettingsService } from 'src/app/services/settings.service';
-import { filterList } from 'src/app/utils/filterList';
-import { sortRecordings } from 'src/app/utils/recordings-sorter';
-import { bringIntoView } from 'src/app/utils/scroll';
-import { untilTrue } from 'src/app/utils/waitForAsync';
-import { AndroidSAF } from 'src/plugins/androidsaf';
-import { ErrorCode } from 'src/plugins/bcrgui';
 import { CdkVirtualScrollViewport, ScrollingModule } from '@angular/cdk/scrolling';
 import { DatePipe } from '@angular/common';
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, inject, signal, untracked, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AudioPlayerComponent, SkipDirection } from '@app/components/audio-player/audio-player.component';
+import { CallIconComponent } from '@app/components/call-icon/call-icon.component';
+import { ActionButton, HeaderComponent } from '@app/components/header/header.component';
+import { VirtualScrollbarComponent } from '@app/components/virtual-scrollbar/virtual-scrollbar.component';
+import { LongPressDirective } from '@app/directives/long-press.directive';
+import { Recording } from '@app/models/recording';
+import { DatetimePipe } from '@app/pipes/datetime.pipe';
+import { FilesizePipe } from '@app/pipes/filesize.pipe';
+import { toHms, ToHmsPipe } from '@app/pipes/to-hms.pipe';
+import { TranslatePipe } from '@app/pipes/translate.pipe';
+import { ContactsService } from '@app/services/contacts.service';
+import { I18nService } from '@app/services/i18n.service';
+import { MessageBoxService } from '@app/services/message-box.service';
+import { RecordingsService } from '@app/services/recordings.service';
+import { SettingsService } from '@app/services/settings.service';
+import { filterList } from '@app/utils/filterList';
+import { sortRecordings } from '@app/utils/recordings-sorter';
+import { bringIntoView } from '@app/utils/scroll';
+import { untilTrue } from '@app/utils/waitForAsync';
 import { Clipboard } from '@capacitor/clipboard';
-import { ActionSheetController, IonButton, IonButtons, IonCard, IonCardContent, IonCardSubtitle, IonCardTitle, IonContent, IonIcon, IonItem, IonList, IonPopover, IonRefresher, IonRefresherContent, IonSearchbar, IonToolbar, RefresherCustomEvent } from '@ionic/angular';
+import { ActionSheetController, IonButton, IonButtons, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonFooter, IonIcon, IonList, IonRefresher, IonRefresherContent, IonSearchbar, IonToolbar, RefresherCustomEvent } from '@ionic/angular';
+import { AndroidSAF } from '@plugins/androidsaf';
+import { ErrorCode } from '@plugins/bcrgui';
 import version from '../../version';
 
 @Component({
@@ -44,13 +44,13 @@ import version from '../../version';
     IonButtons,
     IonCard,
     IonCardContent,
+    IonCardHeader,
     IonCardSubtitle,
     IonCardTitle,
     IonContent,
+    IonFooter,
     IonIcon,
-    IonItem,
     IonList,
-    IonPopover,
     IonRefresher,
     IonRefresherContent,
     IonSearchbar,
@@ -64,7 +64,6 @@ import version from '../../version';
   providers: [
     ContactsService,
     DatePipe,
-    ToHmsPipe,
   ],
 })
 export class MainPage implements AfterViewInit {
@@ -116,7 +115,6 @@ export class MainPage implements AfterViewInit {
   private datePipe = inject(DatePipe);
   private i18n = inject(I18nService);
   private mbs = inject(MessageBoxService);
-  private toHms = inject(ToHmsPipe);
   protected recordingsService = inject(RecordingsService);
   protected router = inject(Router);
   protected settings = inject(SettingsService);
@@ -461,7 +459,7 @@ export class MainPage implements AfterViewInit {
     return `
 ${item.opName}
 Date: ${this.datePipe.transform(item.date, 'medium')}
-Duration: ${this.toHms.transform(item.duration)}
+Duration: ${toHms(item.duration)}
 `.trim();
 
   }
