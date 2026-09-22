@@ -1,11 +1,11 @@
-import { HeaderComponent } from 'src/app/components/header/header.component';
-import { DatetimePipe } from 'src/app/pipes/datetime.pipe';
-import { TranslatePipe } from 'src/app/pipes/translate.pipe';
-import { I18nKey, I18nService } from 'src/app/services/i18n.service';
-import { AppDateTimeFormat, SettingsService } from 'src/app/services/settings.service';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { IonButton, IonContent, IonFooter, IonInput, IonItem, IonSelect, IonSelectOption, ModalController } from '@ionic/angular';
+import { HeaderComponent } from '@app/components/header/header.component';
+import { DatetimePipe } from '@app/pipes/datetime.pipe';
+import { TranslatePipe } from '@app/pipes/translate.pipe';
+import { I18nKey, I18nService } from '@app/services/i18n.service';
+import { AppDateTimeFormat, SettingsService } from '@app/services/settings.service';
+import { IonButton, IonButtons, IonContent, IonFooter, IonInput, IonItem, IonSelect, IonSelectOption, IonToolbar, ModalController } from '@ionic/angular';
 
 @Component({
   selector: 'app-datetime-format-editor',
@@ -17,12 +17,14 @@ import { IonButton, IonContent, IonFooter, IonInput, IonItem, IonSelect, IonSele
     FormsModule,
     HeaderComponent,
     IonButton,
+    IonButtons,
     IonContent,
     IonFooter,
     IonInput,
     IonItem,
     IonSelect,
     IonSelectOption,
+    IonToolbar,
     TranslatePipe,
   ],
 })

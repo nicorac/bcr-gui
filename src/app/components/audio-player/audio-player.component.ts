@@ -1,12 +1,12 @@
 import { Subscription } from 'rxjs';
-import { Recording } from 'src/app/models/recording';
-import { toHms, ToHmsPipe } from 'src/app/pipes/to-hms.pipe';
-import { MessageBoxService } from 'src/app/services/message-box.service';
-import { RecordingsService } from 'src/app/services/recordings.service';
-import { SettingsService } from 'src/app/services/settings.service';
-import { AudioPlayer } from 'src/plugins/audioplayer';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, inject, input, OnDestroy, output, signal, untracked } from '@angular/core';
+import { Recording } from '@app/models/recording';
+import { toHms, ToHmsPipe } from '@app/pipes/to-hms.pipe';
+import { MessageBoxService } from '@app/services/message-box.service';
+import { RecordingsService } from '@app/services/recordings.service';
+import { SettingsService } from '@app/services/settings.service';
 import { IonIcon, IonRange, RangeCustomEvent } from '@ionic/angular';
+import { AudioPlayer } from '@plugins/audioplayer';
 
 export enum PlayerStatusEnum {
   Paused = 0,
