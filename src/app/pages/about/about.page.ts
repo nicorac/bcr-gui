@@ -1,12 +1,12 @@
 import { Subscription } from 'rxjs';
-import { AppRoutesEnum } from 'src/app/app-routing.module';
-import { HeaderComponent } from 'src/app/components/header/header.component';
-import { TranslatePipe } from 'src/app/pipes/translate.pipe';
-import { I18nService } from 'src/app/services/i18n.service';
-import { MessageBoxService } from 'src/app/services/message-box.service';
-import { SettingsService } from 'src/app/services/settings.service';
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { AppRoutesEnum } from '@app/app-routing.module';
+import { HeaderComponent } from '@app/components/header/header.component';
+import { TranslatePipe } from '@app/pipes/translate.pipe';
+import { I18nService } from '@app/services/i18n.service';
+import { MessageBoxService } from '@app/services/message-box.service';
+import { SettingsService } from '@app/services/settings.service';
 import { IonContent, IonLabel, Platform } from '@ionic/angular';
 import version from '../../version';
 

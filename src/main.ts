@@ -10,26 +10,25 @@ import { SettingsService } from './app/services/settings.service';
 import { CustomErrorHandler } from './app/utils/errorHandler';
 import version from './app/version';
 import { environment } from './environments/environment';
+import { registerIonicIcons } from './ionic-icons';
 
 if (environment.production) {
   enableProdMode();
 }
 
+// register icons used by app
+registerIonicIcons();
+
+// start Anguar application
 bootstrapApplication(AppComponent, {
   providers: [
     provideAppInitializer(initializeApp),
+    provideRouter(routes),
     provideIonicAngular({ innerHTMLTemplatesEnabled: true }),
     provideZoneChangeDetection(),
     provideHttpClient(),
-    provideRouter(routes),
-    {
-      provide: ErrorHandler,
-      useClass: CustomErrorHandler,
-    },
-    {
-      provide: RouteReuseStrategy,
-      useClass: IonicRouteStrategy,
-    },
+    { provide: ErrorHandler, useClass: CustomErrorHandler },
+    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
   ],
 }).catch((err) => console.error(err));
 

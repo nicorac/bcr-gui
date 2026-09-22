@@ -20,25 +20,6 @@
     <ion-button (click)="deleteItems(getSelectedItems())">
       <ion-icon name="trash" slot="icon-only" />
     </ion-button>
-
-    <!-- actions context menu -->
-    <ion-popover trigger="context-menu-button" [dismissOnSelect]="true">
-      <ng-template>
-        <ion-content>
-          <ion-list lines="none" class="toolbar-menu-items">
-            <ion-item >
-              <ion-icon src="/assets/icons/select-all.svg" />
-              {{ 'LBL_SELECTALL' | translatePipe }}
-            </ion-item>
-            <ion-item (click)="deleteItems(getSelectedItems())">
-              <ion-icon name="trash" />
-              {{ 'LBL_DELETE' | translatePipe }}
-            </ion-item>
-          </ion-list>
-        </ion-content>
-      </ng-template>
-    </ion-popover>
-
   </ion-buttons>
 
 </app-header>

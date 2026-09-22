@@ -1,4 +1,3 @@
-import { environment } from 'src/environments/environment';
 import { ContactPayload } from '@capacitor-community/contacts';
 import { SettingsService } from '../services/settings.service';
 import { cleanupPhoneNumber } from '../utils/phoneNumbers';
