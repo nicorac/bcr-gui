@@ -1,5 +1,5 @@
 import { Subscription } from 'rxjs';
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { AppRoutesEnum } from '@app/app-routing.module';
 import { HeaderComponent } from '@app/components/header/header.component';
@@ -14,6 +14,7 @@ import version from '../../version';
   selector: 'app-about',
   templateUrl: './about.page.html',
   styleUrls: ['./about.page.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     HeaderComponent,
     IonContent,
@@ -40,7 +41,9 @@ export class AboutPage {
 
   constructor() {
     // subscribe to hardware back button events
-    this.backSub = this.platform.backButton.subscribeWithPriority(10, () => this.router.navigateByUrl(AppRoutesEnum.Main));
+    this.backSub = this.platform.backButton.subscribeWithPriority(10, () =>
+      this.router.navigateByUrl(AppRoutesEnum.Main)
+    );
   }
 
   ionViewWillLeave() {
@@ -66,7 +69,11 @@ export class AboutPage {
       // notify the user about the change
       await this.mbs.showConfirm({
         header: this.i18n.get('SETTINGS_DEV_SECTION'),
-        message: this.i18n.get(this.settings.developerMode ? 'ABOUT_DEV_MODE_ENABLED' : 'ABOUT_DEV_MODE_DISABLED'),
+        message: this.i18n.get(
+          this.settings.developerMode
+            ? 'ABOUT_DEV_MODE_ENABLED'
+            : 'ABOUT_DEV_MODE_DISABLED'
+        ),
         showCancelButton: false,
         backdropDismiss: false,
         onConfirm: () => {

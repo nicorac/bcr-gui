@@ -1,5 +1,5 @@
-import { provideHttpClient } from '@angular/common/http';
-import { enableProdMode, ErrorHandler, inject, provideAppInitializer, provideZoneChangeDetection } from '@angular/core';
+import { provideHttpClient, withXhr } from '@angular/common/http';
+import { enableProdMode, ErrorHandler, inject, provideAppInitializer } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideRouter, RouteReuseStrategy } from '@angular/router';
 import { IonicRouteStrategy, Platform, provideIonicAngular } from '@ionic/angular';
@@ -25,8 +25,7 @@ bootstrapApplication(AppComponent, {
     provideAppInitializer(initializeApp),
     provideRouter(routes),
     provideIonicAngular({ innerHTMLTemplatesEnabled: true }),
-    provideZoneChangeDetection(),
-    provideHttpClient(),
+    provideHttpClient(withXhr()),
     { provide: ErrorHandler, useClass: CustomErrorHandler },
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
   ],

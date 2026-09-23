@@ -53,6 +53,10 @@ android {
       applicationIdSuffix '.debug'
       versionNameSuffix "-debug"
     }
+    canary {
+      applicationIdSuffix '.canary'
+      versionNameSuffix "-canary"
+    }
     release {
       minifyEnabled false
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -62,7 +66,7 @@ android {
 
   // change generated apk name for release builds
   applicationVariants.all { variant ->
-    if (variant.buildType.name == 'release') {
+    if (variant.buildType.name != 'debug') {
       variant.outputs.all {
         outputFileName = "bcr-gui-${defaultConfig.versionName}-${variant.buildType.name}.apk"
       }

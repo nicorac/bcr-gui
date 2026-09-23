@@ -81,8 +81,8 @@ To translate the app, see [translation guide](./src/assets/i18n/README.md).
 ## Libraries
 
 - Ionic 8
-- Capacitor 6.1 (with custom AndroidSAF and AudioPlayer plugins)
-- Angular 18
+- Capacitor 8.1 (with custom AndroidSAF and AudioPlayer plugins)
+- Angular 22
 - Icons from [Ionicons](https://ionic.io/ionicons/v4) and [FreeSVG (public domain icons)](https://freesvg.org/1547046949)
 - Sample audio files (dev debug scripts) [SampleFiles.com](https://sample-files.com/)
 
