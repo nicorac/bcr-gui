@@ -24,7 +24,10 @@ bootstrapApplication(AppComponent, {
   providers: [
     provideAppInitializer(initializeApp),
     provideRouter(routes),
-    provideIonicAngular({ innerHTMLTemplatesEnabled: true }),
+    provideIonicAngular({
+      innerHTMLTemplatesEnabled: true,
+      useSetInputAPI: true,
+    }),
     provideHttpClient(withXhr()),
     { provide: ErrorHandler, useClass: CustomErrorHandler },
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
