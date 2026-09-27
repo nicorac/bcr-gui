@@ -18,5 +18,4 @@ export interface BcrGui {
    */
   restartApp(): void;
 
-
 }

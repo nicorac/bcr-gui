@@ -119,27 +119,27 @@ export class AudioPlayerComponent implements OnDestroy {
         }
 
         // subscribe to player ready event
-        this.removePlayerReadyListener = await AudioPlayer.addListener('playerReady', async () => {
+        this.removePlayerReadyListener = (await AudioPlayer.addListener('playerReady', async () => {
           this.status.set(PlayerStatusEnum.Paused);
           this.progress.set(0);
           // init complete
           this.ready.set(true);
           this.cdr.detectChanges(); // workaround needed to let Angular update values...
-        }).remove;
+        })).remove;
 
         // subscribe to playComplete event and
         // save reference to listener remove function
-        this.removePlayCompletedListener = await AudioPlayer.addListener('playerCompleted', () => {
+        this.removePlayCompletedListener = (await AudioPlayer.addListener('playerCompleted', () => {
           this.status.set(PlayerStatusEnum.Paused);
           this.progress.set(0);
           this.cdr.detectChanges(); // workaround needed to let Angular update values...
-        }).remove;
+        })).remove;
 
         // subscribe to update event and
         // save reference to listener remove function
-        this.removePlayerUpdateListener = await AudioPlayer.addListener('playerUpdate', (res) => {
+        this.removePlayerUpdateListener = (await AudioPlayer.addListener('playerUpdate', (res) => {
           this.progress.set(Math.floor(res.position / 1000));
-        }).remove;
+        })).remove;
 
         // workaround needed to let Angular update values...
         this.cdr.detectChanges();
