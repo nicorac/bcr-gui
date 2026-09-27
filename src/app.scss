@@ -90,6 +90,17 @@ ion-item-divider,
   justify-content: flex-end;
 }
 
+// Removes the phantom outline/border applied to first msgbox shown
+ion-alert {
+  &:focus,
+  &.ion-focused,
+  .alert-wrapper:focus,
+  .alert-wrapper:focus-visible {
+    outline: none !important;
+    box-shadow: var(--ion-alert-box-shadow, none) !important;
+  }
+}
+
 // MessageBox customizations
 ion-alert.msgbox-error {
   .alert-head {
