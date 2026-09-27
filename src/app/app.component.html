@@ -6,6 +6,14 @@
     <ion-header>
       <ion-toolbar translucent>
         <ion-title>{{ 'MAINMENU_MENU_TITLE' | translatePipe }}</ion-title>
+
+        <ion-buttons slot="end">
+          <ion-menu-toggle>
+            <ion-button>
+              <ion-icon slot="icon-only" name="close-outline" />
+            </ion-button>
+          </ion-menu-toggle>
+        </ion-buttons>
       </ion-toolbar>
     </ion-header>
 
@@ -39,6 +47,6 @@
   </ion-menu>
 
   <!-- main content -->
-  <ion-router-outlet />
+  <ion-router-outlet id="main-content" />
 
 </ion-app>

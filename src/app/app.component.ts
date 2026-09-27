@@ -3,7 +3,7 @@ import { Router, RouterLink } from '@angular/router';
 import { App } from '@capacitor/app';
 import { StatusBar } from '@capacitor/status-bar';
 import { NavigationBar } from '@capgo/capacitor-navigation-bar';
-import { IonApp, IonContent, IonHeader, IonIcon, IonLabel, IonList, IonMenu, IonMenuToggle, IonRouterOutlet, IonTitle, IonToolbar, Platform } from '@ionic/angular';
+import { IonApp, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonLabel, IonList, IonMenu, IonMenuToggle, IonRouterOutlet, IonTitle, IonToolbar, Platform } from '@ionic/angular';
 import { AppRoutesEnum } from './app-routing.module';
 import { TranslatePipe } from './pipes/translate.pipe';
 import { I18nService } from './services/i18n.service';
@@ -22,6 +22,8 @@ const TOOLBAR_BACKGROUND_DARK = '#1f241d';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     IonApp,
+    IonButton,
+    IonButtons,
     IonMenu,
     IonContent,
     IonHeader,
