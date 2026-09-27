@@ -84,6 +84,7 @@
         <ion-input
           [ngModel]="settings.defaultCountryPrefix"
           (ngModelChange)="setDefaultCountryPrefix($event)"
+          fill="outline"
           class="phone-prefix ion-text-right"
           type="tel"
           maxlength="7"
