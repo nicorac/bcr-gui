@@ -29,8 +29,8 @@ android {
     targetSdkVersion rootProject.ext.targetSdkVersion
     // version parts: M = Major, m = minor, b = build
     // -------- MMMmmmbbb
-    versionCode 1015003
-    versionName "1.15.3"
+    versionCode 1016000
+    versionName "1.16.0"
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     aaptOptions {
        // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -41,7 +41,7 @@ android {
 
   // signature config (release only)
   signingConfigs {
-    release {
+    main {
       keyAlias keystoreProperties['keyAlias']
       keyPassword keystoreProperties['keyPassword']
       storeFile file(keystoreProperties['storeFile'])
@@ -54,17 +54,20 @@ android {
       versionNameSuffix "-debug"
     }
     canary {
+      initWith release
       applicationIdSuffix '.canary'
       versionNameSuffix "-canary"
+      signingConfig signingConfigs.main
+      matchingFallbacks = ['release']
     }
     release {
       minifyEnabled false
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-      signingConfig signingConfigs.release
+      signingConfig signingConfigs.main
     }
   }
 
-  // change generated apk name for release builds
+  // change generated apk name for non-debug builds
   applicationVariants.all { variant ->
     if (variant.buildType.name != 'debug') {
       variant.outputs.all {
@@ -74,18 +77,18 @@ android {
   }
 
   sourceSets {
-    main {
-      manifest.srcFile 'src/main/AndroidManifest.xml'
-      res.srcDirs = ['src/main/res']
-    }
     debug {
       manifest.srcFile 'src/debug/AndroidManifest.xml'
       res.srcDirs = ['src/debug/res']
     }
-//    release {
-//      manifest.srcFile 'src/release/AndroidManifest.xml'
-//      res.srcDirs = ['src/release/res']
-//    }
+    canary {
+      manifest.srcFile 'src/canary/AndroidManifest.xml'
+      res.srcDirs = ['src/canary/res']
+    }
+    main {
+      manifest.srcFile 'src/main/AndroidManifest.xml'
+      res.srcDirs = ['src/main/res']
+    }
   }
 }
 

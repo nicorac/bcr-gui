@@ -13,7 +13,7 @@
     "check-i18n-files": "node -r ts-node/register scripts/check-i18n-files.ts",
     "prebuild:android": "node scripts/check-android-version.js",
     "build:android": "ionic capacitor build android --no-open --prod && cd android && gradlew assembleRelease && cd ..",
-    "build:android:canary": "ionic capacitor build android --no-open --canary && cd android && gradlew assembleRelease && cd ..",
+    "build:android:canary": "ionic capacitor build android --no-open --prod && cd android && gradlew assembleCanary && cd ..",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint",
