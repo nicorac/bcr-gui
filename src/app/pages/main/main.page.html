@@ -159,6 +159,16 @@
 
   </div>
 
+  <!-- wait overlay -->
+  @if (progressMessage()) {
+    <ion-loading
+      class="progress-overlay"
+      [isOpen]="true"
+      [message]="progressMessage()"
+      backdropDismiss="false"
+    />
+  }
+
 </ion-content>
 
 <!-- audio player -->

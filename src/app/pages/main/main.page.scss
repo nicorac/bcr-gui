@@ -138,5 +138,17 @@
   height: var(--item-height);
   .op-name {
     -webkit-line-clamp: 1;
+    line-clamp: 1;
+  }
+}
+
+.progress-overlay {
+  --background: var(--ion-color-step-100, #ffffff);
+  --color: var(--ion-color-primary, #3880ff);
+  --min-width: 60%;
+  ::ng-deep .loading-wrapper {
+    border: 2px solid var(--ion-color-step-200, #ffffff);
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
   }
 }

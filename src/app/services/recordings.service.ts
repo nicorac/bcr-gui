@@ -212,7 +212,7 @@ export class RecordingsService {
   /**
    * Deletes the given recordings (and their optional JSON metadata)
    */
-  async deleteRecording(deleteItems: Recording[]) {
+  async deleteRecording(deleteItems: Recording[], progressCallback?: (deleted: number, totalCount: number) => void) {
 
     // shared delete function
     const deleteFileFn = async (fileUri: string) => {
@@ -232,6 +232,7 @@ export class RecordingsService {
 
     // delete all items
     let tmpDb = this.recordings();
+    let count = 0;
     for (const item of deleteItems) {
       if (
         item && await deleteFileFn(item.audioUri)
@@ -240,6 +241,8 @@ export class RecordingsService {
         // remove item from DB
         tmpDb = tmpDb.filter(i => i !== item);
       }
+      // send progress
+      progressCallback?.(++count, deleteItems.length);
     }
 
     // send update event & save DB

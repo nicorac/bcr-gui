@@ -22,7 +22,7 @@ import { sortRecordings } from '@app/utils/recordings-sorter';
 import { bringIntoView } from '@app/utils/scroll';
 import { untilTrue } from '@app/utils/waitForAsync';
 import { Clipboard } from '@capacitor/clipboard';
-import { ActionSheetController, IonButton, IonButtons, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonFooter, IonIcon, IonList, IonRefresher, IonRefresherContent, IonSearchbar, IonToolbar, RefresherCustomEvent } from '@ionic/angular';
+import { ActionSheetController, IonButton, IonButtons, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonFooter, IonIcon, IonList, IonLoading, IonRefresher, IonRefresherContent, IonSearchbar, IonToolbar, RefresherCustomEvent } from '@ionic/angular';
 import { AndroidSAF } from '@plugins/androidsaf';
 import { ErrorCode } from '@plugins/bcrgui';
 import version from '../../version';
@@ -59,6 +59,7 @@ import version from '../../version';
     ToHmsPipe,
     TranslatePipe,
     VirtualScrollbarComponent,
+    IonLoading,
   ],
   providers: [
     DatetimePipe,
@@ -82,6 +83,9 @@ export class MainPage implements AfterViewInit {
     const item = this.selectedItem();
     return this.items()?.findIndex(i => i === item) ?? -1;
   });
+
+  // show a progress for long actions
+  protected progressMessage = signal<string|undefined>(undefined);
 
   // filtered items collection
   protected items = computed<Recording[]>(() => {
@@ -275,7 +279,11 @@ export class MainPage implements AfterViewInit {
       onConfirm: async () => {
         // forcibly unload audio
         await this.player()?.unload();
-        this.recordingsService.deleteRecording(items);
+        this.progressMessage.set(`0 / ${items.length}`);
+        await this.recordingsService.deleteRecording(items, (deleted, total) => {
+          this.progressMessage.set(`${deleted} / ${total}`);
+        });
+        this.progressMessage.set(undefined);
         this.clearSelection();
       }
     });
