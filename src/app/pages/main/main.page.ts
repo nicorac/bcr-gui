@@ -1,5 +1,4 @@
 import { CdkVirtualScrollViewport, ScrollingModule } from '@angular/cdk/scrolling';
-import { DatePipe } from '@angular/common';
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, inject, signal, untracked, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -62,7 +61,7 @@ import version from '../../version';
     VirtualScrollbarComponent,
   ],
   providers: [
-    DatePipe,
+    DatetimePipe,
   ],
 })
 export class MainPage implements AfterViewInit {
@@ -111,7 +110,7 @@ export class MainPage implements AfterViewInit {
   private asc = inject(ActionSheetController);
   private cdr = inject(ChangeDetectorRef);
   private contactsService = inject(ContactsService);
-  private datePipe = inject(DatePipe);
+  private datePipe = inject(DatetimePipe);
   private i18n = inject(I18nService);
   private mbs = inject(MessageBoxService);
   protected recordingsService = inject(RecordingsService);
@@ -457,7 +456,7 @@ export class MainPage implements AfterViewInit {
 
     return `
 ${item.opName}
-Date: ${this.datePipe.transform(item.date, 'medium')}
+Date: ${this.datePipe.transform(item.date)}
 Duration: ${toHms(item.duration)}
 `.trim();
 
