@@ -1,5 +1,5 @@
 import { Subscription } from 'rxjs';
-import { ChangeDetectionStrategy, Component, ElementRef, inject, OnInit, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, inject, model, OnInit, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FILENAME_PATTERN_SUPPORTED_VARS, FILENAME_PATTERN_TEMPLATES, Recording } from '@app/models/recording';
 import { TranslatePipe } from '@app/pipes/translate.pipe';
@@ -44,7 +44,7 @@ export class FilenamePatternEditorComponent implements OnInit {
   private ref = inject(ElementRef<HTMLIonModalElement>);
 
   // injected by caller
-  public initialPattern = '';
+  public initialPattern = model('');
   public onConfirm?: (pattern: string) => Promise<void>;
 
   // internal refs
@@ -75,7 +75,7 @@ export class FilenamePatternEditorComponent implements OnInit {
 
   ngOnInit() {
     // set initial pattern
-    this.pattern.set(this.initialPattern);
+    this.pattern.set(this.initialPattern());
     // set own class
     this.ref.nativeElement.parentElement?.classList.add('tag-editor');
     // first validation

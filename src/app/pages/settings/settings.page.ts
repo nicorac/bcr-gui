@@ -16,6 +16,7 @@ import { Share } from '@capacitor/share';
 import { IonButton, IonCheckbox, IonContent, IonIcon, IonInput, IonItem, IonItemDivider, IonList, IonSelect, IonSelectOption, ModalController, Platform } from '@ionic/angular';
 import { BcrGui } from '@plugins/bcrgui';
 import { SettingsService } from '../../services/settings.service';
+import { ComponentProps } from '../../utils/component-props';
 import { DatetimeFormatEditorComponent } from './datetime-format-editor/datetime-format-editor.component';
 import { FilenamePatternEditorComponent } from './filename-pattern-editor/filename-pattern-editor.component';
 
@@ -183,7 +184,7 @@ export class SettingsPage {
     this.editor = await this.modalController.create({
       component: FilenamePatternEditorComponent,
       backdropDismiss: false,
-      componentProps: <FilenamePatternEditorComponent> {
+      componentProps: <ComponentProps<typeof FilenamePatternEditorComponent>> {
         initialPattern: this.settings.filenamePattern,
         onConfirm: async (pattern: string) => {
           this.settings.filenamePattern = pattern;
@@ -194,8 +195,8 @@ export class SettingsPage {
             message: this.i18n.get('SETTINGS_RESCAN_TEXT'),
             onConfirm: () => this.recordingsService.refreshContent({ forceFilenameParse: true }),
           })
-        },
-      }
+        }
+      },
     });
     this.editor.onWillDismiss().then(() => this.editor = undefined);
     this.editor.present();
