@@ -1,5 +1,14 @@
 # Version history
 
+## Version 1.16.0 (2026-xx-xx)
+
+New features:
+
+* Updated Angular to v.22
+* Switched to zoneless mode
+
+Bug fixes:
+
 ## Version 1.15.3 (2026-08-30)
 
 New features:
