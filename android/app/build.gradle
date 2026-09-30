@@ -6,18 +6,68 @@ apply plugin: 'com.android.application'
  *
  * File content:
  * -----------------------------------------------------------------------------------------
- * storeFile=<full filename of the "*.jks" key file
- * storePassword=<password of the "*.jks" key file>
+ * storeFile=<full filename of the "*.jks" keystore file
+ * storePassword=<password of the "*.jks" keystore file>
  * keyAlias=<ID of the key to be used to sign the APK>
- * keyPassword=<password for the key>
+ * keyPassword=<password of the key>
+ * -----------------------------------------------------------------------------------------
+ *
+ * In CI environment the same informations are extracted from
+ * the ANDROID_KEYSTORE_BASE64_PROPERTIES secret, which contains
+ * -----------------------------------------------------------------------------------------
+ * storeBase64=MIIKMAIBAzCCCdoGCSqGSIb3DQ..... (base64 version of the keystore)
+ * storePassword=<password of the keystore>
+ * keyAlias=<ID of the key to be used to sign the APK>
+ * keyPassword=<password of the key>
  * -----------------------------------------------------------------------------------------
  */
+
+// Extract JSON secret from CI if present and set up local properties path
+System.println("=== Testing ANDROID_KEYSTORE_BASE64_PROPERTIES env key ===")
+def keystoreBase64Content = System.getenv("ANDROID_KEYSTORE_BASE64_PROPERTIES")
+def keystorePropsPath = ""
+
+if (keystoreBase64Content != null && !keystoreBase64Content.isEmpty()) {
+  System.println("Extracting temp keystore from ANDROID_KEYSTORE_BASE64_PROPERTIES secret")
+  try {
+    def props = new Properties()
+    props.load(new StringReader(keystoreBase64Content))
+
+    // Extract .jks file from Base64 into build directory
+    def keystoreFile = file("${layout.buildDirectory.get()}/outputs/keystore/release.jks")
+    keystoreFile.parentFile.mkdirs()
+    keystoreFile.bytes = props.storeBase64.decodeBase64()
+
+    // Generate temporary .properties file
+    def tempPropsFile = file("${layout.buildDirectory.get()}/outputs/keystore/keystore.properties")
+    tempPropsFile.text = """
+      storeFile=${keystoreFile.absolutePath}
+      storePassword=${props.storePassword}
+      keyAlias=${props.keyAlias}
+      keyPassword=${props.keyPassword}
+    """.stripIndent()
+
+    // Override the path variable so Step 2 reads this temporary file
+    keystorePropsPath = tempPropsFile.absolutePath
+  } catch (Exception e) {
+    System.err.println("Failed to process ANDROID_KEYSTORE_BASE64_PROPERTIES: " + e.message)
+  }
+}
+else {
+  keystorePropsPath = System.getenv("ANDROID_KEYSTORE_PROPS")
+}
+
+// Read properties file (works for both local ANDROID_KEYSTORE_PROPS and CI generated file)
 System.print("Loading Android keystore config from: ")
-System.println(System.getenv("ANDROID_KEYSTORE_PROPS"))
+System.println(keystorePropsPath)
 def keystoreProperties = new Properties()
-def keystorePropertiesFile = file(System.getenv("ANDROID_KEYSTORE_PROPS"))
-if (keystorePropertiesFile.exists()) {
-  keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
+if (keystorePropsPath != null && !keystorePropsPath.isEmpty()) {
+  def keystorePropertiesFile = file(keystorePropsPath)
+  if (keystorePropertiesFile.exists()) {
+    System.out.println("Loading Android keystore config from: " + keystorePropsPath)
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+  }
 }
 
 android {
