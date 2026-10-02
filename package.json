@@ -5,6 +5,7 @@
   "description": "BCR-GUI is a companion app for BCR (Basic Call Recorder)",
   "homepage": "https://github.com/nicorac/bcr-gui",
   "scripts": {
+    "postinstall": "patch-package",
     "ng": "ng",
     "prestart": "adb shell \"su -c 'chmod +r /proc/net/unix'\"",
     "start": "ionic serve",
@@ -68,6 +69,7 @@
     "eslint-plugin-import": "2.32.0",
     "eslint-plugin-jsdoc": "50.4.3",
     "istanbul-lib-instrument": "^6.0.3",
+    "patch-package": "^8.0.1",
     "ts-node": "10.9.2",
     "typescript": "6.0.3",
     "vitest": "^4.0.8"
