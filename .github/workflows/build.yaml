@@ -4,7 +4,8 @@ on:
   push:
     branches:
       - dev
-      - release
+    tags:
+      - 'v*.*.*'
   # pull_request:
   #   branches:
   #     - main
@@ -12,14 +13,14 @@ on:
 
 jobs:
   build-android:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 24.15.0
           cache: 'npm'
@@ -31,13 +32,14 @@ jobs:
           java-version: '21'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-
-      - name: Install Ionic CLI
-        run: npm install -g @ionic/cli
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Add Weblate remote
+        run: |
+          git remote add weblate https://hosted.weblate.org/git/bcr-gui/app/
 
       - name: Add android directory to PATH
         run: echo "${{ github.workspace }}/android" >> $GITHUB_PATH
@@ -46,32 +48,44 @@ jobs:
         run: chmod +x android/gradlew
 
       - name: Build Android Release APK
-        if: github.event_name == 'push' && github.ref == 'refs/heads/release'
+        if: github.ref_type == 'tag'
         run: npm run build:android
         env:
           ANDROID_KEYSTORE_BASE64_PROPERTIES: ${{ secrets.ANDROID_KEYSTORE_BASE64_PROPERTIES }}
 
       - name: Build Android Canary APK
-        if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
+        if: github.ref_type == 'branch' && github.ref_name == 'dev'
         run: npm run build:android:canary
         env:
           ANDROID_KEYSTORE_BASE64_PROPERTIES: ${{ secrets.ANDROID_KEYSTORE_BASE64_PROPERTIES }}
 
       - name: Upload Release APK artifact
-        if: github.event_name == 'push' && github.ref == 'refs/heads/release'
-        uses: actions/upload-artifact@v4
+        if: github.ref_type == 'tag'
+        uses: actions/upload-artifact@v7
         with:
           name: bcrgui-release-apk
           path: android/app/build/outputs/apk/release/*.apk
-          retention-days: 7
+          retention-days: 14
 
       - name: Upload Canary APK artifact
-        if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
-        uses: actions/upload-artifact@v4
+        if: github.ref_type == 'branch' && github.ref_name == 'dev'
+        uses: actions/upload-artifact@v7
         with:
           name: bcrgui-canary-apk
           path: android/app/build/outputs/apk/canary/*.apk
-          retention-days: 7
+          retention-days: 14
+
+      - name: Create GitHub Release (Draft)
+        if: github.ref_type == 'tag'
+        run: |
+          CLEAN_VERSION="${GITHUB_REF_NAME#v}"
+          gh release create "$GITHUB_REF_NAME" \
+            android/app/build/outputs/apk/release/*.apk \
+            --title "Version $CLEAN_VERSION" \
+            --notes "$CLEAN_VERSION version history..." \
+            --draft
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Clean sensitive files
         if: always()

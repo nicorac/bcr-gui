@@ -14,21 +14,57 @@ function runCommand(command) {
   return childProcess.execSync(command, { encoding: 'utf8' }).trim();
 }
 
+/**
+ * Safely resolves a git reference (returns null if ref does not exist)
+ *
+ * @param {string} ref - Git reference
+ * @returns {string|null} Commit hash or null
+ */
+function safeRevParse(ref) {
+  try {
+    return runCommand(`git rev-parse --verify "${ref}"`);
+  } catch {
+    return null;
+  }
+}
+
 // main script
 try {
-  console.log(`Fetching latest changes from ${remoteBranch}...`);
+  const isCI = process.env.CI === 'true';
+
+  console.log(`Fetching latest changes from ${remoteOrigin}...`);
   runCommand(`git fetch -- "${remoteOrigin}"`);
 
-  // Get commit hashes for local and remote branches
-  const localHash = runCommand(`git rev-parse ${branchName}`);
-  const remoteHash = runCommand(`git rev-parse ${remoteBranch}`);
+  const remoteHash = safeRevParse(remoteBranch);
 
-  if (localHash !== remoteHash) {
-    console.error(`[ERROR] ${remoteOrigin} origin is not synchronized, please check it.`);
+  if (!remoteHash) {
+    console.error(`[ERROR] Remote reference ${remoteBranch} could not be resolved.`);
     process.exit(1);
   }
-  else {
-    // all OK
+
+  let localHash = null;
+
+  if (isCI) {
+    // In CI environment: compare origin/i18n directly
+    console.log(`[INFO] Running in CI: fetching origin/${branchName}...`);
+    runCommand(`git fetch -- origin ${branchName}`);
+    localHash = safeRevParse(`origin/${branchName}`);
+  } else {
+    // In local environment: prefer local branch 'i18n'
+    localHash = safeRevParse(branchName);
+  }
+
+  if (!localHash) {
+    console.error(`[ERROR] Could not resolve local reference for '${branchName}'.`);
+    process.exit(1);
+  }
+
+  if (localHash !== remoteHash) {
+    console.error(`[ERROR] ${remoteOrigin} origin is not synchronized.`);
+    console.error(` Local reference : ${localHash}`);
+    console.error(` Remote reference: ${remoteHash}`);
+    process.exit(1);
+  } else {
     console.log(`[OK] Branch ${branchName} is up to date with ${remoteBranch}.`);
     process.exit(0);
   }
