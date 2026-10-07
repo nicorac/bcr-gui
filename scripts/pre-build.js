@@ -34,6 +34,8 @@ for (const script of scripts) {
     console.error(`Script ${script} failed with exit code ${result.status}`);
     process.exit(result.status ?? 1);
   }
+
+  console.log();
 }
 
 console.log('All pre-build scripts executed successfully.');

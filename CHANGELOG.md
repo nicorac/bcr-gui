@@ -1,13 +1,19 @@
 # Version history
 
-## Version 1.16.0 (2026-xx-xx)
+## Version 1.16.0-rc1 (2026-10-07)
 
 New features:
 
-* Updated Angular to v.22
-* Switched to zoneless mode
+* Updated to Angular 22.2 (zoneless mode)
+* Updated to Ionic 9.0, Capacitor 8.5
+* Added support to the new "edge-to-edge" Android mode (Android 15+)
+* Added close button to main menu
+* Multiple files delete now shows a progress dialog
 
 Bug fixes:
+
+* Fixed missing border around "Default country prefix" input field, making it hard to see/click
+* The recording date in the "share to..." message now follows the user's selected date format setting
 
 ## Version 1.15.3 (2026-08-30)
 
