@@ -53,9 +53,9 @@ jobs:
         env:
           ANDROID_KEYSTORE_BASE64_PROPERTIES: ${{ secrets.ANDROID_KEYSTORE_BASE64_PROPERTIES }}
 
-      - name: Build Android Canary APK
+      - name: Build Android Development APK
         if: github.ref_type == 'branch' && github.ref_name == 'dev'
-        run: npm run build:android:canary
+        run: npm run build:android
         env:
           ANDROID_KEYSTORE_BASE64_PROPERTIES: ${{ secrets.ANDROID_KEYSTORE_BASE64_PROPERTIES }}
 
@@ -67,7 +67,7 @@ jobs:
           path: android/app/build/outputs/apk/release/*.apk
           retention-days: 14
 
-      - name: Upload Canary APK artifact
+      - name: Upload Development APK artifact
         if: github.ref_type == 'branch' && github.ref_name == 'dev'
         uses: actions/upload-artifact@v7
         with:
