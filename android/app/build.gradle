@@ -87,6 +87,16 @@ android {
        // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
       ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
     }
+
+    // appends GIT hash to versionName on 'dev' pushes
+    def isCI = System.getenv("CI") == "true"
+    def refName = System.getenv("GITHUB_REF_NAME") ?: ""
+    def sha = System.getenv("GITHUB_SHA") ?: ""
+    if (isCI && refName == "dev" && sha.length() >= 8) {
+      def shortHash = sha.substring(0, 8)
+      versionName "${versionName}-${shortHash}"
+    }
+
   }
 
   // signature config (release only)
