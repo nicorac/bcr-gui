@@ -60,12 +60,20 @@ export class I18nService {
     this._cultureDefs = await this.getJsonContent(`${LANG_BASE_URL}/_cultures.json`);
 
     // retrieve device culture ID (resolving aliases)
-    this._deviceCultureID = (await Device.getLanguageTag()).value;
+    this._deviceCultureID = this.cleanupLanguageTag((await Device.getLanguageTag()).value);
     const aliasedID = this._cultureDefs.find(c => c.aliases?.includes(this._deviceCultureID));
     if (aliasedID) {
       this._deviceCultureID = aliasedID.id;
     }
 
+  }
+
+  /**
+   * Removes any BCP 47 extension from the given language tag.
+   * it-IT-u-fw-mon-mu-celsius --> it-IT
+   */
+  private cleanupLanguageTag(languageTag: string) {
+    return new Intl.Locale(languageTag).baseName;
   }
 
   /**
