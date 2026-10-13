@@ -31,8 +31,8 @@ ion-button {
   }
 }
 
-.phone-prefix {
-  width: initial;
-  min-width: 2em;
-  max-width: 5em;
+.phone-prefix ::ng-deep input {
+  width: min-content;
+  min-width: 4ch;
+  max-width: 4ch;
 }
