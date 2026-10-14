@@ -101,6 +101,11 @@ ion-alert {
   }
 }
 
+// Allow \n in error messages
+ion-alert .alert-message {
+  white-space: pre-line;
+}
+
 // MessageBox customizations
 ion-alert.msgbox-error {
   .alert-head {

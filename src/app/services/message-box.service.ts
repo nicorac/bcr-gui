@@ -1,9 +1,9 @@
 import { inject, Injectable } from '@angular/core';
 import { Clipboard } from '@capacitor/clipboard';
-import { AlertButton, AlertController, AlertInput, IonicSafeString } from '@ionic/angular';
+import { AlertButton, AlertController, AlertInput } from '@ionic/angular';
 import { I18nKey, I18nService, TranslationArgs } from './i18n.service';
 
-export type MessageType = string|string[]|IonicSafeString;
+export type MessageType = string|string[];
 
 @Injectable({
   providedIn: 'root'
@@ -13,12 +13,9 @@ export class MessageBoxService {
   private alertController = inject(AlertController);
   private i18n = inject(I18nService);
 
-  private formatMessage(message?: MessageType): string|IonicSafeString {
+  private formatMessage(message?: MessageType): string {
     if (Array.isArray(message)) {
-      return new IonicSafeString(message.join('<br>'));
-    }
-    else if (typeof message === 'string' && message.includes('\n')) {
-      return new IonicSafeString(message.replaceAll('\n', '<br/>'));
+      return message.join('\n');
     }
     return message ?? '';
   }
@@ -28,7 +25,7 @@ export class MessageBoxService {
    */
   private async getAlert(options: {
     header?: string,
-    message?: string|IonicSafeString,
+    message?: string,
     buttons?: (AlertButton | string)[],
     inputs?: AlertInput[],
     cssClass?: string,
@@ -156,16 +153,15 @@ export class MessageBoxService {
 
     // remove leading and trailing empty lines (preserving the ones between message and details)
     const msg = msgLines.join('\n').trim();
-    console.error(msg);
 
     // log to console
-    const msgHtml = new IonicSafeString(msg.replace(/\n/g, '<br/>'));
+    console.error(msg);
 
     // show alert dialog
     const mb = await this.getAlert({
       cssClass: 'msgbox-error',
       header: options.header ?? this.i18n.get('LBL_ERROR'),
-      message: msgHtml,
+      message: msg,
       buttons: [
         {
           text: this.i18n.get('LBL_COPY'),
