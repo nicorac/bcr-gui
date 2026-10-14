@@ -91,7 +91,9 @@ export class NumberDisplayNameMap {
    * Extract the display name from the given contact
    */
   private getContactDisplayName(contact: ContactPayload, defaultValue = '<none>'): string {
-    return contact?.name?.display ?? defaultValue;
+    return contact?.name?.display
+      ?? contact?.organization?.company
+      ?? defaultValue;
   }
 
 }
