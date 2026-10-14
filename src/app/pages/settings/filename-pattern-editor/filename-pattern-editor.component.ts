@@ -1,5 +1,5 @@
 import { Subscription } from 'rxjs';
-import { ChangeDetectionStrategy, Component, ElementRef, inject, model, OnInit, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, inject, input, model, OnInit, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FILENAME_PATTERN_SUPPORTED_VARS, FILENAME_PATTERN_TEMPLATES, Recording } from '@app/models/recording';
 import { TranslatePipe } from '@app/pipes/translate.pipe';
@@ -45,7 +45,7 @@ export class FilenamePatternEditorComponent implements OnInit {
 
   // injected by caller
   public initialPattern = model('');
-  public onConfirm?: (pattern: string) => Promise<void>;
+  public onConfirm = input.required<(pattern: string) => Promise<void>>();
 
   // internal refs
   private backSub?: Subscription;
@@ -91,7 +91,7 @@ export class FilenamePatternEditorComponent implements OnInit {
   }
 
   async confirm() {
-    await this.onConfirm?.(this.pattern());
+    await this.onConfirm()?.(this.pattern());
     this.cancel();
   }
 
