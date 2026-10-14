@@ -1,5 +1,13 @@
 # Version history
 
+## Version 1.16.0-rc2 (2026-10-14)
+
+Bug fixes:
+
+* Fixed issues with unicode language tags extensions (#257)
+* Fixed "True Phone Dialer & Contacts" pattern (#225)
+* Increased "Prefix" field width in settings page to fit long international prefixes (#259)
+
 ## Version 1.16.0-rc1 (2026-10-07)
 
 New features:
