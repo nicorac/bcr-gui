@@ -152,3 +152,14 @@
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
   }
 }
+
+.date-filter-input {
+  --color: var(--ion-color-step-600);
+  --highlight-color-focused: var(--ion-color-step-600);
+  --highlight-color-valid: var(--ion-color-step-600);
+  --highlight-color-invalid: var(--ion-color-step-600);
+
+  &::part(label) {
+    color: var(--ion-color-step-600) !important;
+  }
+}
