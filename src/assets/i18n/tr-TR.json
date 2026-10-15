@@ -109,8 +109,6 @@
   "SETTINGS_APPEARANCE": "Görünüm",
   "SETTINGS_APPEARANCE_DARK": "Koyu",
   "SETTINGS_APPEARANCE_LIGHT": "Açık",
-  "SETTINGS_COUNTRY_PREFIX": "Varsayılan ülke kodu",
-  "SETTINGS_COUNTRY_PREFIX_HELP": "Numaralarda eksik olduğunda kullanılacak ülke kodu (ör. ABD için +1)",
   "SETTINGS_DATETIME_EMPTY": "Boş",
   "SETTINGS_DATETIME_FORMAT": "Tarih/saat biçimi",
   "SETTINGS_FILENAME_PATTERN": "Dosya adı deseni",

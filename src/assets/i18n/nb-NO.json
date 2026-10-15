@@ -109,8 +109,6 @@
   "SETTINGS_APPEARANCE": "Utseende",
   "SETTINGS_APPEARANCE_DARK": "Mørk",
   "SETTINGS_APPEARANCE_LIGHT": "Lys",
-  "SETTINGS_COUNTRY_PREFIX": "Standard landskode",
-  "SETTINGS_COUNTRY_PREFIX_HELP": "Landskoden (f.eks. +47 for Norge) som skal brukes på numre som mangler det",
   "SETTINGS_DATETIME_EMPTY": "Tom",
   "SETTINGS_DATETIME_FORMAT": "Dato-/klokkeslettformat",
   "SETTINGS_FILENAME_PATTERN": "Dato-/klokkeslettformat",

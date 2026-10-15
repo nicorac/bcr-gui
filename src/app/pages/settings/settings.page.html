@@ -75,23 +75,6 @@
       </div>
     </ion-item>
 
-    <ion-item>
-      <div class="wrapper">
-        <div class="label">
-          <div>{{ 'SETTINGS_COUNTRY_PREFIX' | translatePipe }}</div>
-          <div class="help">{{ 'SETTINGS_COUNTRY_PREFIX_HELP' | translatePipe }}</div>
-        </div>
-        <ion-input
-          [ngModel]="settings.defaultCountryPrefix"
-          (ngModelChange)="setDefaultCountryPrefix($event)"
-          fill="outline"
-          class="phone-prefix ion-text-right"
-          type="tel"
-          maxlength="7"
-        />
-      </div>
-    </ion-item>
-
     <!-- recordings section -->
     <ion-item-divider>
       <h4>{{ 'SETTINGS_RECORDINGS_SECTION' | translatePipe }}</h4>

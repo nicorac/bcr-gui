@@ -109,8 +109,6 @@
   "SETTINGS_APPEARANCE": "Görünüş",
   "SETTINGS_APPEARANCE_DARK": "Tünd",
   "SETTINGS_APPEARANCE_LIGHT": "Açıq",
-  "SETTINGS_COUNTRY_PREFIX": "Varsayılan ölkə kodu",
-  "SETTINGS_COUNTRY_PREFIX_HELP": "Nömrələrdə ölkə kodu çatışmayan zaman istifadə olunacaq kod (məsələn, ABŞ üçün +1)",
   "SETTINGS_DATETIME_EMPTY": "Boş",
   "SETTINGS_DATETIME_FORMAT": "Tarix və saat formatı",
   "SETTINGS_FILENAME_PATTERN": "Fayl adı şablonu",

@@ -1,3 +1,5 @@
+import { BcrGui } from '@plugins/bcrgui';
+
 /**
  * Test if the given string contains a phone number.
  */
@@ -7,8 +9,21 @@ export function isPhoneNumber(phoneNumber?: string): boolean {
 }
 
 /**
- * Cleanup the given phone number by keeping only "+" and digits.
+ * Test if the given string contains a phone number in E164 format.
  */
-export function cleanupPhoneNumber(phoneNumber: string): string {
-  return phoneNumber.replace(/[^\d\+]/g, '');
+export function isE164Number(phoneNumber?: string): boolean {
+  return !!phoneNumber
+    && phoneNumber.startsWith('+')
+    && !(/\s-_\./.test(phoneNumber))
+  ;
+}
+
+/**
+ * Return the E.164 format of the given raw number by using Android native lib.
+ * NOTE: no conversion is called if the input number already is an E164 number.
+ */
+export async function getE164Number(rawNumber: string) {
+  return isE164Number(rawNumber)
+    ? rawNumber
+    : (await BcrGui.formatNumberToE164({ number: rawNumber }))?.number ?? rawNumber;
 }

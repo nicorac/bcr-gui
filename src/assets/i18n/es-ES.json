@@ -109,8 +109,6 @@
   "SETTINGS_APPEARANCE": "Aspecto",
   "SETTINGS_APPEARANCE_DARK": "Oscuro",
   "SETTINGS_APPEARANCE_LIGHT": "Claro",
-  "SETTINGS_COUNTRY_PREFIX": "Prefijo del país predeterminado",
-  "SETTINGS_COUNTRY_PREFIX_HELP": "El prefijo del país (por ejemplo, +1 para EE.UU.) que se utilizará con los números que no lo tengan",
   "SETTINGS_DATETIME_EMPTY": "Vacío",
   "SETTINGS_DATETIME_FORMAT": "Formato de la fecha y la hora",
   "SETTINGS_FILENAME_PATTERN": "Pauta de nombres de archivo",

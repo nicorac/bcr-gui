@@ -65,12 +65,6 @@ export class SettingsService {
   public playbackSpeed = 1;  // audio playback speed (1 => 100%)
 
   /**
-   * Default country phone prefix
-   */
-  @JsonProperty()
-  public defaultCountryPrefix: string = '';
-
-  /**
    * Custom filename format
    */
   @JsonProperty()

@@ -18,6 +18,7 @@ import { MessageBoxService } from '@app/services/message-box.service';
 import { RecordingsService } from '@app/services/recordings.service';
 import { SettingsService } from '@app/services/settings.service';
 import { filterList } from '@app/utils/filterList';
+import { getE164Number } from '@app/utils/phoneNumbers';
 import { sortRecordings } from '@app/utils/recordings-sorter';
 import { bringIntoView } from '@app/utils/scroll';
 import { untilTrue } from '@app/utils/waitForAsync';
@@ -358,8 +359,9 @@ export class MainPage implements AfterViewInit {
     if (await this.contactsService.checkPermission() !== 'granted') return;
 
     // find contact with that phone number
-    const pnm = await this.contactsService.getPhoneNumbersMap();
-    const displayName = pnm.getDisplayName(rec.opNumber);
+    const e164Number = await getE164Number(rec.opNumber);
+    const contact = (await this.contactsService.getPhoneNumbersMap())[e164Number];
+    const displayName = contact?.displayName;
 
     // contact found?
     if (displayName) {
