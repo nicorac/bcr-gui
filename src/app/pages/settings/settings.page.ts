@@ -13,7 +13,7 @@ import { SortModeEnum } from '@app/utils/recordings-sorter';
 import version from '@app/version';
 import { Directory, Encoding, Filesystem } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
-import { IonButton, IonCheckbox, IonContent, IonIcon, IonInput, IonItem, IonItemDivider, IonList, IonSelect, IonSelectOption, ModalController, Platform } from '@ionic/angular';
+import { IonButton, IonCheckbox, IonContent, IonIcon, IonItem, IonItemDivider, IonList, IonSelect, IonSelectOption, ModalController, Platform } from '@ionic/angular';
 import { BcrGui } from '@plugins/bcrgui';
 import { SettingsService } from '../../services/settings.service';
 import { ComponentProps } from '../../utils/component-props';
@@ -32,7 +32,6 @@ import { FilenamePatternEditorComponent } from './filename-pattern-editor/filena
     IonCheckbox,
     IonContent,
     IonIcon,
-    IonInput,
     IonItem,
     IonItemDivider,
     IonList,
@@ -213,21 +212,6 @@ export class SettingsPage {
     });
     this.editor.onWillDismiss().then(() => this.editor = undefined);
     this.editor.present();
-  }
-
-  /**
-   * Set the default country prefix to settings
-   */
-  setDefaultCountryPrefix(prefix: string) {
-    prefix = prefix.trim();
-    if (prefix) {
-      if (!prefix.startsWith('+')) {
-        prefix = '+' + prefix;
-      }
-      if (/^\+\d*$/g.test(prefix)) {
-        this.settings.defaultCountryPrefix = prefix;
-      }
-    }
   }
 
   /**

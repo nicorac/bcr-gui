@@ -109,8 +109,6 @@
   "SETTINGS_APPEARANCE": "نما",
   "SETTINGS_APPEARANCE_DARK": "تاریک",
   "SETTINGS_APPEARANCE_LIGHT": "روشن",
-  "SETTINGS_COUNTRY_PREFIX": "انگاره پیشوند کشور",
-  "SETTINGS_COUNTRY_PREFIX_HELP": "پیشوند کشور (مانند +1 امریکا) برای بکار گرفته شدن آن شماره ها را ندارد",
   "SETTINGS_DATETIME_EMPTY": "خالی",
   "SETTINGS_DATETIME_FORMAT": "پیکره گهنامه/زمان",
   "SETTINGS_FILENAME_PATTERN": "الگوی نام پرونده",

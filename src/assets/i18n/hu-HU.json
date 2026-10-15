@@ -109,8 +109,6 @@
   "SETTINGS_APPEARANCE": "Megjelenés",
   "SETTINGS_APPEARANCE_DARK": "Sötét",
   "SETTINGS_APPEARANCE_LIGHT": "Világos",
-  "SETTINGS_COUNTRY_PREFIX": "Alapértelmezett ország előtag",
-  "SETTINGS_COUNTRY_PREFIX_HELP": "Az ország előtagja (pl. +1 az USA esetében), amelyet a hiányzó számok esetén kell használni",
   "SETTINGS_DATETIME_EMPTY": "Üres",
   "SETTINGS_DATETIME_FORMAT": "Dátum/idő formátum",
   "SETTINGS_FILENAME_PATTERN": "Fájlnévminta",

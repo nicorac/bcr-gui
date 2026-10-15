@@ -8,7 +8,7 @@ import { Recording, UNKNOWN_NAME_OR_NUMBER } from '../models/recording';
 import { MainPage } from '../pages/main/main.page';
 import { replaceExtension } from '../utils/filesystem';
 import { deserializeObject, serializeObject } from '../utils/json-serializer';
-import { isPhoneNumber } from '../utils/phoneNumbers';
+import { getE164Number, isPhoneNumber } from '../utils/phoneNumbers';
 import { ContactsService } from './contacts.service';
 import { I18nService } from './i18n.service';
 import { MessageBoxService } from './message-box.service';
@@ -93,8 +93,7 @@ export class RecordingsService {
     this.refreshProgress.set(0.001);
     console.log("Reading files in folder:");
 
-    // get a phone numbers map
-    // find contact with that phone number
+    // get a phone numbers map to find contacts by their phone number
     const pnm = await this.contactsService.getPhoneNumbersMap();
 
     // filename RegExp parser instance
@@ -159,7 +158,9 @@ export class RecordingsService {
               || (dbRecord.opName === UNKNOWN_NAME_OR_NUMBER && dbRecord.opNumber !== UNKNOWN_NAME_OR_NUMBER)
               || isPhoneNumber(dbRecord.opName)
           ) {
-            const displayName = pnm.getDisplayName(dbRecord.opNumber);
+            // format number to E.164 format
+            const e164Number = await getE164Number(dbRecord.opNumber);
+            const displayName = pnm[e164Number]?.displayName;
             if (displayName) {
               dbRecord.opName = displayName;
             }
