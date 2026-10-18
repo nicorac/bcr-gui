@@ -4,8 +4,8 @@
 
 New features:
 
-* Improved phone number handling by using native Android API (in E.164 format) (#468)
-* Removed the now useless "Default country prefix" configuration setting (#468)
+* Improved phone number handling by using native Android API (in E.164 format) (#259)
+* Removed the now useless "Default country prefix" configuration setting (#259)
 
 Bug fixes:
 

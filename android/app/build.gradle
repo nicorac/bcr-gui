@@ -127,15 +127,6 @@ android {
     }
   }
 
-  // change generated apk name for non-debug builds
-  applicationVariants.all { variant ->
-    if (variant.buildType.name != 'debug') {
-      variant.outputs.all {
-        outputFileName = "bcr-gui-${defaultConfig.versionName}-${variant.buildType.name}.apk"
-      }
-    }
-  }
-
   sourceSets {
     debug {
       manifest.srcFile 'src/debug/AndroidManifest.xml'
@@ -148,6 +139,24 @@ android {
     main {
       manifest.srcFile 'src/main/AndroidManifest.xml'
       res.srcDirs = ['src/main/res']
+    }
+  }
+
+  packaging {
+    // since we don't distribute through PlayStore we prefer dex files to be compressed (as it was before gradle 9.x)
+    dex {
+      useLegacyPackaging = true
+    }
+  }
+}
+
+androidComponents {
+  onVariants(selector().all()) { variant ->
+    // Apply custom naming for non-debug builds
+    if (variant.name != "debug") {
+      variant.outputs.forEach { output ->
+        output.outputFileName.set("bcr-gui-${android.defaultConfig.versionName}-${variant.name}.apk")
+      }
     }
   }
 }

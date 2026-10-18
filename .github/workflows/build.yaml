@@ -81,8 +81,8 @@ jobs:
         if: (github.ref_type == 'branch' && github.ref_name == 'dev') || github.event_name == 'workflow_dispatch' || github.ref_type == 'tag'
         uses: actions/upload-artifact@v7
         with:
-          name: bcrgui-release-apk
           path: android/app/build/outputs/apk/release/*.apk
+          archive: false
           retention-days: 14
 
       - name: Create GitHub Release (Draft)
