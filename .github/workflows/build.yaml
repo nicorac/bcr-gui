@@ -20,6 +20,23 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7
 
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # needed to read git tags
+
+      - name: Check if this commit has a tag to skip build
+        if: github.ref_type == 'branch'
+        run: |
+          if git describe --exact-match --tags HEAD >/dev/null 2>&1; then
+            echo "This commit also has an associated tag. This build will be aborted to let the 'tag' one complete."
+            gh run cancel ${{ github.run_id }}
+            # Mettiamo in pausa per dare il tempo a GitHub di terminare la run
+            sleep 30
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Set up Node.js
         uses: actions/setup-node@v7
         with:
