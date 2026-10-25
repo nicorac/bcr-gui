@@ -2,6 +2,10 @@
 
 ## Version 1.16.0 (2026-10-25)
 
+Security:
+
+* Fixed security advisory [GHSA-jq38-cm25-hgrj](https://github.com/nicorac/bcr-gui/security/advisories/GHSA-jq38-cm25-hgrj)
+
 New features:
 
 * Updated to Angular 22.2 (zoneless mode), Ionic 9.0, Capacitor 8.5
