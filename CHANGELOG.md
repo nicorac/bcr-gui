@@ -1,9 +1,13 @@
 # Version history
 
-## Version 1.16.0-rc3 (2026-10-18)
+## Version 1.16.0 (2026-10-25)
 
 New features:
 
+* Updated to Angular 22.2 (zoneless mode), Ionic 9.0, Capacitor 8.5
+* Added support to the new "edge-to-edge" Android mode (Android 15+)
+* Added close button to main menu
+* Multiple files delete now shows a progress dialog
 * Improved phone number handling by using native Android API (in E.164 format) (#259)
 * Removed the now useless "Default country prefix" configuration setting (#259)
 
@@ -11,28 +15,8 @@ Bug fixes:
 
 * Fixed filename pattern editor not saving changes
 * Fixed display name for contacts with only a "business name" (#253)
-
-## Version 1.16.0-rc2 (2026-10-14)
-
-Bug fixes:
-
 * Fixed issues with unicode language tags extensions (#257)
 * Fixed "True Phone Dialer & Contacts" pattern (#225)
-* Increased "Prefix" field width in settings page to fit long international prefixes (#259)
-
-## Version 1.16.0-rc1 (2026-10-07)
-
-New features:
-
-* Updated to Angular 22.2 (zoneless mode)
-* Updated to Ionic 9.0, Capacitor 8.5
-* Added support to the new "edge-to-edge" Android mode (Android 15+)
-* Added close button to main menu
-* Multiple files delete now shows a progress dialog
-
-Bug fixes:
-
-* Fixed missing border around "Default country prefix" input field, making it hard to see/click
 * The recording date in the "share to..." message now follows the user's selected date format setting
 
 ## Version 1.15.3 (2026-08-30)
