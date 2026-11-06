@@ -109,8 +109,6 @@
   "SETTINGS_APPEARANCE": "Wygląd",
   "SETTINGS_APPEARANCE_DARK": "Ciemny",
   "SETTINGS_APPEARANCE_LIGHT": "Jasny",
-  "SETTINGS_COUNTRY_PREFIX": "Domyślny prefiks kraju",
-  "SETTINGS_COUNTRY_PREFIX_HELP": "Prefiks kraju (np. +48 dla Polski), który ma być używany dla numerów, które go nie posiadają",
   "SETTINGS_DATETIME_EMPTY": "Brak",
   "SETTINGS_DATETIME_FORMAT": "Format daty/czasu",
   "SETTINGS_FILENAME_PATTERN": "Wzorzec nazwy pliku",

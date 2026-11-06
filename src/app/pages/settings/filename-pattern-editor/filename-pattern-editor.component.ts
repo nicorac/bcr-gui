@@ -1,24 +1,31 @@
 import { Subscription } from 'rxjs';
-import { IonicBundleModule } from 'src/app/IonicBundle.module';
-import { FILENAME_PATTERN_SUPPORTED_VARS, FILENAME_PATTERN_TEMPLATES, Recording } from 'src/app/models/recording';
-import { TranslatePipe } from 'src/app/pipes/translate.pipe';
-import { I18nKey, I18nService } from 'src/app/services/i18n.service';
-import { AndroidSAF, ErrorCode } from 'src/plugins/androidsaf';
-import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, ElementRef, OnInit, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, inject, input, model, OnInit, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { IonModal, IonTextarea, ModalController, Platform } from '@ionic/angular';
+import { FILENAME_PATTERN_SUPPORTED_VARS, FILENAME_PATTERN_TEMPLATES, Recording } from '@app/models/recording';
+import { TranslatePipe } from '@app/pipes/translate.pipe';
+import { I18nKey, I18nService } from '@app/services/i18n.service';
+import { IonButton, IonButtons, IonContent, IonFooter, IonHeader, IonItem, IonLabel, IonList, IonModal, IonTextarea, IonTitle, IonToolbar, ModalController, Platform } from '@ionic/angular';
+import { AndroidSAF, ErrorCode } from '@plugins/androidsaf';
 
 @Component({
   selector: 'app-filename-pattern-editor',
-  standalone: true,
   templateUrl: './filename-pattern-editor.component.html',
   styleUrls: ['../shared.scss', './filename-pattern-editor.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    CommonModule,
     FormsModule,
-    IonicBundleModule,
+    IonButton,
+    IonButtons,
+    IonContent,
+    IonFooter,
+    IonHeader,
+    IonItem,
+    IonLabel,
+    IonList,
+    IonModal,
+    IonTextarea,
+    IonTitle,
+    IonToolbar,
     TranslatePipe,
   ],
 })
@@ -28,11 +35,17 @@ export class FilenamePatternEditorComponent implements OnInit {
   protected testFilename = signal('');
   protected testResult = signal('');
   protected pattern = signal('');
-  protected patternError = signal<string|undefined>(undefined);
+  protected patternError = signal<string | undefined>(undefined);
+
+  // services
+  private i18n = inject(I18nService);
+  private mc = inject(ModalController);
+  private platform = inject(Platform);
+  private ref = inject(ElementRef<HTMLIonModalElement>);
 
   // injected by caller
-  public initialPattern = '';
-  public onConfirm?: (pattern: string) => Promise<void>;
+  public initialPattern = model('');
+  public onConfirm = input.required<(pattern: string) => Promise<void>>();
 
   // internal refs
   private backSub?: Subscription;
@@ -40,31 +53,29 @@ export class FilenamePatternEditorComponent implements OnInit {
   private placeholdersModal = viewChild.required<IonModal>('placeholdersModal');
   private templateLoadModal = viewChild.required<IonModal>('templateLoadModal');
 
-  protected placeholders = FILENAME_PATTERN_SUPPORTED_VARS.map(key => {
-    let val: Record<string,string>|undefined;
+  protected placeholders = FILENAME_PATTERN_SUPPORTED_VARS.map((key) => {
+    let val: Record<string, string> | undefined;
     switch (key) {
-      case 'direction': val = { values: "'in' | 'out' | 'conference'" }; break;
-      default: val = undefined;
+      case 'direction':
+        val = { values: "'in' | 'out' | 'conference'" };
+        break;
+      default:
+        val = undefined;
     }
     return {
       text: `{${key}}`,
       description: this.i18n.get(`FNP_EDITOR_VAR_${key}` as I18nKey, val),
-    }
+    };
   });
 
-  constructor(
-    private i18n: I18nService,
-    private mc: ModalController,
-    private platform: Platform,
-    private ref: ElementRef<HTMLIonModalElement>,
-  ) {
+  constructor() {
     // subscribe to hardware back button events
     this.backSub = this.platform.backButton.subscribeWithPriority(10, () => this.cancel());
   }
 
   ngOnInit() {
     // set initial pattern
-    this.pattern.set(this.initialPattern);
+    this.pattern.set(this.initialPattern());
     // set own class
     this.ref.nativeElement.parentElement?.classList.add('tag-editor');
     // first validation
@@ -80,7 +91,7 @@ export class FilenamePatternEditorComponent implements OnInit {
   }
 
   async confirm() {
-    await this.onConfirm?.(this.pattern());
+    await this.onConfirm()?.(this.pattern());
     this.cancel();
   }
 

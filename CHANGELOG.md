@@ -1,5 +1,28 @@
 # Version history
 
+## Version 1.16.0 (2026-10-25)
+
+Security:
+
+* Fixed security advisory [GHSA-jq38-cm25-hgrj](https://github.com/nicorac/bcr-gui/security/advisories/GHSA-jq38-cm25-hgrj)
+
+New features:
+
+* Updated to Angular 22.2 (zoneless mode), Ionic 9.0, Capacitor 8.5
+* Added support to the new "edge-to-edge" Android mode (Android 15+)
+* Added close button to main menu
+* Multiple files delete now shows a progress dialog
+* Improved phone number handling by using native Android API (in E.164 format) (#259)
+* Removed the now useless "Default country prefix" configuration setting (#259)
+
+Bug fixes:
+
+* Fixed filename pattern editor not saving changes
+* Fixed display name for contacts with only a "business name" (#253)
+* Fixed issues with unicode language tags extensions (#257)
+* Fixed "True Phone Dialer & Contacts" pattern (#225)
+* The recording date in the "share to..." message now follows the user's selected date format setting
+
 ## Version 1.15.3 (2026-08-30)
 
 New features:
@@ -53,7 +76,6 @@ New features:
 Bug fixes:
 
 * Fixed error on user cancel when selecting a contact (#237)
-
 * Fixed error when search box filter causes the list to miss the selected item (#236)
 
 ## Version 1.14.1 (2026-06-06)
@@ -67,9 +89,7 @@ New features:
 New features:
 
 * Improved timebar seek by showing scroll time into a pin over the bar handle (#229)
-
 * BCR metadata parser now handles more fields (contact_name -> call_log_name -> caller_name -> opNumber) (#228)
-
 * Regex parser now trims the extracted phone number and caller name fields
 
 Bug fixes:
@@ -83,9 +103,7 @@ Bug fixes:
 New features:
 
 * Added Hungarian language (Magyar, hu-HU, thanks to @gattyan61)
-
 * Added Chinese (Traditional) language (中文（繁體）, zh-Hant, thanks to @Palatis)
-
 * New feature to handle culture ID aliases for each defined culture and improve automatic device language detection for culture codes like `zh-Hant-TW` (#218)
 
 * Added proximity sensor requirement to app manifest, needed by some ROMs to let app access sensor (#215)
@@ -175,7 +193,6 @@ Bug fixes:
 Bug fixes:
 
 * Improved audio play in background, now the app stays alive and resumes correctly clicking on the notification
-
 * Fixed issue preventing the screen to turn off pressing the power button while playing (#171)
 
 ## Version 1.9.0 (2024-11-03)
@@ -183,15 +200,12 @@ Bug fixes:
 New features:
 
 * Replaced MediaPlayer with media3 player (ExoPlayer), which should perform better with OGG files (#162) (#130) (#28)
-
 * Added support for MediaService and MediaSession (better integrates in Android media management)
-
 * Improved Android player notification handling
 
 Bug fixes:
 
 * Fixed missing Ukrainian language configuration (language available but not selectable)
-
 * Translated modal dialogs OK/Cancel buttons, "Test result" filename pattern, "None" date/time format option (#164)
 
 ## Version 1.8.0 (2024-10-15)
@@ -200,11 +214,8 @@ New features:
 
 * BCR-GUI can now be selected as default player for BCR recordings \
   (just press `OPEN` button in BCR notification that appears when recording completes)
-
 * Recordings can now be played through earpiece (using proximity sensor)
-
 * Converted Web application to Angular signals & standalone components (to improve reactivity and efficiency)
-
 * Updated French and Czech translations
 
 Bug fixes:
@@ -353,7 +364,6 @@ New features:
 Bug fixes:
 
 * Improved recording list scrollbar smoothness
-
 * Increased spacing between recording play buttons
 
 ## Version 1.3.0 (2024-01-26)
@@ -371,11 +381,8 @@ Bug fixes:
 New features:
 
 * Application now uses Angular 17
-
 * Uniformed style of "modal action sheets" and "action sheets"
-
 * Improved dark mode readability (list, messageboxes, background, ...)
-
 * Removed unused (and never used) READ_EXTERNAL_STORAGE permission
 
 Bug fixes:
@@ -416,11 +423,8 @@ Bug fixes:
 New features:
 
 * Added new filename pattern placeholders, to customize datetime format parsing
-
 * Improved filename pattern editor
-
 * Added support for pattern templates (to support additional call recorders)
-
 * Added support for GrapheneOS embedded call recorder filename pattern
 
 ## Version 0.0.23 (2023-12-09)
@@ -432,7 +436,6 @@ New features:
 Bug fixes:
 
 * Wrapped multiselect actions in a toolbar context menu, shown in multiselect mode
-
 * Date format changes are now applied immediately (no need to restart the app)
 
 ## Version 0.0.22 (2023-12-03)
@@ -472,7 +475,6 @@ Bug fixes:
 New features:
 
 * Added filename parser support for customized filename patterns
-
 * Hardware back button press now navigates back to home page instead of closing the app
 
 ## Version 0.0.17 (2023-11-03)
@@ -480,7 +482,6 @@ New features:
 Bug fixes:
 
 * Default values not correctly deserialized for new settings
-
 * Fixed rendering of items with caller name longer than one line
 
 ## Version 0.0.16 (2023-11-01)
@@ -494,9 +495,7 @@ New features:
 New features:
 
 * Deeply improved native AndroidSAF code, now optimized to manage thousands of recordings (tested with 2000+ records)
-
 * New optimized "virtual" recordings list, it can now easily handle thousands rows with low memory footprint and no stuttering
-
 * Added custom scrollbar to recordings list, to ease list scrolling
 
 ## Version 0.0.14 (2023-10-08)
@@ -504,7 +503,6 @@ New features:
 Bug fixes:
 
 * Fixed NativeAudio plugin to avoid other audio applications be pauses at app start
-
 * Deleting entries from list does not update DB for entries without metadata file
 
 ## Version 0.0.13 (2023-09-26)
@@ -512,7 +510,6 @@ Bug fixes:
 New features:
 
 * App recordings database is now an accessible file (`.bcr-gui.database.json`) stored in the same folder as BCR audio files; it allows app to be uninstalled/reinstalled/moved preserving its database content (in anticipation of new features that will allow adding notes, tags, ... to recordings)
-
 * Improved database management
 
 Bug fixes:

@@ -11,6 +11,11 @@ const content = fs.readFileSync(versionFile).toString();
 // extract versions
 const versionName = /^\s+versionName\s+"(?<ver>.*?)"$/gm.exec(content)?.groups['ver'];
 console.log('Found versionName:', versionName);
+// quit if versionName contains special version suffixes, like "-beta1"...
+if (versionName.match(/[\-\_]+/g)) {
+  console.log('[WARNING] this is a beta/rc version, skipping version check');
+  process.exit(0)
+}
 const versionCode = /^\s+versionCode\s+(?<ver>.*?)$/gm.exec(content)?.groups['ver'];
 console.log('Found versionCode:', versionCode);
 

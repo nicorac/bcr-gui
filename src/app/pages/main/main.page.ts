@@ -1,37 +1,35 @@
-import { AudioPlayerComponent, SkipDirection } from 'src/app/components/audio-player/audio-player.component';
-import { CallIconComponent } from 'src/app/components/call-icon/call-icon.component';
-import { ActionButton, HeaderComponent } from 'src/app/components/header/header.component';
-import { VirtualScrollbarComponent } from 'src/app/components/virtual-scrollbar/virtual-scrollbar.component';
-import { LongPressDirective } from 'src/app/directives/long-press.directive';
-import { IonicBundleModule } from 'src/app/IonicBundle.module';
-import { Recording } from 'src/app/models/recording';
-import { DatetimePipe } from 'src/app/pipes/datetime.pipe';
-import { FilesizePipe } from 'src/app/pipes/filesize.pipe';
-import { ToHmsPipe } from 'src/app/pipes/to-hms.pipe';
-import { TranslatePipe } from 'src/app/pipes/translate.pipe';
-import { ContactsService } from 'src/app/services/contacts.service';
-import { I18nService } from 'src/app/services/i18n.service';
-import { MessageBoxService } from 'src/app/services/message-box.service';
-import { RecordingsService } from 'src/app/services/recordings.service';
-import { SettingsService } from 'src/app/services/settings.service';
-import { filterList } from 'src/app/utils/filterList';
-import { sortRecordings } from 'src/app/utils/recordings-sorter';
-import { bringIntoView } from 'src/app/utils/scroll';
-import { untilTrue } from 'src/app/utils/waitForAsync';
-import { AndroidSAF } from 'src/plugins/androidsaf';
-import { ErrorCode } from 'src/plugins/bcrgui';
 import { CdkVirtualScrollViewport, ScrollingModule } from '@angular/cdk/scrolling';
-import { DatePipe } from '@angular/common';
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, signal, untracked, viewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, inject, signal, untracked, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AudioPlayerComponent, SkipDirection } from '@app/components/audio-player/audio-player.component';
+import { CallIconComponent } from '@app/components/call-icon/call-icon.component';
+import { ActionButton, HeaderComponent } from '@app/components/header/header.component';
+import { VirtualScrollbarComponent } from '@app/components/virtual-scrollbar/virtual-scrollbar.component';
+import { LongPressDirective } from '@app/directives/long-press.directive';
+import { Recording } from '@app/models/recording';
+import { DatetimePipe } from '@app/pipes/datetime.pipe';
+import { FilesizePipe } from '@app/pipes/filesize.pipe';
+import { toHms, ToHmsPipe } from '@app/pipes/to-hms.pipe';
+import { TranslatePipe } from '@app/pipes/translate.pipe';
+import { ContactsService } from '@app/services/contacts.service';
+import { I18nService } from '@app/services/i18n.service';
+import { MessageBoxService } from '@app/services/message-box.service';
+import { RecordingsService } from '@app/services/recordings.service';
+import { SettingsService } from '@app/services/settings.service';
+import { filterList } from '@app/utils/filterList';
+import { getE164Number } from '@app/utils/phoneNumbers';
+import { sortRecordings } from '@app/utils/recordings-sorter';
+import { bringIntoView } from '@app/utils/scroll';
+import { untilTrue } from '@app/utils/waitForAsync';
 import { Clipboard } from '@capacitor/clipboard';
-import { ActionSheetController, IonSearchbar, RefresherCustomEvent } from '@ionic/angular';
+import { ActionSheetController, IonButton, IonButtons, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonContent, IonFooter, IonIcon, IonList, IonLoading, IonRefresher, IonRefresherContent, IonSearchbar, IonToolbar, RefresherCustomEvent } from '@ionic/angular';
+import { AndroidSAF } from '@plugins/androidsaf';
+import { ErrorCode } from '@plugins/bcrgui';
 import version from '../../version';
 
 @Component({
   selector: 'app-main',
-  standalone: true,
   templateUrl: './main.page.html',
   styleUrls: ['./main.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -42,17 +40,30 @@ import version from '../../version';
     FilesizePipe,
     FormsModule,
     HeaderComponent,
-    IonicBundleModule,
+    IonButton,
+    IonButtons,
+    IonCard,
+    IonCardContent,
+    IonCardHeader,
+    IonCardSubtitle,
+    IonCardTitle,
+    IonContent,
+    IonFooter,
+    IonIcon,
+    IonList,
+    IonRefresher,
+    IonRefresherContent,
+    IonSearchbar,
+    IonToolbar,
     LongPressDirective,
     ScrollingModule,
     ToHmsPipe,
     TranslatePipe,
     VirtualScrollbarComponent,
+    IonLoading,
   ],
   providers: [
-    ContactsService,
-    DatePipe,
-    ToHmsPipe,
+    DatetimePipe,
   ],
 })
 export class MainPage implements AfterViewInit {
@@ -87,6 +98,9 @@ export class MainPage implements AfterViewInit {
     const item = this.selectedItem();
     return this.items()?.findIndex(i => i === item) ?? -1;
   });
+
+  // show a progress for long actions
+  protected progressMessage = signal<string|undefined>(undefined);
 
   // filtered items collection
   protected items = computed<Recording[]>(() => {
@@ -129,29 +143,26 @@ export class MainPage implements AfterViewInit {
   private scrollViewport = viewChild(CdkVirtualScrollViewport);
   private searchBar = viewChild(IonSearchbar);
 
-  constructor(
-    private asc: ActionSheetController,
-    private cdr: ChangeDetectorRef,
-    private contactsService: ContactsService,
-    private datePipe: DatePipe,
-    private i18n: I18nService,
-    private mbs: MessageBoxService,
-    private toHms: ToHmsPipe,
-    protected recordingsService: RecordingsService,
-    protected router: Router,
-    protected settings: SettingsService,
-  ) {
+  private asc = inject(ActionSheetController);
+  private cdr = inject(ChangeDetectorRef);
+  private contactsService = inject(ContactsService);
+  private datePipe = inject(DatetimePipe);
+  private i18n = inject(I18nService);
+  private mbs = inject(MessageBoxService);
+  protected recordingsService = inject(RecordingsService);
+  protected router = inject(Router);
+  protected settings = inject(SettingsService);
 
-    // // DEBUG: automatically select first recording
-    // if (!environment.production) {
-    //   effect(() => {
-    //     if (this.items()?.length) {
-    //       setTimeout(() => this.onItemClick(this.items()[0]), 250);
-    //     }
-    //   });
-    // }
-
-  }
+  // constructor() {
+  //   // DEBUG: automatically select first recording
+  //   if (!environment.production) {
+  //     effect(() => {
+  //       if (this.items()?.length) {
+  //         setTimeout(() => this.onItemClick(this.items()[0]), 250);
+  //       }
+  //     });
+  //   }
+  // }
 
   async ionViewWillEnter() {
 
@@ -302,7 +313,11 @@ export class MainPage implements AfterViewInit {
       onConfirm: async () => {
         // forcibly unload audio
         await this.player()?.unload();
-        this.recordingsService.deleteRecording(items);
+        this.progressMessage.set(`0 / ${items.length}`);
+        await this.recordingsService.deleteRecording(items, (deleted, total) => {
+          this.progressMessage.set(`${deleted} / ${total}`);
+        });
+        this.progressMessage.set(undefined);
         this.clearSelection();
       }
     });
@@ -377,8 +392,9 @@ export class MainPage implements AfterViewInit {
     if (await this.contactsService.checkPermission() !== 'granted') return;
 
     // find contact with that phone number
-    const pnm = await this.contactsService.getPhoneNumbersMap();
-    const displayName = pnm.getDisplayName(rec.opNumber);
+    const e164Number = await getE164Number(rec.opNumber);
+    const contact = (await this.contactsService.getPhoneNumbersMap())[e164Number];
+    const displayName = contact?.displayName;
 
     // contact found?
     if (displayName) {
@@ -483,8 +499,8 @@ export class MainPage implements AfterViewInit {
 
     return `
 ${item.opName}
-Date: ${this.datePipe.transform(item.date, 'medium')}
-Duration: ${this.toHms.transform(item.duration)}
+Date: ${this.datePipe.transform(item.date)}
+Duration: ${toHms(item.duration)}
 `.trim();
 
   }

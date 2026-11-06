@@ -129,6 +129,7 @@ $buttonSize: 2.5em;
 .range-bar {
   --bar-height: 5px;
   --knob-size: 24px;
+  padding-top: 0;
 }
 
 ion-range::part(bar) {

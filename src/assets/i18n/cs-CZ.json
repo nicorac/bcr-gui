@@ -109,8 +109,6 @@
   "SETTINGS_APPEARANCE": "Vzhled",
   "SETTINGS_APPEARANCE_DARK": "Tmavý",
   "SETTINGS_APPEARANCE_LIGHT": "Světlý",
-  "SETTINGS_COUNTRY_PREFIX": "Výchozí předčíslí země",
-  "SETTINGS_COUNTRY_PREFIX_HELP": "Použité předčíslí země (např. +420 pro ČR), bude-li scházet",
   "SETTINGS_DATETIME_EMPTY": "Prázdné",
   "SETTINGS_DATETIME_FORMAT": "Formát data/času",
   "SETTINGS_FILENAME_PATTERN": "Šablona názvu souboru",

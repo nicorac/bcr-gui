@@ -1,7 +1,7 @@
 import { BehaviorSubject } from 'rxjs';
-import { AndroidDateTimeSettings } from 'src/plugins/androiddatetimesettings';
 import { Injectable } from '@angular/core';
 import { Preferences } from '@capacitor/preferences';
+import { AndroidDateTimeSettings } from '@plugins/androiddatetimesettings';
 import { FILENAME_PATTERN_TEMPLATES } from '../models/recording';
 import { deserializeObject, JsonProperty, serializeObject } from '../utils/json-serializer';
 import { SortModeEnum } from '../utils/recordings-sorter';
@@ -63,12 +63,6 @@ export class SettingsService {
    */
   @JsonProperty()
   public playbackSpeed = 1;  // audio playback speed (1 => 100%)
-
-  /**
-   * Default country phone prefix
-   */
-  @JsonProperty()
-  public defaultCountryPrefix: string = '';
 
   /**
    * Custom filename format

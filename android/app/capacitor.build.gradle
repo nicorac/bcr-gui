@@ -2,8 +2,8 @@
 
 android {
   compileOptions {
-      sourceCompatibility JavaVersion.VERSION_17
-      targetCompatibility JavaVersion.VERSION_17
+      sourceCompatibility JavaVersion.VERSION_21
+      targetCompatibility JavaVersion.VERSION_21
   }
 }
 
@@ -18,7 +18,6 @@ dependencies {
     implementation project(':capacitor-share')
     implementation project(':capacitor-status-bar')
     implementation project(':capgo-capacitor-navigation-bar')
-    implementation project(':kristianheljas-capacitor-app-restart')
     implementation project(':capacitor-native-settings')
 
 }

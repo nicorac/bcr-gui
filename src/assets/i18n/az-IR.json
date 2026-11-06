@@ -109,8 +109,6 @@
   "SETTINGS_APPEARANCE": "گؤرونوش",
   "SETTINGS_APPEARANCE_DARK": "تیره",
   "SETTINGS_APPEARANCE_LIGHT": "آچیق",
-  "SETTINGS_COUNTRY_PREFIX": "پیش‌فرض اؤلکه کوْدو",
-  "SETTINGS_COUNTRY_PREFIX_HELP": "شماره‌لرده اؤلکه کوْدو اولمادیغی زامان ایستیفاده اولوناجاق کود (مثلاً، آمریکا اۆچون +1)",
   "SETTINGS_DATETIME_EMPTY": "بوش",
   "SETTINGS_DATETIME_FORMAT": "تاریخ و ساعت فورمتی",
   "SETTINGS_FILENAME_PATTERN": "فایل آدی قالب",

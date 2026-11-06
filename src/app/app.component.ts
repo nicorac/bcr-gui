@@ -1,11 +1,10 @@
-import { ChangeDetectionStrategy, Component, OnInit, Optional } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, viewChild } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { App } from '@capacitor/app';
 import { StatusBar } from '@capacitor/status-bar';
 import { NavigationBar } from '@capgo/capacitor-navigation-bar';
-import { IonRouterOutlet, Platform } from '@ionic/angular';
+import { IonApp, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonLabel, IonList, IonMenu, IonMenuToggle, IonRouterOutlet, IonTitle, IonToolbar, Platform } from '@ionic/angular';
 import { AppRoutesEnum } from './app-routing.module';
-import { IonicBundleModule } from './IonicBundle.module';
 import { TranslatePipe } from './pipes/translate.pipe';
 import { I18nService } from './services/i18n.service';
 import { MessageBoxService } from './services/message-box.service';
@@ -18,33 +17,44 @@ const TOOLBAR_BACKGROUND_DARK = '#1f241d';
 
 @Component({
   selector: 'app-root',
-  standalone: true,
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    IonicBundleModule,
+    IonApp,
+    IonButton,
+    IonButtons,
+    IonMenu,
+    IonContent,
+    IonHeader,
+    IonIcon,
+    IonLabel,
+    IonList,
+    IonMenuToggle,
+    IonRouterOutlet,
+    IonTitle,
+    IonToolbar,
     RouterLink,
     TranslatePipe,
   ],
 })
 export class AppComponent implements OnInit {
 
-  AppRoutesEnum = AppRoutesEnum;
+  protected AppRoutesEnum = AppRoutesEnum;
 
-  constructor(
-    private i18n: I18nService,
-    private mbs: MessageBoxService,
-    private platform: Platform,
-    private recordingsService: RecordingsService,
-    private router: Router,
-    private settings: SettingsService,
-    @Optional() private routerOutlet?: IonRouterOutlet
-  ) {
+  private i18n = inject(I18nService);
+  private mbs = inject(MessageBoxService);
+  private platform = inject(Platform);
+  private recordingsService = inject(RecordingsService);
+  private router = inject(Router);
+  private settings = inject(SettingsService);
+  private routerOutlet = viewChild(IonRouterOutlet);
+
+  constructor() {
 
     // customize Back button management
     this.platform.backButton.subscribeWithPriority(-1, () => {
-      if (!this.routerOutlet?.canGoBack()) {
+      if (!this.routerOutlet()?.canGoBack()) {
         App.exitApp();
       }
     });
@@ -100,9 +110,28 @@ export class AppComponent implements OnInit {
    * Add or remove the "dark" class on the document body
    */
   private updateDarkMode(theme: Theme) {
-    const androidColor = { color: theme === 'dark' ? TOOLBAR_BACKGROUND_DARK : TOOLBAR_BACKGROUND_LIGHT };
+
+    // update body style
     document.body.classList.toggle('dark', theme === 'dark');
-    StatusBar.setBackgroundColor(androidColor);
-    NavigationBar.setNavigationBarColor(androidColor);
+
+    // set new navbar color
+    // this is useless in A15+ (because of the edge-to-edge feature),
+    // left here for older versions compatibility
+    const navigationColor = this.getBodyCssValue('--player-background-color');
+    NavigationBar.setNavigationBarColor({ color: navigationColor });
+
+    // set new statusbar color
+    const statusbarColor = this.getBodyCssValue('--ion-toolbar-background');
+    StatusBar.setBackgroundColor({ color: statusbarColor });
+
   }
+
+  /**
+   * Read the value of a body CSS variable
+   */
+  private getBodyCssValue(variableName: string) {
+    const style = getComputedStyle(document.body);
+    return style?.getPropertyValue(variableName) ?? '';
+  }
+
 }

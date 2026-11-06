@@ -1,4 +1,4 @@
-import { AndroidSAF, Encoding, IDocumentFile } from 'src/plugins/androidsaf';
+import { AndroidSAF, Encoding, IDocumentFile } from '@plugins/androidsaf';
 import { replaceExtension, stripExtension } from '../utils/filesystem';
 import { JsonProperty } from '../utils/json-serializer';
 import { BcrRecordingMetadata, CallDirection } from './BcrRecordingMetadata';
@@ -33,7 +33,7 @@ export const FILENAME_PATTERN_TEMPLATES: { name:string, pattern:string }[] = [
   { name: 'Huawei call recorder', pattern: '^{contact_name}@{phone_number}_{date:year}{date:month}{date:day}{date:hours}{date:minutes}{date:seconds}' },
   { name: 'LineageOS call app', pattern: '^{phone_number}_{date:year2}{date:month}{date:day}_{date:hours}{date:minutes}{date:seconds}' },
   { name: 'ShizuCallRecorder', pattern: '^{date}_{direction}_{phone_number}' },
-  { name: 'True Phone Dialer & Contacts', pattern: String.raw`^({contact_name} \()?(?<phone_number>\+?[\d\s\-\,\;]+) .*[\)\@] {date:year}\-{date:month}\-{date:day}_{date:hours}{date:minutes}{date:seconds}_{direction}` },
+  { name: 'True Phone Dialer & Contacts', pattern: String.raw`^({contact_name} \()?(?<phone_number>\+?[\d\s\-\,\;]+).*[\)\@] {date:year}\-{date:month}\-{date:day}_{date:hours}{date:minutes}{date:seconds}_{direction}` },
 ];
 
 /**

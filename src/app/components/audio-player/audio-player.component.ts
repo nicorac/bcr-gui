@@ -1,13 +1,12 @@
 import { Subscription } from 'rxjs';
-import { IonicBundleModule } from 'src/app/IonicBundle.module';
-import { Recording } from 'src/app/models/recording';
-import { toHms, ToHmsPipe } from 'src/app/pipes/to-hms.pipe';
-import { MessageBoxService } from 'src/app/services/message-box.service';
-import { RecordingsService } from 'src/app/services/recordings.service';
-import { SettingsService } from 'src/app/services/settings.service';
-import { AudioPlayer } from 'src/plugins/audioplayer';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, input, OnDestroy, OnInit, output, signal, untracked } from '@angular/core';
-import { RangeCustomEvent } from '@ionic/angular';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, inject, input, OnDestroy, output, signal, untracked } from '@angular/core';
+import { Recording } from '@app/models/recording';
+import { toHms, ToHmsPipe } from '@app/pipes/to-hms.pipe';
+import { MessageBoxService } from '@app/services/message-box.service';
+import { RecordingsService } from '@app/services/recordings.service';
+import { SettingsService } from '@app/services/settings.service';
+import { IonIcon, IonRange, RangeCustomEvent } from '@ionic/angular';
+import { AudioPlayer } from '@plugins/audioplayer';
 
 export enum PlayerStatusEnum {
   Paused = 0,
@@ -21,13 +20,16 @@ export type SeekMode = 'begin' | 'rew' | 'fwd';
   selector: 'app-audio-player',
   templateUrl: './audio-player.component.html',
   styleUrls: ['./audio-player.component.scss'],
-  standalone: true,
-  imports: [ IonicBundleModule, ToHmsPipe ],
+  imports: [
+    IonIcon,
+    IonRange,
+    ToHmsPipe,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AudioPlayerComponent implements OnInit, OnDestroy {
+export class AudioPlayerComponent implements OnDestroy {
 
-  PlayerStatusEnum = PlayerStatusEnum;
+  protected PlayerStatusEnum = PlayerStatusEnum;
 
   // player status
   protected ready = signal(false);
@@ -50,31 +52,28 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
   // knob
   protected isDraggingKnob = signal(false);
 
-  constructor(
-    private cdr: ChangeDetectorRef,
-    private mbs: MessageBoxService,
-    private recordingsService: RecordingsService,
-    protected settings: SettingsService,
-  ) {
+  private cdr = inject(ChangeDetectorRef);
+  private mbs = inject(MessageBoxService);
+  private recordingsService = inject(RecordingsService);
+  protected settings = inject(SettingsService);
+
+  constructor() {
     effect(() => {
       untracked(async () => await this.unload());
       if (this.recording()) {
         untracked(async () => await this.load(this.recording()));
       }
     });
-
   }
 
-  async ngOnInit() {
-
-    // try {
-    //   // preload audio file
-    //   await this.preloadAudio();
-    // } catch (error: any) {
-    //   this.showError(error, 'ngOnInit()');
-    // }
-
-  }
+  // async ngOnInit() {
+  //   try {
+  //     // preload audio file
+  //     await this.preloadAudio();
+  //   } catch (error: any) {
+  //     this.showError(error, 'ngOnInit()');
+  //   }
+  // }
 
   async ngOnDestroy() {
     // release asset
@@ -120,27 +119,27 @@ export class AudioPlayerComponent implements OnInit, OnDestroy {
         }
 
         // subscribe to player ready event
-        this.removePlayerReadyListener = await AudioPlayer.addListener('playerReady', async () => {
+        this.removePlayerReadyListener = (await AudioPlayer.addListener('playerReady', async () => {
           this.status.set(PlayerStatusEnum.Paused);
           this.progress.set(0);
           // init complete
           this.ready.set(true);
           this.cdr.detectChanges(); // workaround needed to let Angular update values...
-        }).remove;
+        })).remove;
 
         // subscribe to playComplete event and
         // save reference to listener remove function
-        this.removePlayCompletedListener = await AudioPlayer.addListener('playerCompleted', () => {
+        this.removePlayCompletedListener = (await AudioPlayer.addListener('playerCompleted', () => {
           this.status.set(PlayerStatusEnum.Paused);
           this.progress.set(0);
           this.cdr.detectChanges(); // workaround needed to let Angular update values...
-        }).remove;
+        })).remove;
 
         // subscribe to update event and
         // save reference to listener remove function
-        this.removePlayerUpdateListener = await AudioPlayer.addListener('playerUpdate', (res) => {
+        this.removePlayerUpdateListener = (await AudioPlayer.addListener('playerUpdate', (res) => {
           this.progress.set(Math.floor(res.position / 1000));
-        }).remove;
+        })).remove;
 
         // workaround needed to let Angular update values...
         this.cdr.detectChanges();

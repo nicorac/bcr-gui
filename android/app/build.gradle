@@ -6,18 +6,68 @@ apply plugin: 'com.android.application'
  *
  * File content:
  * -----------------------------------------------------------------------------------------
- * storeFile=<full filename of the "*.jks" key file
- * storePassword=<password of the "*.jks" key file>
+ * storeFile=<full filename of the "*.jks" keystore file
+ * storePassword=<password of the "*.jks" keystore file>
  * keyAlias=<ID of the key to be used to sign the APK>
- * keyPassword=<password for the key>
+ * keyPassword=<password of the key>
+ * -----------------------------------------------------------------------------------------
+ *
+ * In CI environment the same informations are extracted from
+ * the ANDROID_KEYSTORE_BASE64_PROPERTIES secret, which contains
+ * -----------------------------------------------------------------------------------------
+ * storeBase64=MIIKMAIBAzCCCdoGCSqGSIb3DQ..... (base64 version of the keystore)
+ * storePassword=<password of the keystore>
+ * keyAlias=<ID of the key to be used to sign the APK>
+ * keyPassword=<password of the key>
  * -----------------------------------------------------------------------------------------
  */
+
+// Extract JSON secret from CI if present and set up local properties path
+System.println("=== Testing ANDROID_KEYSTORE_BASE64_PROPERTIES env key ===")
+def keystoreBase64Content = System.getenv("ANDROID_KEYSTORE_BASE64_PROPERTIES")
+def keystorePropsPath = ""
+
+if (keystoreBase64Content != null && !keystoreBase64Content.isEmpty()) {
+  System.println("Extracting temp keystore from ANDROID_KEYSTORE_BASE64_PROPERTIES secret")
+  try {
+    def props = new Properties()
+    props.load(new StringReader(keystoreBase64Content))
+
+    // Extract .jks file from Base64 into build directory
+    def keystoreFile = file("${layout.buildDirectory.get()}/outputs/keystore/release.jks")
+    keystoreFile.parentFile.mkdirs()
+    keystoreFile.bytes = props.storeBase64.decodeBase64()
+
+    // Generate temporary .properties file
+    def tempPropsFile = file("${layout.buildDirectory.get()}/outputs/keystore/keystore.properties")
+    tempPropsFile.text = """
+      storeFile=${keystoreFile.absolutePath}
+      storePassword=${props.storePassword}
+      keyAlias=${props.keyAlias}
+      keyPassword=${props.keyPassword}
+    """.stripIndent()
+
+    // Override the path variable so Step 2 reads this temporary file
+    keystorePropsPath = tempPropsFile.absolutePath
+  } catch (Exception e) {
+    System.err.println("Failed to process ANDROID_KEYSTORE_BASE64_PROPERTIES: " + e.message)
+  }
+}
+else {
+  keystorePropsPath = System.getenv("ANDROID_KEYSTORE_PROPS")
+}
+
+// Read properties file (works for both local ANDROID_KEYSTORE_PROPS and CI generated file)
 System.print("Loading Android keystore config from: ")
-System.println(System.getenv("ANDROID_KEYSTORE_PROPS"))
+System.println(keystorePropsPath)
 def keystoreProperties = new Properties()
-def keystorePropertiesFile = file(System.getenv("ANDROID_KEYSTORE_PROPS"))
-if (keystorePropertiesFile.exists()) {
-  keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
+if (keystorePropsPath != null && !keystorePropsPath.isEmpty()) {
+  def keystorePropertiesFile = file(keystorePropsPath)
+  if (keystorePropertiesFile.exists()) {
+    System.out.println("Loading Android keystore config from: " + keystorePropsPath)
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+  }
 }
 
 android {
@@ -29,19 +79,29 @@ android {
     targetSdkVersion rootProject.ext.targetSdkVersion
     // version parts: M = Major, m = minor, b = build
     // -------- MMMmmmbbb
-    versionCode 1015003
-    versionName "1.15.3"
+    versionCode 1016000
+    versionName "1.16.0"
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     aaptOptions {
        // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
        // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
       ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
     }
+
+    // appends GIT hash to versionName on 'dev' pushes
+    def isCI = System.getenv("CI") == "true"
+    def refName = System.getenv("GITHUB_REF_NAME") ?: ""
+    def sha = System.getenv("GITHUB_SHA") ?: ""
+    if (isCI && refName == "dev" && sha.length() >= 8) {
+      def shortHash = sha.substring(0, 8)
+      versionName "${versionName}-${shortHash}"
+    }
+
   }
 
   // signature config (release only)
   signingConfigs {
-    release {
+    main {
       keyAlias keystoreProperties['keyAlias']
       keyPassword keystoreProperties['keyPassword']
       storeFile file(keystoreProperties['storeFile'])
@@ -53,35 +113,51 @@ android {
       applicationIdSuffix '.debug'
       versionNameSuffix "-debug"
     }
+    canary {
+      initWith release
+      applicationIdSuffix '.canary'
+      versionNameSuffix "-canary"
+      signingConfig signingConfigs.main
+      matchingFallbacks = ['release']
+    }
     release {
       minifyEnabled false
-      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-      signingConfig signingConfigs.release
-    }
-  }
-
-  // change generated apk name for release builds
-  applicationVariants.all { variant ->
-    if (variant.buildType.name == 'release') {
-      variant.outputs.all {
-        outputFileName = "bcr-gui-${defaultConfig.versionName}-${variant.buildType.name}.apk"
-      }
+      proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+      signingConfig signingConfigs.main
     }
   }
 
   sourceSets {
-    main {
-      manifest.srcFile 'src/main/AndroidManifest.xml'
-      res.srcDirs = ['src/main/res']
-    }
     debug {
       manifest.srcFile 'src/debug/AndroidManifest.xml'
       res.srcDirs = ['src/debug/res']
     }
-//    release {
-//      manifest.srcFile 'src/release/AndroidManifest.xml'
-//      res.srcDirs = ['src/release/res']
-//    }
+    canary {
+      manifest.srcFile 'src/canary/AndroidManifest.xml'
+      res.srcDirs = ['src/canary/res']
+    }
+    main {
+      manifest.srcFile 'src/main/AndroidManifest.xml'
+      res.srcDirs = ['src/main/res']
+    }
+  }
+
+  packaging {
+    // since we don't distribute through PlayStore we prefer dex files to be compressed (as it was before gradle 9.x)
+    dex {
+      useLegacyPackaging = true
+    }
+  }
+}
+
+androidComponents {
+  onVariants(selector().all()) { variant ->
+    // Apply custom naming for non-debug builds
+    if (variant.name != "debug") {
+      variant.outputs.forEach { output ->
+        output.outputFileName.set("bcr-gui-${android.defaultConfig.versionName}-${variant.name}.apk")
+      }
+    }
   }
 }
 

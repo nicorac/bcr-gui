@@ -109,8 +109,6 @@
   "SETTINGS_APPEARANCE": "Vẻ ngoài",
   "SETTINGS_APPEARANCE_DARK": "Tối",
   "SETTINGS_APPEARANCE_LIGHT": "Sáng",
-  "SETTINGS_COUNTRY_PREFIX": "Tiền tố quốc gia mặc định",
-  "SETTINGS_COUNTRY_PREFIX_HELP": "Tiền tố quốc gia (tức là +1 cho Hoa Kỳ) sẽ được sử dụng khi thiếu các số",
   "SETTINGS_DATETIME_EMPTY": "Trống",
   "SETTINGS_DATETIME_FORMAT": "Định dạng ngày/giờ",
   "SETTINGS_FILENAME_PATTERN": "Mẫu tên tệp",

@@ -106,8 +106,6 @@
   "SETTINGS_APPEARANCE": "Aspect",
   "SETTINGS_APPEARANCE_DARK": "Întunecat",
   "SETTINGS_APPEARANCE_LIGHT": "Luminos",
-  "SETTINGS_COUNTRY_PREFIX": "Prefix de țară implicit",
-  "SETTINGS_COUNTRY_PREFIX_HELP": "Prefixul de țară (ex. +40 pentru România) pentru a fi folosit cu numere care lipsesc",
   "SETTINGS_DATETIME_FORMAT": "Format dată/oră",
   "SETTINGS_FILENAME_PATTERN": "Șablon nume de fișier",
   "SETTINGS_GENERAL_SECTION": "General",

@@ -1,6 +1,6 @@
 <app-header title="{{ 'MAINMENU_SETTINGS' | translatePipe }}" />
 
-<ion-content id="main-content" class="ion-padding">
+<ion-content id="main-content">
 
   <ion-list class="config-items" lines="full">
 
@@ -72,22 +72,6 @@
         <ion-button (click)="editDatetimeFormat()">
           {{ 'LBL_EDIT' | translatePipe }}
         </ion-button>
-      </div>
-    </ion-item>
-
-    <ion-item>
-      <div class="wrapper">
-        <div class="label">
-          <div>{{ 'SETTINGS_COUNTRY_PREFIX' | translatePipe }}</div>
-          <div class="help">{{ 'SETTINGS_COUNTRY_PREFIX_HELP' | translatePipe }}</div>
-        </div>
-        <ion-input
-          [ngModel]="settings.defaultCountryPrefix"
-          (ngModelChange)="setDefaultCountryPrefix($event)"
-          class="phone-prefix ion-text-right"
-          type="tel"
-          maxlength="7"
-        />
       </div>
     </ion-item>
 

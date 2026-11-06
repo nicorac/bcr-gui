@@ -1,35 +1,42 @@
 import { Subscription } from 'rxjs';
-import { AppRoutesEnum } from 'src/app/app-routing.module';
-import { HeaderComponent } from 'src/app/components/header/header.component';
-import { IonicBundleModule } from 'src/app/IonicBundle.module';
-import { DatetimePipe } from 'src/app/pipes/datetime.pipe';
-import { TranslatePipe } from 'src/app/pipes/translate.pipe';
-import { I18nService } from 'src/app/services/i18n.service';
-import { MessageBoxService } from 'src/app/services/message-box.service';
-import { RecordingsService } from 'src/app/services/recordings.service';
-import { SortModeEnum } from 'src/app/utils/recordings-sorter';
-import version from 'src/app/version';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AppRoutesEnum } from '@app/app-routing.module';
+import { HeaderComponent } from '@app/components/header/header.component';
+import { DatetimePipe } from '@app/pipes/datetime.pipe';
+import { TranslatePipe } from '@app/pipes/translate.pipe';
+import { I18nService } from '@app/services/i18n.service';
+import { MessageBoxService } from '@app/services/message-box.service';
+import { RecordingsService } from '@app/services/recordings.service';
+import { SortModeEnum } from '@app/utils/recordings-sorter';
+import version from '@app/version';
 import { Directory, Encoding, Filesystem } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
-import { ModalController, Platform } from '@ionic/angular';
-import { CapacitorAppRestart } from '@kristianheljas/capacitor-app-restart';
+import { IonButton, IonCheckbox, IonContent, IonIcon, IonItem, IonItemDivider, IonList, IonSelect, IonSelectOption, ModalController, Platform } from '@ionic/angular';
+import { BcrGui } from '@plugins/bcrgui';
 import { SettingsService } from '../../services/settings.service';
+import { ComponentProps } from '../../utils/component-props';
 import { DatetimeFormatEditorComponent } from './datetime-format-editor/datetime-format-editor.component';
 import { FilenamePatternEditorComponent } from './filename-pattern-editor/filename-pattern-editor.component';
 
 @Component({
   selector: 'app-settings',
-  standalone: true,
   templateUrl: './settings.page.html',
   styleUrls: ['./shared.scss', './settings.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     FormsModule,
     HeaderComponent,
-    IonicBundleModule,
+    IonButton,
+    IonCheckbox,
+    IonContent,
+    IonIcon,
+    IonItem,
+    IonItemDivider,
+    IonList,
+    IonSelect,
+    IonSelectOption,
     TranslatePipe,
   ],
   providers: [
@@ -47,16 +54,16 @@ export class SettingsPage {
 
   public readonly IMPORT_EXPORT_FILENAME = "bcr-gui.settings.json";
 
-  constructor(
-    private dtp: DatetimePipe,
-    protected i18n: I18nService,
-    protected messageBoxService: MessageBoxService,
-    protected modalController: ModalController,
-    protected platform: Platform,
-    protected recordingsService: RecordingsService,
-    protected router: Router,
-    protected settings: SettingsService,
-  ) {
+  private dtp = inject(DatetimePipe);
+  protected i18n = inject(I18nService);
+  protected messageBoxService = inject(MessageBoxService);
+  protected modalController = inject(ModalController);
+  protected platform = inject(Platform);
+  protected recordingsService = inject(RecordingsService);
+  protected router = inject(Router);
+  protected settings = inject(SettingsService);
+
+  constructor() {
     // subscribe to hardware back button events
     this.backSub = this.platform.backButton.subscribeWithPriority(10, () => this.router.navigateByUrl(AppRoutesEnum.Main));
   }
@@ -111,9 +118,9 @@ export class SettingsPage {
         confirmText: this.i18n.get('SETTINGS_IMPEXP_IMPORT_RESTART'),
         showCancelButton: false,
         backdropDismiss: false,
-        onConfirm: async () => {
+        onConfirm: () => {
           // restart the app
-          await CapacitorAppRestart.restartApp();
+          BcrGui.restartApp();
         },
       });
     };
@@ -176,7 +183,7 @@ export class SettingsPage {
     this.editor = await this.modalController.create({
       component: FilenamePatternEditorComponent,
       backdropDismiss: false,
-      componentProps: <FilenamePatternEditorComponent> {
+      componentProps: <ComponentProps<typeof FilenamePatternEditorComponent>> {
         initialPattern: this.settings.filenamePattern,
         onConfirm: async (pattern: string) => {
           this.settings.filenamePattern = pattern;
@@ -187,8 +194,8 @@ export class SettingsPage {
             message: this.i18n.get('SETTINGS_RESCAN_TEXT'),
             onConfirm: () => this.recordingsService.refreshContent({ forceFilenameParse: true }),
           })
-        },
-      }
+        }
+      },
     });
     this.editor.onWillDismiss().then(() => this.editor = undefined);
     this.editor.present();
@@ -205,21 +212,6 @@ export class SettingsPage {
     });
     this.editor.onWillDismiss().then(() => this.editor = undefined);
     this.editor.present();
-  }
-
-  /**
-   * Set the default country prefix to settings
-   */
-  setDefaultCountryPrefix(prefix: string) {
-    prefix = prefix.trim();
-    if (prefix) {
-      if (!prefix.startsWith('+')) {
-        prefix = '+' + prefix;
-      }
-      if (/^\+\d*$/g.test(prefix)) {
-        this.settings.defaultCountryPrefix = prefix;
-      }
-    }
   }
 
   /**

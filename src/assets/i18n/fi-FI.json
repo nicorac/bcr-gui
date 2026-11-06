@@ -109,8 +109,6 @@
   "SETTINGS_APPEARANCE": "Ulkonäkö",
   "SETTINGS_APPEARANCE_DARK": "Tumma",
   "SETTINGS_APPEARANCE_LIGHT": "Vaalea",
-  "SETTINGS_COUNTRY_PREFIX": "Oletusmaakoodi",
-  "SETTINGS_COUNTRY_PREFIX_HELP": "Oletusmaakoodi (esim. +358 Suomelle) jota käytetään numeroihin joissa sitä ei ole",
   "SETTINGS_DATETIME_EMPTY": "Tyhjä",
   "SETTINGS_DATETIME_FORMAT": "Päivämäärän/ajan muoto",
   "SETTINGS_FILENAME_PATTERN": "Tiedostonimen malli",

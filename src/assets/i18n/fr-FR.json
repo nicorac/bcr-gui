@@ -109,8 +109,6 @@
   "SETTINGS_APPEARANCE": "Apparence",
   "SETTINGS_APPEARANCE_DARK": "Sombre",
   "SETTINGS_APPEARANCE_LIGHT": "Clair",
-  "SETTINGS_COUNTRY_PREFIX": "Préfix pays par défaut",
-  "SETTINGS_COUNTRY_PREFIX_HELP": "Le préfix pays (ex. +33 pour FR) a utiliser pour les numéros",
   "SETTINGS_DATETIME_EMPTY": "Vide",
   "SETTINGS_DATETIME_FORMAT": "Format de la date/heure",
   "SETTINGS_FILENAME_PATTERN": "Reconnaissance des fichiers",

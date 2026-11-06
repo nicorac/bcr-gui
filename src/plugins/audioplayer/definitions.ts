@@ -27,9 +27,9 @@ export interface AudioPlayer extends EventManagerPlugin {
   setPlaybackSpeed(data: { playbackSpeed: number }): Promise<void>;
 
   // events
-  addListener(eventName: 'playerReady', listenerFunc: () => void): Promise<PluginListenerHandle> & PluginListenerHandle;
-  addListener(eventName: 'playerUpdate', listenerFunc: (data: IUpdateData) => void): Promise<PluginListenerHandle> & PluginListenerHandle;
-  addListener(eventName: 'playerCompleted', listenerFunc: () => void): Promise<PluginListenerHandle> & PluginListenerHandle;
+  addListener(eventName: 'playerReady', listenerFunc: () => void): Promise<PluginListenerHandle>;
+  addListener(eventName: 'playerUpdate', listenerFunc: (data: IUpdateData) => void): Promise<PluginListenerHandle>;
+  addListener(eventName: 'playerCompleted', listenerFunc: () => void): Promise<PluginListenerHandle>;
 
   // utils
 

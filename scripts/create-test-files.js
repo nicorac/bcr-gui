@@ -6,7 +6,8 @@ const path = require('path');
 const readline = require('readline');
 
 const basePath = path.dirname(__filename);
-const demoAudioFilename = 'create-test-files.m4a';
+const demoAudioFilename = 'voice-sample-96kbps.m4a';  // source audio filename
+const demoAudioLength = 26.3;                         // source audio length (in seconds)
 const outDir = basePath + '/out';
 
 // readline sync
@@ -97,8 +98,8 @@ function getRandomName() {
         },
         recording: {
           channel_count: 1,
-          duration_secs_total: 2.064,
-          duration_secs_encoded: 2.064,
+          duration_secs_total: demoAudioLength,
+          duration_secs_encoded: demoAudioLength,
         }
       }
     };

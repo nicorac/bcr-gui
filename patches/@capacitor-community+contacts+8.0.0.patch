@@ -1,0 +1,13 @@
+diff --git a/node_modules/@capacitor-community/contacts/android/build.gradle b/node_modules/@capacitor-community/contacts/android/build.gradle
+index 3f9c6d9..0237d8b 100644
+--- a/node_modules/@capacitor-community/contacts/android/build.gradle
++++ b/node_modules/@capacitor-community/contacts/android/build.gradle
+@@ -30,7 +30,7 @@ android {
+     buildTypes {
+         release {
+             minifyEnabled false
+-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
++            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+         }
+     }
+     lintOptions {

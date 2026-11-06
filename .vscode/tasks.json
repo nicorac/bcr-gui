@@ -4,8 +4,8 @@
     {
       "label": "Ionic run (ext device)",
       "type": "shell",
-      "command": "ionic",
-      "args": [ "capacitor", "run", "android", "--livereload", "--external", "--target=${input:getDeviceID}" ],
+      "command": "npx",
+      "args": [ "ionic", "capacitor", "run", "android", "--livereload", "--external", "--target=${input:getDeviceID}" ],
       "isBackground": true,
       "options": {
         "cwd": "${workspaceFolder}",
@@ -33,8 +33,8 @@
     {
       "label": "Ionic serve (localhost)",
       "type": "shell",
-      "command": "ionic",
-      "args": [ "serve", "--port=8100", "--host=localhost"],
+      "command": "npx",
+      "args": [ "ionic", "serve", "--port=8100", "--host=localhost"],
       "isBackground": true,
       "options": {
         "cwd": "${workspaceFolder}",

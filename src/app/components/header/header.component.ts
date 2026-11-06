@@ -1,7 +1,6 @@
-import { IonicBundleModule } from 'src/app/IonicBundle.module';
-import { RecordingsService } from 'src/app/services/recordings.service';
-import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
+import { RecordingsService } from '@app/services/recordings.service';
+import { IonButton, IonButtons, IonHeader, IonIcon, IonMenuButton, IonProgressBar, IonTitle, IonToolbar } from '@ionic/angular';
 
 export type ActionButton = {
   icon: () => string,
@@ -13,9 +12,17 @@ export type ActionButton = {
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ AsyncPipe, IonicBundleModule ]
+  imports: [
+    IonButton,
+    IonButtons,
+    IonHeader,
+    IonIcon,
+    IonMenuButton,
+    IonTitle,
+    IonToolbar,
+    IonProgressBar,
+  ],
 })
 export class HeaderComponent {
 
@@ -23,9 +30,6 @@ export class HeaderComponent {
   actionButtons = input<ActionButton[]>([]);
   showCustomContent = input(false);
 
-  constructor(
-    protected recordingsService: RecordingsService,
-  )
-  { }
+  protected recordingsService = inject(RecordingsService);
 
 }

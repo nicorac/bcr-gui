@@ -109,8 +109,6 @@
   "SETTINGS_APPEARANCE": "Внешний вид",
   "SETTINGS_APPEARANCE_DARK": "Тёмная",
   "SETTINGS_APPEARANCE_LIGHT": "Светлая",
-  "SETTINGS_COUNTRY_PREFIX": "Стандартный префикс страны",
-  "SETTINGS_COUNTRY_PREFIX_HELP": "Префикс страны (т.е. +7 для России) для использования с номерами без него",
   "SETTINGS_DATETIME_EMPTY": "Пусто",
   "SETTINGS_DATETIME_FORMAT": "Формат даты/времени",
   "SETTINGS_FILENAME_PATTERN": "Формат имён файлов",

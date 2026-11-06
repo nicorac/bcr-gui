@@ -109,8 +109,6 @@
   "SETTINGS_APPEARANCE": "Налаштування зовнішнього вигляду",
   "SETTINGS_APPEARANCE_DARK": "Темна тема",
   "SETTINGS_APPEARANCE_LIGHT": "Світла тема",
-  "SETTINGS_COUNTRY_PREFIX": "Код країни за умовчанням",
-  "SETTINGS_COUNTRY_PREFIX_HELP": "Код країни (тобто +1 для США), який буде використовуватися з відсутніми цифрами",
   "SETTINGS_DATETIME_EMPTY": "Порожній",
   "SETTINGS_DATETIME_FORMAT": "Формат дати/часу",
   "SETTINGS_FILENAME_PATTERN": "Шаблон назви файлів",

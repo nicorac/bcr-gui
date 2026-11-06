@@ -1,14 +1,14 @@
-import { AndroidSAF, AndroidSAFUtils, ErrorCode, GetFileUriOptions, ReadFileOptions } from 'src/plugins/androidsaf';
-import { AudioPlayer } from 'src/plugins/audioplayer';
 import { Injectable, signal } from '@angular/core';
 import { Encoding } from '@capacitor/filesystem';
 import { Platform } from '@ionic/angular';
+import { AndroidSAF, AndroidSAFUtils, ErrorCode, GetFileUriOptions, ReadFileOptions } from '@plugins/androidsaf';
+import { AudioPlayer } from '@plugins/audioplayer';
 import { DB_FILENAME, DB_SCHEMA_VERSION, DbContent } from '../models/dbContent';
 import { Recording, UNKNOWN_NAME_OR_NUMBER } from '../models/recording';
 import { MainPage } from '../pages/main/main.page';
 import { replaceExtension } from '../utils/filesystem';
 import { deserializeObject, serializeObject } from '../utils/json-serializer';
-import { isPhoneNumber } from '../utils/phoneNumbers';
+import { getE164Number, isPhoneNumber } from '../utils/phoneNumbers';
 import { ContactsService } from './contacts.service';
 import { I18nService } from './i18n.service';
 import { MessageBoxService } from './message-box.service';
@@ -93,8 +93,7 @@ export class RecordingsService {
     this.refreshProgress.set(0.001);
     console.log("Reading files in folder:");
 
-    // get a phone numbers map
-    // find contact with that phone number
+    // get a phone numbers map to find contacts by their phone number
     const pnm = await this.contactsService.getPhoneNumbersMap();
 
     // filename RegExp parser instance
@@ -159,7 +158,9 @@ export class RecordingsService {
               || (dbRecord.opName === UNKNOWN_NAME_OR_NUMBER && dbRecord.opNumber !== UNKNOWN_NAME_OR_NUMBER)
               || isPhoneNumber(dbRecord.opName)
           ) {
-            const displayName = pnm.getDisplayName(dbRecord.opNumber);
+            // format number to E.164 format
+            const e164Number = await getE164Number(dbRecord.opNumber);
+            const displayName = pnm[e164Number]?.displayName;
             if (displayName) {
               dbRecord.opName = displayName;
             }
@@ -212,7 +213,7 @@ export class RecordingsService {
   /**
    * Deletes the given recordings (and their optional JSON metadata)
    */
-  async deleteRecording(deleteItems: Recording[]) {
+  async deleteRecording(deleteItems: Recording[], progressCallback?: (deleted: number, totalCount: number) => void) {
 
     // shared delete function
     const deleteFileFn = async (fileUri: string) => {
@@ -232,6 +233,7 @@ export class RecordingsService {
 
     // delete all items
     let tmpDb = this.recordings();
+    let count = 0;
     for (const item of deleteItems) {
       if (
         item && await deleteFileFn(item.audioUri)
@@ -240,6 +242,8 @@ export class RecordingsService {
         // remove item from DB
         tmpDb = tmpDb.filter(i => i !== item);
       }
+      // send progress
+      progressCallback?.(++count, deleteItems.length);
     }
 
     // send update event & save DB

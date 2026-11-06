@@ -20,25 +20,6 @@
     <ion-button (click)="deleteItems(getSelectedItems())">
       <ion-icon name="trash" slot="icon-only" />
     </ion-button>
-
-    <!-- actions context menu -->
-    <ion-popover trigger="context-menu-button" [dismissOnSelect]="true">
-      <ng-template>
-        <ion-content>
-          <ion-list lines="none" class="toolbar-menu-items">
-            <ion-item >
-              <ion-icon src="/assets/icons/select-all.svg" />
-              {{ 'LBL_SELECTALL' | translatePipe }}
-            </ion-item>
-            <ion-item (click)="deleteItems(getSelectedItems())">
-              <ion-icon name="trash" />
-              {{ 'LBL_DELETE' | translatePipe }}
-            </ion-item>
-          </ion-list>
-        </ion-content>
-      </ng-template>
-    </ion-popover>
-
   </ion-buttons>
 
 </app-header>
@@ -78,7 +59,7 @@
 <!-- main content (list) -->
 <ion-content #content
   id="main-content"
-  class="ion-padding main-content"
+  class="main-content"
   [class.disabled]="recordingsService.refreshProgress()"
   [scrollY]="false"
 >
@@ -132,7 +113,7 @@
                 <div class="op-name">{{ item.opName }}</div>
               </ion-card-title>
               <ion-card-subtitle class="left-container subtitle">
-                <app-call-icon class="call-direction-icon" [direction]="item?.direction ?? ''" />
+                <app-call-icon class="call-direction-icon" [direction]="item?.direction || ''" />
                 <span>{{ item?.date | datetime }}</span>
                 @if (item.duration) {
                   • <span>{{ item.duration | toHms }}</span>
@@ -195,15 +176,26 @@
 
     </ion-list>
 
-    <!-- audio player -->
-    @if (selectedItem() && !isMultiselect()) {
-      <app-audio-player #audioPlayer
-        class="player"
-        [recording]="selectedItem()!"
-        (onSkip)="onSkip($event)"
-      />
-    }
-
   </div>
 
+  <!-- wait overlay -->
+  @if (progressMessage()) {
+    <ion-loading
+      class="progress-overlay"
+      [isOpen]="true"
+      [message]="progressMessage()"
+      backdropDismiss="false"
+    />
+  }
+
 </ion-content>
+
+<!-- audio player -->
+@if (selectedItem() && !isMultiselect()) {
+  <ion-footer>
+    <app-audio-player #audioPlayer class="player"
+      [recording]="selectedItem()!"
+      (onSkip)="onSkip($event)"
+    />
+  </ion-footer>
+}
