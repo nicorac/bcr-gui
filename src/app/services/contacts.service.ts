@@ -6,7 +6,6 @@ import { BcrGui } from '@plugins/bcrgui';
 import { isPhoneNumber } from '../utils/phoneNumbers';
 import { I18nService } from './i18n.service';
 import { MessageBoxService } from './message-box.service';
-import { SettingsService } from './settings.service';
 
 @Injectable({
   providedIn: 'root',
@@ -15,7 +14,6 @@ export class ContactsService {
 
   private i18n = inject(I18nService);
   private mbs = inject(MessageBoxService);
-  private settings = inject(SettingsService);
 
   /**
    * Returns a map between contact phone numbers (in E.164 format) and contacts.
@@ -27,8 +25,13 @@ export class ContactsService {
    *
    */
   async getPhoneNumbersMap() {
-    const { contacts } = await BcrGui.getContactsIndexedByE164();
-    return contacts ?? {};
+    if (await this.checkPermission(false) === 'granted') {
+      const { contacts } = await BcrGui.getContactsIndexedByE164();
+      return contacts ?? {};
+    }
+    else {
+      return {};
+    }
   }
 
   /**
@@ -45,14 +48,15 @@ export class ContactsService {
 
   /**
    * Check Android Contacts permission
+   * @param askIfDenied If true, prompts the user for contacts permission again, even if previously requested.
    */
-  async checkPermission(): Promise<PermissionState|'limited'> {
+  async checkPermission(askIfDenied: boolean = true): Promise<PermissionState|'limited'> {
 
     // check current permission status
     const { contacts: perm } = await Contacts.requestPermissions();
 
     // permission was already granted or user was already asked for and denied it
-    if (perm !== 'granted') {
+    if (perm !== 'granted' && askIfDenied !== false) {
       // show info alert
       await this.mbs.showConfirm({
         header: this.i18n.get('CONTACTS_PERM_TITLE'),
