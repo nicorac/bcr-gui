@@ -70,3 +70,6 @@ Thumbs.db
 # other files
 android/app/src/main/AndroidManifest.xml.orig
 /.env
+
+# Test data
+Debug Call Recordings/
